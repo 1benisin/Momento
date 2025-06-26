@@ -133,14 +133,14 @@ Defines a specific event created by a host.
 
 Tracks the status of each invitation sent for an event.
 
-| Column       | Type         | Description                                        |
-| ------------ | ------------ | -------------------------------------------------- |
-| `id`         | `uuid`       | Primary Key.                                       |
-| `event_id`   | `uuid`       | Foreign key to `events.id`.                        |
-| `profile_id` | `uuid`       | Foreign key to `social_profiles.id` (the invitee). |
-| `status`     | `text`       | e.g., 'sent', 'accepted', 'declined', 'expired'.   |
-| `created_at` | `timestampz` |                                                    |
-| `updated_at` | `timestampz` |                                                    |
+| Column       | Type         | Description                                                                                                       |
+| ------------ | ------------ | ----------------------------------------------------------------------------------------------------------------- |
+| `id`         | `uuid`       | Primary Key.                                                                                                      |
+| `event_id`   | `uuid`       | Foreign key to `events.id`.                                                                                       |
+| `profile_id` | `uuid`       | Foreign key to `social_profiles.id` (the invitee).                                                                |
+| `status`     | `text`       | e.g., 'sent', 'confirmed', 'declined', 'expired', 'payment_failed'. 'confirmed' means the user accepted and paid. |
+| `created_at` | `timestampz` |                                                                                                                   |
+| `updated_at` | `timestampz` |                                                                                                                   |
 
 ### `attendance` Table
 
@@ -218,7 +218,28 @@ A standard schema for private 1-on-1 conversations between event attendees.
 
 ---
 
-## 5. Common Queries & Data Relationships
+## 5. Monetization
+
+To handle payments for event invitations, we'll need a table to track individual transactions. The `users` table already includes a `payment_customer_id` to link a user with their Stripe Customer object.
+
+### `payments` Table
+
+This table will store a record for each payment attempt made by a user.
+
+| Column             | Type         | Description                                                                           |
+| ------------------ | ------------ | ------------------------------------------------------------------------------------- |
+| `id`               | `uuid`       | Primary Key.                                                                          |
+| `user_id`          | `uuid`       | Foreign key to `users.id` (the payer).                                                |
+| `event_id`         | `uuid`       | Foreign key to `events.id` (the event being paid for).                                |
+| `amount_in_cents`  | `integer`    | The charge amount in the smallest currency unit (e.g., 500 for $5.00).                |
+| `currency`         | `text`       | The currency of the charge (e.g., "usd").                                             |
+| `status`           | `text`       | The status of the payment from the provider (e.g., 'succeeded', 'pending', 'failed'). |
+| `stripe_charge_id` | `text`       | The unique charge identifier from Stripe for reconciliation. Unique.                  |
+| `created_at`       | `timestampz` |                                                                                       |
+
+---
+
+## 6. Common Queries & Data Relationships
 
 This section clarifies how to retrieve common sets of related data using the schemas defined above. This approach avoids data duplication by querying for relationships rather than storing lists on individual records.
 

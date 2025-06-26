@@ -42,9 +42,12 @@ This phase focuses on building the absolute essential features required for the 
 
 **[Epic #005] Payment Integration (V1):**
 
-- Integration with a payment processor (e.g., Stripe).
-- Prompt users to add a payment method upon signup or first invite acceptance.
+- Integration with Stripe for payment processing.
+- Implement the `payments` table in the database.
+- Create a "Payment Methods" screen in the app for users to manage their cards.
+- Integrate the payment flow into the event invitation acceptance process.
 - Logic to charge a participant $5 upon accepting an event invitation.
+- Set up backend webhooks to securely listen for transaction status updates from Stripe.
 
 **[Epic #006] Simple Event Hosting Flow:**
 

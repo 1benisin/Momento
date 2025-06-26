@@ -74,3 +74,12 @@ The design will subtly encourage users to wait until after the event to exchange
 - **Model**: Participants will be charged a $5 fee upon accepting an event invitation. This fee confirms their spot and helps reduce no-shows.
 - **Payment Flow**: Users can add a credit card to their private profile information at any time. If a user does not have a payment method on file when they accept their first invitation, they will be prompted to add one before their acceptance is confirmed.
 - **Integration**: This requires integration with a third-party payment processor (e.g., Stripe) to securely handle credit card storage and transactions.
+- **User-Facing Features**:
+  - A dedicated "Payment Methods" screen where users can add or remove credit cards.
+  - A "Transaction History" screen where users can see a list of their past payments.
+  - Clear in-app prompts and confirmations for all charges.
+  - Email receipts for successful payments.
+- **Backend Requirements**:
+  - Server-side logic to create and manage Stripe Customer objects.
+  - Secure endpoints to handle payment intent creation and confirmation.
+  - Webhooks to listen for payment status updates from Stripe (e.g., `charge.succeeded`).
