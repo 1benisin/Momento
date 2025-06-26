@@ -23,6 +23,7 @@ Our user interface is inspired by the elegance and intentionality found in art a
 - **Framework:** React Native with Expo
 - **Navigation:** Expo Router
 - **Styling:** NativeWind
+- **Build Service:** Expo Application Services (EAS) Build
 - **Backend:** Supabase
 
 ## Core Features (High-Level)
