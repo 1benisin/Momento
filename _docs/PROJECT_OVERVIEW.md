@@ -1,7 +1,15 @@
 # Project Overview
 
-Momento is a social application focused on creating curated, real-world experiences to help people connect. The core idea is to move away from the swiping mechanics of traditional dating apps and instead facilitate meaningful interactions through small, invite-only events.
+Momento is a social app designed to help people connect through curated, invite-only events. The goal is to move beyond traditional dating apps and foster genuine connections, both platonic and romantic, in small group settings.
 
-The app aims to build a community around shared interests and passions by carefully matching participants to events. It will cater to different user types, including event participants, hosts (who can be users or businesses), and service providers.
+The core of Momento is the "event" — a thoughtfully planned gathering hosted by a fellow user, a local business, or a service provider. Participants are invited based on a deep, multi-dimensional understanding of their interests, passions, and personalities. Our goal is to move past superficial profiles and create the ideal conditions for authentic friendships and relationships to blossom.
 
-A significant component of the app will be building a multidimensional map of users' passions and interests to ensure high-quality matches and event recommendations. The long-term vision includes AI-driven features to enhance user profiling, event creation, and pre-event engagement.
+The app encourages living in the moment, assuring users that connection and communication with other attendees can happen through the app after the event, freeing them to be present and engaged during the experience itself.
+
+## Technology Stack
+
+- **Framework:** React Native with Expo
+- **Navigation:** Expo Router
+- **Styling:** NativeWind
+- **Backend:** Supabase
+- **Payments:** Stripe (using `@stripe/stripe-react-native` on the client and `stripe-node` on the server)

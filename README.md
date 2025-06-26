@@ -44,7 +44,7 @@ The Momento ecosystem is comprised of three key roles:
 
 ## Getting Started
 
-> Instructions on how to install, configure, and run the project will be added here.
+> Instructions on how to install, configure, and run the project can now be found in [\_docs/DEVELOPMENT_PROCESS.md](_docs/DEVELOPMENT_PROCESS.md).
 
 ```bash
 # Example setup commands

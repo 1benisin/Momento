@@ -2,6 +2,11 @@
 
 This document outlines a scalable and efficient development process for Momento. The system is designed to be simple, repeatable, and scale from a solo developer to a full team.
 
+## Core Development Principles
+
+- **Expo First**: We will use the Expo ecosystem for development. Where possible, we should prefer using packages from the Expo SDK (`expo-...`) over other third-party or core React Native packages to ensure maximum compatibility and stability.
+- **File System for Artifacts, Tools for State**: We use the file system for storing artifacts (like PRDs), but use dedicated tools (like GitHub Issues) for tracking their state.
+
 The core principle we'll follow is: **Use the file system for storing artifacts, but use dedicated tools for tracking their state.**
 
 We will leverage the power of Git and repository hosting services (like GitHub or GitLab) for what they do best. We'll keep non-code artifacts in a stable, predictable location and use Issues and Project Boards to track their status.
@@ -24,7 +29,7 @@ We will leverage the power of Git and repository hosting services (like GitHub o
 │   │   ├── prd.md
 │   │   └── tasks.md
 │   └── ...
-├── src/                  # Your application source code
+├── app/                  # Your application source code (with Expo)
 ├── README.md
 └── ...
 ```
@@ -51,33 +56,12 @@ Here's how the LLM-assisted, 3-step process fits into this professional structur
     - Create a new issue titled: `[Epic] User Profile V1 - #001`.
     - In the issue description, link directly to the PRD file in your repository. This connects the work tracker to the specification.
 
-**Issue Description Example:**
-
-> ### Epic: User Profile V1
->
-> This epic covers the initial implementation of user profiles.
->
-> - View Full PRD
-
 ### Step 2: Define the Tasks
 
 1.  **Generate the Task List**: Have your LLM break down the `prd.md` into a list of actionable development tasks. Save this as `/_epics/001-user-profile-v1/tasks.md`.
 2.  **Populate the GitHub Issue**:
     - Go back to the GitHub Issue you created.
     - Use GitHub's task list feature to copy-paste the tasks from your `tasks.md` file into the issue description.
-
-**Issue Description Example (Updated):**
-
-> ...
->
-> ### Development Tasks
->
-> - [ ] Create Supabase table for user profiles
-> - [ ] Build the profile view screen
-> - [ ] Implement the "Edit Profile" form
-> - [ ] Style the component using NativeWind
-
-This is now your single source of truth for progress. As you complete work, you check the boxes directly in the GitHub issue.
 
 ### Step 3: Implement the Feature
 
@@ -89,26 +73,36 @@ This is now your single source of truth for progress. As you complete work, you 
     ```
 2.  **Code & Commit**: Do the development work. Your commit messages can even reference the epic ID for clarity (e.g., `git commit -m "feat(profile): create profile view screen #001"`).
 3.  **Create a Pull Request (PR)**: When the work is ready for review, open a PR.
-    - **Title**: `feat: Implement User Profile V1`
-    - **Link the Issue**: In the PR description, use a GitHub keyword like `Closes #123` (where `#123` is the ID of your Epic issue). This automatically links the PR to the issue. When the PR is merged, the issue will be closed automatically.
+    - **Link the Issue**: In the PR description, use a GitHub keyword like `Closes #123` (where `#123` is the ID of your Epic issue). This automatically links the PR to the issue.
 
-### Visualizing Progress with a Kanban Board
+## Getting Started
 
-Instead of folders, you use a GitHub Project Board.
+To get the project set up on your local machine, follow these steps.
 
-1.  Go to the "Projects" tab in your repository.
-2.  Create a new project (using the "Board" template).
-3.  Your columns are `Backlog`, `To Do` (Ready for Dev), `In Progress`, and `Done`.
-4.  The GitHub Issues you created are the "cards" on this board. You can drag and drop the "User Profile" issue from `To Do` to `In Progress` when you create the branch. The board gives everyone (including you) a high-level view of all work in flight.
+1.  **Clone the repository:**
 
-## Summary: Your New Workflow
+    ```bash
+    git clone https://github.com/your-username/momento.git
+    ```
 
-| Stage          | Old Method (planning folders)     | New "Momento Method"                                                              |
-| :------------- | :-------------------------------- | :-------------------------------------------------------------------------------- |
-| 1. Planning    | Create `prd.md` in `/planning`.   | Create a folder in `/_epics`. Add `prd.md`. Create a GitHub Issue & link the PRD. |
-| 2. Tasking     | Create `tasks.md` in `/planning`. | Add `tasks.md` to the epic folder. Add a task list to the GitHub Issue.           |
-| 3. Development | Move files to `/working`.         | Create a `feature/001-...` branch. Move the GitHub Issue card to "In Progress".   |
-| 4. Completion  | Move files to `/finished`.        | Merge the PR. The linked Issue is automatically moved to "Done" and closed.       |
+2.  **Navigate to the project directory:**
+
+    ```bash
+    cd momento
+    ```
+
+3.  **Install dependencies:**
+
+    ```bash
+    npm install
+    ```
+
+4.  **Run the development server:**
+    ```bash
+    npx expo start
+    ```
+
+## Summary
 
 This professional workflow gives you the best of all worlds:
 
@@ -116,5 +110,3 @@ This professional workflow gives you the best of all worlds:
 - **Clean Git History**: No more messy file moves.
 - **Integrated State Tracking**: Your Kanban board and issues are the source of truth for status.
 - **Traceability**: You have a perfect, unbroken chain from the PRD -> the Issue -> the Branch -> the Pull Request -> the final merged code.
-
-This is how high-performing teams organize their work. Adopting this structure now will set you up for incredible efficiency and clarity as Momento grows.
