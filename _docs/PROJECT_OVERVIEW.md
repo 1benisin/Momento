@@ -13,3 +13,4 @@ The app encourages living in the moment, assuring users that connection and comm
 - **Styling:** NativeWind
 - **Backend:** Supabase
 - **Payments:** Stripe (using `@stripe/stripe-react-native` on the client and `stripe-node` on the server)
+- **Verification:** Stripe Identity
