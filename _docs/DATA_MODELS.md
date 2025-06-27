@@ -47,12 +47,13 @@ Stores private data directly linked to the Supabase Auth user. This information 
 
 This table stores internal, system-generated data and metrics about a user. This data is never exposed to the user and is used exclusively for algorithms related to matching and event curation. In the future, this may also include qualitative data like AI interview transcripts.
 
-| Column                           | Type         | Description                                                                                  |
-| -------------------------------- | ------------ | -------------------------------------------------------------------------------------------- |
-| `user_id`                        | `uuid`       | Primary Key. Foreign key to `users.id`. (One-to-One)                                         |
-| `absentee_rating`                | `float`      | Tracks no-shows or lateness. A lower score is worse. Calculated from the `attendance` table. |
-| `internal_attractiveness_rating` | `float`      | Internal score for matching. Not visible to user.                                            |
-| `updated_at`                     | `timestampz` | Records the last time the metrics were updated.                                              |
+| Column                           | Type         | Description                                                                                    |
+| -------------------------------- | ------------ | ---------------------------------------------------------------------------------------------- |
+| `user_id`                        | `uuid`       | Primary Key. Foreign key to `users.id`. (One-to-One)                                           |
+| `absentee_rating`                | `float`      | Tracks no-shows or lateness. A lower score is worse. Calculated from the `attendance` table.   |
+| `contribution_score`             | `float`      | An internal score rewarding positive social behavior (e.g., receiving kudos, good attendance). |
+| `internal_attractiveness_rating` | `float`      | Internal score for matching. Not visible to user.                                              |
+| `updated_at`                     | `timestampz` | Records the last time the metrics were updated.                                                |
 
 ### `social_profiles` Table
 
@@ -243,6 +244,19 @@ Stores feedback provided by participants after an event.
 | `comment`            | `text`       | Optional public comment.                                        |
 | `created_at`         | `timestampz` |                                                                 |
 
+### `attendee_kudos` Table
+
+This table stores positive, private affirmations given from one attendee to another after an event. This data is used to calculate the `contribution_score`.
+
+| Column                | Type         | Description                                                         |
+| --------------------- | ------------ | ------------------------------------------------------------------- |
+| `id`                  | `uuid`       | Primary Key.                                                        |
+| `event_id`            | `uuid`       | Foreign key to `events.id`.                                         |
+| `giver_profile_id`    | `uuid`       | Foreign key to `social_profiles.id` (the user giving the kudo).     |
+| `receiver_profile_id` | `uuid`       | Foreign key to `social_profiles.id` (the user receiving the kudo).  |
+| `kudo`                | `text`       | The specific kudo given (e.g., 'great_listener', 'welcoming_vibe'). |
+| `created_at`          | `timestampz` |                                                                     |
+
 ### `event_posts` Table
 
 The public message feed for an event. Anonymized roles ("Host", "Attendee", "Invitee") will be handled by the application logic.
@@ -362,6 +376,13 @@ This section clarifies how to retrieve common sets of related data using the sch
 - **Query** the `profile_interests` join table.
 - **Filter** by the user's `social_profiles.id` to get all corresponding `interest_id`s.
 - **Join** with the `interests` table to retrieve the names of each interest.
+
+### How to count a user's kudos:
+
+- **Query** the `attendee_kudos` table.
+- **Filter** by the user's `social_profiles.id` in the `receiver_profile_id` column.
+- **Group** the results by the `kudo` column.
+- **Count** the records in each group to get a total for each type of kudo (e.g., "Made Me Laugh": 5, "Great Listener": 3).
 
 ### How to find mutual "Connect Again" matches:
 

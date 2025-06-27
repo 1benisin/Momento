@@ -106,6 +106,13 @@ With the core loop in place, this phase is about making the experience richer, m
 - **Build the triggered verification system:** A report against a user triggers a mandatory verification check.
 - **Develop the user "coaching" module:** A mandatory educational walkthrough for users who receive a serious report.
 
+**[Epic #XXX] Community Health & Contribution:**
+
+- **Implement the "Peer-to-Peer Kudos" system:** After an event, allow users to give anonymous, private, positive acknowledgements (e.g., "Great Listener") to other attendees.
+- **Develop the "Contribution Score":** Create the internal `contribution_score` metric in the `user_internal_metrics` table.
+- **Backend Logic:** Build the system to calculate the score based on kudos received, attendance records, and other positive engagement signals. Track counts for each kudo type to calculate metrics like a kudos-per-event ratio.
+- **Algorithm Integration:** Factor the Contribution Score into the event curation algorithm to reward positive community members.
+
 **[Epic #XXX] The Memory Book & Enhanced Connections:**
 
 - Build the dedicated "Memory Book" screen for users to see a log of people they've met.
