@@ -12,6 +12,7 @@ User profiles will contain three categories of information:
   - A record of profiles the user has liked.
   - An "absentee rating" (for tracking no-shows or lateness).
   - An internal "attractiveness rating" to assist in matching users with others in a similar range.
+  - A "contribution score" that gamifies positive social engagement. This score is influenced by receiving "kudos" from peers, good attendance, and participating in pre-event activities. The system will track the counts of each type of kudo received, allowing for metrics like a kudos-per-event ratio. A higher score can increase a user's likelihood of being invited to high-demand events.
 - **Future Experiment**: Requiring at least one profile picture to be taken through the in-app camera to ensure it is recent and unedited.
 
 ### The Authentic Photo
@@ -88,6 +89,9 @@ Once a user's attendance is confirmed (payment successful), they will be present
 - The day after the event, participants will be prompted to provide feedback on the event and the host.
 - They will also report if any participants were late or did not show up.
 - After submitting feedback, participants will unlock the ability to message other attendees one-on-one.
+- **Peer-to-Peer Kudos**: To encourage a culture of positive participation, after rating the host, users will be prompted to give anonymous, private "kudos" to fellow attendees who made the experience special. These are presented as collectible badges that the recipient can see in their own profile.
+  - **Example Kudos Badges:** "Great Listener," "Made Me Laugh," "Welcoming Vibe," "Amazing Storyteller," "Brought the Energy," "Deep Thinker."
+  - This feedback is a key input for the internal "Contribution Score." While the giver is anonymous, the recipient collects the badge, reinforcing positive community behavior.
 - **Future Experiment**:
   - To combat "check-in and bail" scenarios, we will request and store the user's location at the moment they tap "I'm Here". If a user is reported as a "no-show" after having checked in, this creates a "disputed" attendance status. Such cases will be reviewed, and if a user is found to have left after checking in, it will negatively impact their internal rating more severely than a standard no-show.
   - Allowing message posting on the event page itself (e.g., for a thank-you note from the host).
