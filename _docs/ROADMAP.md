@@ -23,15 +23,18 @@ This phase focuses on building the absolute essential features required for the 
 - Sign up/Login with Supabase Auth.
 - Basic user profiles: name, profile image, public bio.
 - Storage for private info (email, phone, credit card).
+- Optional ID verification flow for users to get a "Verified" badge.
 
 **[Epic #002] User Host Profiles (V1):**
 
 - Ability for a basic user to upgrade to a "User Host" profile.
+- **Mandatory ID verification** required before a host profile can be created.
 - Displays ratings from past events they've hosted.
 
 **[Epic #003] Business Host Profiles (V1):**
 
 - Separate profile type for businesses/service providers.
+- **Mandatory ID verification** for the primary business contact.
 - Basic info: name, location, pictures, description.
 
 **[Epic #004] Basic Interest Building Flow:**
@@ -52,7 +55,8 @@ This phase focuses on building the absolute essential features required for the 
 **[Epic #006] Simple Event Hosting Flow:**
 
 - A user or business host can create a new event.
-- Fields: Title, Description, Date/Time, Location, Min/Max participants.
+- Fields: Title, Description, Date/Time, Location, Min/Max participants, optional Minimum Age.
+- Add a checkbox for the host to join as an attendee, counting them toward the participant total.
 
 **[Epic #007] Core Invitation Flow (App-Curated):**
 
@@ -65,6 +69,12 @@ This phase focuses on building the absolute essential features required for the 
 - A simple post-event feedback form (rate the event/host).
 - Unlock 1-on-1 messaging between event attendees after feedback is submitted.
 - Track attendance (showed up / no-show).
+
+**[Epic #009] Calendar Integration:**
+
+- On the invitation confirmation screen, add an "Add to Calendar" button.
+- Implement logic to generate and download a standard `.ics` calendar file.
+- Requires schema change to add `end_time` to `event_itinerary_stops`.
 
 ## Phase 2: Growth (Enriching the Experience)
 
@@ -85,6 +95,30 @@ With the core loop in place, this phase is about making the experience richer, m
 
 - A simple feed to browse other user profiles.
 - Ability to "like" profiles to feed the matching algorithm.
+
+**[Epic #XXX] User Safety Tools (Blocking & Reporting):**
+
+- Build the multi-tiered system for user safety: "Don't Connect Again," "Block," and "Report."
+- Implement the "Block" functionality, which prevents all interaction and visibility between two users.
+- Create the guided, educational reporting flow that automatically blocks the reported user.
+- Develop the necessary database tables (`blocked_users`, `reports`) and backend logic for logging and aggregation.
+- Establish an internal review process for handling formal reports.
+- **Build the triggered verification system:** A report against a user triggers a mandatory verification check.
+- **Develop the user "coaching" module:** A mandatory educational walkthrough for users who receive a serious report.
+
+**[Epic #XXX] The Memory Book & Enhanced Connections:**
+
+- Build the dedicated "Memory Book" screen for users to see a log of people they've met.
+- Implement features for adding private notes, favoriting, and signaling a desire to "Connect Again."
+- The "Connect Again" signal will be used by the event curation algorithm.
+- Display a mutual "Connect Again" status to users.
+- **User Story:** As a new user, I am prompted to take an in-app photo at my first event so others can recognize me and to create my first Face Card.
+- **Task:** Integrate native camera APIs for an in-app photo-taking experience.
+- **Task:** Implement the `profile_photos` table and logic for the "Authentic" badge, including the 12-month expiry.
+- **Task:** Update the `connections` table schema to store immutable Face Card snapshots (`connected_profile_snapshot_face_card_url`, etc.).
+- **Task:** Develop the progressive "Face Card" system, from initial photo to stylized version.
+- **Task:** Build the system for unlockable customizations (frames, badges) for Face Cards based on user achievements.
+- **Spike:** Research and integrate a third-party AI image generation service (e.g., DALL-E 3 API, Stable Diffusion API) for the stylization feature.
 
 **[Epic #XXX] Advanced Host Tools & Ratings:**
 
