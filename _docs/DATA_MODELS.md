@@ -320,6 +320,45 @@ To support the "Memory Book" feature, this table stores the relationship between
 | `private_notes`                            | `text`       | User's private notes about this connection, visible only to them.                                           |
 | `created_at`                               | `timestampz` |                                                                                                             |
 
+### `user_social_links` Table
+
+Stores the social media links a user has associated with their account. This information is private by default and only shared explicitly.
+
+| Column       | Type         | Description                                                           |
+| ------------ | ------------ | --------------------------------------------------------------------- |
+| `id`         | `uuid`       | Primary Key.                                                          |
+| `user_id`    | `uuid`       | Foreign key to `users.id`.                                            |
+| `platform`   | `text`       | The social media platform (e.g., 'instagram', 'twitter', 'linkedin'). |
+| `url`        | `text`       | The full URL to the user's profile.                                   |
+| `created_at` | `timestampz` |                                                                       |
+
+### `social_connections` Table
+
+This join table acts as a permissions layer, tracking which user has shared which social link with whom.
+
+| Column                | Type         | Description                                                             |
+| --------------------- | ------------ | ----------------------------------------------------------------------- |
+| `id`                  | `uuid`       | Primary Key.                                                            |
+| `sharer_profile_id`   | `uuid`       | Foreign key to `social_profiles.id` (the user initiating the share).    |
+| `receiver_profile_id` | `uuid`       | Foreign key to `social_profiles.id` (the user receiving the share).     |
+| `social_link_id`      | `uuid`       | Foreign key to `user_social_links.id` (the specific link being shared). |
+| `created_at`          | `timestampz` |                                                                         |
+
+_Note: To ensure a link is only shared once between two people, the primary key could be a composite of (`sharer_profile_id`, `receiver_profile_id`, `social_link_id`)._
+
+### `event_photos` Table
+
+This table stores photos uploaded by attendees to a shared event gallery.
+
+| Column                | Type         | Description                                                          |
+| --------------------- | ------------ | -------------------------------------------------------------------- |
+| `id`                  | `uuid`       | Primary Key.                                                         |
+| `event_id`            | `uuid`       | Foreign key to `events.id`. Links the photo to a specific event.     |
+| `uploader_profile_id` | `uuid`       | Foreign key to `social_profiles.id`. Tracks who uploaded the photo.  |
+| `image_url`           | `text`       | URL of the photo (likely in a Supabase Storage bucket).              |
+| `status`              | `text`       | For moderation, e.g., 'visible', 'hidden_by_host', 'pending_review'. |
+| `created_at`          | `timestampz` |                                                                      |
+
 ---
 
 ## 7. Monetization
@@ -384,6 +423,13 @@ This section clarifies how to retrieve common sets of related data using the sch
 - **Group** the results by the `kudo` column.
 - **Count** the records in each group to get a total for each type of kudo (e.g., "Made Me Laugh": 5, "Great Listener": 3).
 
+### How to get social links shared with a user:
+
+- **Query** the `social_connections` table.
+- **Filter** by the user's `social_profiles.id` in the `receiver_profile_id` column to get all `social_link_id`s they have been granted access to.
+- **Join** with the `user_social_links` table on `social_link_id` to retrieve the `platform` and `url`.
+- **Join** with the `social_profiles` table on `sharer_profile_id` to link the social link back to the sharer's profile.
+
 ### How to find mutual "Connect Again" matches:
 
 - **Join** the `connections` table with itself.
@@ -422,3 +468,38 @@ This table logs formal reports submitted by users for review by the Momento team
 | `comments`            | `text`       | The detailed comments provided by the reporter.                  |
 | `status`              | `text`       | The internal status of the report (e.g., 'pending', 'resolved'). |
 | `created_at`          | `timestampz` |                                                                  |
+
+---
+
+## 10. Notifications
+
+To handle push and SMS notifications and respect user preferences, the following tables are required.
+
+### `push_notification_tokens` Table
+
+This table stores the unique push tokens for each of a user's devices, allowing the backend to send notifications via a service like Expo Push Notifications.
+
+| Column        | Type         | Description                                                      |
+| ------------- | ------------ | ---------------------------------------------------------------- |
+| `id`          | `uuid`       | Primary Key.                                                     |
+| `user_id`     | `uuid`       | Foreign key to `users.id`.                                       |
+| `token`       | `text`       | The push token from the notification service. Must be unique.    |
+| `device_info` | `text`       | Optional, human-readable info about the device (e.g., "iPhone"). |
+| `created_at`  | `timestampz` |                                                                  |
+
+### `user_notification_settings` Table
+
+This table provides granular control for users to opt in or out of different categories of notifications. The backend logic must always check these settings before sending any communication.
+
+| Column                    | Type         | Description                                                                 |
+| ------------------------- | ------------ | --------------------------------------------------------------------------- |
+| `user_id`                 | `uuid`       | Primary Key. Foreign key to `users.id`.                                     |
+| `sms_invitations`         | `boolean`    | Defaults to `true`. User agrees to receive new invitations via SMS.         |
+| `sms_reminders`           | `boolean`    | Defaults to `true`. User agrees to receive event start reminders via SMS.   |
+| `push_event_invitations`  | `boolean`    | Defaults to `true`. Push notifications for new & expiring invitations.      |
+| `push_event_updates`      | `boolean`    | Defaults to `true`. Push notifications for event changes and confirmations. |
+| `push_event_reminders`    | `boolean`    | Defaults to `true`. Push notifications for upcoming events.                 |
+| `push_direct_messages`    | `boolean`    | Defaults to `true`. Push notifications for new DMs.                         |
+| `push_social`             | `boolean`    | Defaults to `true`. Push notifications for kudos, matches, etc.             |
+| `push_account_and_safety` | `boolean`    | Defaults to `true`. Push notifications for payments, reports, etc.          |
+| `updated_at`              | `timestampz` |                                                                             |

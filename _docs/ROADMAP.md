@@ -68,6 +68,7 @@ This phase focuses on building the absolute essential features required for the 
 
 - A simple post-event feedback form (rate the event/host).
 - Unlock 1-on-1 messaging between event attendees after feedback is submitted.
+- Implement push notifications for feedback reminders and new direct messages.
 - Track attendance (showed up / no-show).
 
 **[Epic #009] Calendar Integration:**
@@ -75,6 +76,18 @@ This phase focuses on building the absolute essential features required for the 
 - On the invitation confirmation screen, add an "Add to Calendar" button.
 - Implement logic to generate and download a standard `.ics` calendar file.
 - Requires schema change to add `end_time` to `event_itinerary_stops`.
+
+**[Epic #010] Notification System (V1):**
+
+- Integrate Expo Push Notifications service for push notifications.
+- Integrate Twilio for SMS notifications.
+- Create `push_notification_tokens` and `user_notification_settings` tables in the database.
+- Build the in-app "Notification Settings" screen for users to manage their preferences.
+- Implement backend logic in Supabase Edge Functions to handle sending critical notifications:
+  - New Invitation (Push & SMS)
+  - Event Confirmed (Push)
+  - Event Updated/Cancelled (Push & SMS)
+  - 1-hour reminder (Push & SMS)
 
 ## Phase 2: Growth (Enriching the Experience)
 
@@ -105,6 +118,7 @@ With the core loop in place, this phase is about making the experience richer, m
 - Establish an internal review process for handling formal reports.
 - **Build the triggered verification system:** A report against a user triggers a mandatory verification check.
 - **Develop the user "coaching" module:** A mandatory educational walkthrough for users who receive a serious report.
+- Implement push notifications for report status updates.
 
 **[Epic #XXX] Community Health & Contribution:**
 
@@ -112,6 +126,7 @@ With the core loop in place, this phase is about making the experience richer, m
 - **Develop the "Contribution Score":** Create the internal `contribution_score` metric in the `user_internal_metrics` table.
 - **Backend Logic:** Build the system to calculate the score based on kudos received, attendance records, and other positive engagement signals. Track counts for each kudo type to calculate metrics like a kudos-per-event ratio.
 - **Algorithm Integration:** Factor the Contribution Score into the event curation algorithm to reward positive community members.
+- Implement push notifications for receiving peer-to-peer kudos.
 
 **[Epic #XXX] The Memory Book & Enhanced Connections:**
 
@@ -127,6 +142,25 @@ With the core loop in place, this phase is about making the experience richer, m
 - **Task:** Build the system for unlockable customizations (frames, badges) for Face Cards based on user achievements.
 - **Spike:** Research and integrate a third-party AI image generation service (e.g., DALL-E 3 API, Stable Diffusion API) for the stylization feature.
 
+**[Epic #XXX] Social Connect in Memory Book:**
+
+- **User Story:** As a user, I want to securely share my social media profiles with people I've met to continue our connection outside the app.
+- **Task:** Create a new "My Social Links" section in the user's private profile settings.
+- **Task:** Build the UI in the Memory Book to allow a user to select and share one or more of their saved social links with a specific connection.
+- **Task:** Implement the receiving end of the flow, where shared links appear on the sender's Face Card along with a "Share Back" prompt.
+- **Task:** Create the `user_social_links` and `social_connections` tables in the database.
+- **Task:** Develop backend logic to manage sharing permissions, including revoking access.
+
+**[Epic #XXX] Shared Event Galleries & Camera Roll:**
+
+- Build a shared photo gallery for each event, visible only to verified attendees.
+- Implement functionality for attendees to upload one or more photos to the gallery.
+- Provide options for users to download a single photo or all photos from an event album (e.g., as a zip file).
+- Create a personal "Camera Roll" screen where users can view and manage all photos they've uploaded across events, as well as their profile photos.
+- The event host will have moderation privileges to remove photos from their event's gallery.
+- Attendees will be able to report inappropriate photos for review.
+- This feature requires adding an `event_photos` table to the database.
+
 **[Epic #XXX] Advanced Host Tools & Ratings:**
 
 - Display host ratings on their profiles.
@@ -136,10 +170,6 @@ With the core loop in place, this phase is about making the experience richer, m
 **[Epic #XXX] Photo Sharing:**
 
 - Allow participants to upload photos to a shared, private event gallery after the event.
-
-**[Epic #XXX] SMS Invitations:**
-
-- Integration with a text message service (e.g., Twilio) to send event invitation links via SMS.
 
 ## Phase 3: Scale & Intelligence (Future Vision)
 
