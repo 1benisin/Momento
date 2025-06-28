@@ -139,6 +139,15 @@ The core of the Memory Book is the **Face Card**, a dynamic, collectible memento
   - **Favorites (⭐):** A private bookmarking tool for personal organization.
   - **Connect Again (🔗):** A private signal to the backend that influences future event curation. If mutual, a special indicator is displayed on the Face Card.
 
+### Social Connect: Effortless Social Sharing
+
+To bridge the gap between a memorable event and an ongoing connection, users can privately share their social media profiles through the Memory Book. This feature removes the awkwardness of asking for handles and keeps the focus on in-person connection during the event.
+
+- **Private by Default:** Users can add their social media links (Instagram, Twitter, etc.) in their private profile settings. This information is never public on their profile.
+- **One-to-One Sharing:** From a connection's Face Card in the Memory Book, a user can choose to share one or more of their saved social links. This is a deliberate, one-way action.
+- **Reciprocal Flow:** When a user receives a shared social link, it appears on the sender's Face Card in their Memory Book. A prompt will ask if they'd like to "Share back," making reciprocation seamless.
+- **User Control:** A user can revoke a shared link at any time, removing it from the other person's view.
+
 ## 9. User Safety: Blocking & Reporting
 
 To build a safe and trustworthy community, users will have access to a multi-tiered system for managing their interactions with others. The design prioritizes user comfort and provides clear, distinct tools for different situations.
@@ -230,3 +239,23 @@ Instead of a "secret password," the arrival is centered around a "Deck of Cards"
     - **Attendee Cards:** Subsequent cards show every other checked-in attendee in the order they arrived.
 
 This flow ensures that even if attendees arrive before the host, they can still identify and connect with each other, turning a moment of potential awkwardness into the first moment of connection. When the host finally does check in, their card's status updates, and a notification can be sent to all attendees: **"Your host, Sarah, has arrived!"**
+
+## 12. Shared Event Galleries & Camera Roll
+
+To extend the life of an event and give attendees a way to share their collective memories, the app will feature a robust photo-sharing system.
+
+### Shared Event Galleries
+
+- **Functionality:** After an event has concluded and attendance has been verified, a "Photos" tab will appear on the post-event screen. This is a collaborative gallery visible only to those who attended.
+- **Uploading:** Any attendee can upload photos from their phone's library to the shared gallery.
+- **Downloading:** Users can download any single photo they wish. They will also have an option to download the entire event album as a single compressed (`.zip`) file.
+- **Host Moderation:** The event host has the ability to remove any photo from the gallery.
+- **User Reporting:** Any attendee can report a photo for being inappropriate or for privacy reasons (e.g., "I'm in this photo and I want it removed"). Reports are sent to the host and/or a central moderation team.
+
+### Personal Camera Roll
+
+To give users a central place for all their visual memories within the app, a "My Camera Roll" section will be accessible from their main profile. This area will be organized into distinct sections:
+
+- **My Profile Photos:** Manage photos used for their public `social_profile`.
+- **My Event Uploads:** A view of every photo they have personally uploaded across all their events.
+- **Event Albums:** A chronological gallery of all events attended, acting as shortcuts to each event's shared gallery.
