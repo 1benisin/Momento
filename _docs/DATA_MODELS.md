@@ -8,18 +8,36 @@ The design prioritizes clarity and scalability, separating concerns like user au
 
 ## Core Entities
 
-- **Users**: Handles authentication and private user data.
-- **User Internal Metrics**: Stores internal-only scores and metrics for a user.
-- **Social Profiles**: Public-facing information for event participants.
-- **Host Profiles**: Public-facing information for users who host events.
-- **Events**: The central entity for all gatherings.
-- **Invitations**: Tracks which users are invited to which events and their response.
-- **Attendance**: Tracks which participants attended an event.
-- **Ratings**: Stores feedback given to hosts and events.
-- **Interests**: A global catalog of possible user interests.
-- **Profile Interests**: A join table linking profiles to their selected interests.
-- **Event Posts**: A public message board for a specific event.
-- **Conversations & Messages**: Powers private, post-event, 1-on-1 messaging.
+This document is organized into the following data models. Each model represents a table in our database.
+
+- **[Users](#users-table)**: Handles authentication and private user data.
+- **[Waitlist Users](#waitlist_users-table)**: Captures users from outside the initial launch area.
+- **[User Internal Metrics](#user_internal_metrics-table)**: Stores internal-only scores and metrics for a user.
+- **[User Interest Vectors](#user_interest_vectors-table)**: Stores vector embeddings of user interests for matching.
+- **[Social Profiles](#social_profiles-table)**: Public-facing information for event participants.
+- **[Profile Photos](#profile_photos-table)**: A user's collection of profile photos.
+- **[Host Profiles](#host_profiles-table)**: Public-facing information for users who host events.
+- **[Interests](#interests-table)**: A global catalog of possible user interests.
+- **[Profile Interests](#profile_interests-table)**: A join table linking profiles to their selected interests.
+- **[Locations](#locations-table)**: Stores structured data for physical locations of events.
+- **[Event Itinerary Stops](#event_itinerary_stops-table)**: Defines the journey of a multi-stop event.
+- **[Event Collaborators](#event_collaborators-table)**: Links an event to co-hosts or instructors.
+- **[Events](#events-table)**: The central entity for all gatherings.
+- **[Invitations](#invitations-table)**: Tracks which users are invited to which events and their response.
+- **[Attendance](#attendance-table)**: Tracks which participants attended an event.
+- **[Ratings](#ratings-table)**: Stores feedback given to hosts and events.
+- **[Attendee Kudos](#attendee_kudos-table)**: Stores private, positive affirmations between attendees.
+- **[Event Posts](#event_posts-table)**: A public message board for a specific event.
+- **[Conversations & Messages](#post-event-direct-messaging)**: Powers private, post-event, 1-on-1 messaging.
+- **[Connections](#connections-table)**: Stores the relationship between two users who met at an event.
+- **[User Social Links](#user_social_links-table)**: Stores a user's social media links.
+- **[Social Connections](#social_connections-table)**: A permissions layer for sharing social links.
+- **[Event Photos](#event_photos-table)**: A shared photo gallery for an event.
+- **[Payments](#payments-table)**: Tracks payment transactions for events.
+- **[Blocked Users](#blocked_users-table)**: Manages user-to-user blocking.
+- **[Reports](#reports-table)**: Logs formal reports submitted by users for moderation.
+- **[Push Notification Tokens](#push_notification_tokens-table)**: Stores device tokens for push notifications.
+- **[User Notification Settings](#user_notification_settings-table)**: Manages user's notification preferences.
 
 ---
 
@@ -31,17 +49,27 @@ We will separate private user data from public profile data. This enhances secur
 
 Stores private data directly linked to the Supabase Auth user. This information is never public.
 
-| Column                | Type         | Description                                                    |
-| --------------------- | ------------ | -------------------------------------------------------------- |
-| `id`                  | `uuid`       | Primary Key. Foreign key to `auth.users.id`.                   |
-| `email`               | `text`       | User's private email address.                                  |
-| `phone_number`        | `text`       | User's private phone number.                                   |
-| `last_name`           | `text`       | User's private last name.                                      |
-| `birth_date`          | `date`       | User's date of birth, for age calculation.                     |
-| `is_verified`         | `boolean`    | Defaults to `false`. True if user completed ID verification.   |
-| `status`              | `text`       | e.g., 'active', 'suspended', 'verification_pending', 'banned'. |
-| `payment_customer_id` | `text`       | Stripe (or other payment provider) customer ID.                |
-| `created_at`          | `timestampz` |                                                                |
+| Column                | Type         | Description                                                                                            |
+| --------------------- | ------------ | ------------------------------------------------------------------------------------------------------ |
+| `id`                  | `uuid`       | Primary Key. Foreign key to `auth.users.id`.                                                           |
+| `phone_number`        | `text`       | User's private phone number. Used for authentication. For MVP, this must be a US-based number. Unique. |
+| `email`               | `text`       | Optional. User's private email, used for account recovery or payment receipts.                         |
+| `last_name`           | `text`       | User's private last name.                                                                              |
+| `birth_date`          | `date`       | User's date of birth, for age calculation.                                                             |
+| `is_verified`         | `boolean`    | Defaults to `false`. True if user completed ID verification.                                           |
+| `status`              | `text`       | e.g., 'active', 'suspended', 'verification_pending', 'banned'.                                         |
+| `payment_customer_id` | `text`       | Stripe (or other payment provider) customer ID.                                                        |
+| `created_at`          | `timestampz` |                                                                                                        |
+
+### `waitlist_users` Table
+
+This table captures users from outside the initial US-only launch area who wish to be notified when Momento is available in their country.
+
+| Column         | Type         | Description                                                   |
+| -------------- | ------------ | ------------------------------------------------------------- |
+| `id`           | `uuid`       | Primary Key.                                                  |
+| `phone_number` | `text`       | The user's full phone number, including country code. Unique. |
+| `created_at`   | `timestampz` | Records when the user was added to the waitlist.              |
 
 ### `user_internal_metrics` Table
 
@@ -54,6 +82,18 @@ This table stores internal, system-generated data and metrics about a user. This
 | `contribution_score`             | `float`      | An internal score rewarding positive social behavior (e.g., receiving kudos, good attendance). |
 | `internal_attractiveness_rating` | `float`      | Internal score for matching. Not visible to user.                                              |
 | `updated_at`                     | `timestampz` | Records the last time the metrics were updated.                                                |
+
+### `user_interest_vectors` Table
+
+This table stores the vector embeddings that represent a user's interests. This data is the foundation of the matching algorithm and is never exposed to the user. For a detailed explanation of the strategy, see `_docs/MATCHING_ALGORITHM.md`.
+
+| Column        | Type         | Description                                                                                               |
+| ------------- | ------------ | --------------------------------------------------------------------------------------------------------- |
+| `id`          | `uuid`       | Primary Key.                                                                                              |
+| `user_id`     | `uuid`       | Foreign key to `users.id`.                                                                                |
+| `vector`      | `vector`     | The interest vector embedding. The size will depend on the embedding model used (e.g., 1536 for OpenAI).  |
+| `vector_type` | `text`       | The type of vector, e.g., 'positive_v1', 'negative_v1'. This allows for versioning and multiple personas. |
+| `updated_at`  | `timestampz` | Records the last time this vector was updated.                                                            |
 
 ### `social_profiles` Table
 
@@ -98,6 +138,8 @@ A separate profile that a user can have if they choose to become a host.
 | `host_bio`       | `text`       | A biography specific to their hosting activities.                |
 | `average_rating` | `float`      | Calculated average from all event/host ratings.                  |
 | `created_at`     | `timestampz` |                                                                  |
+
+This profile will also feature an "Event History" section, displaying a list of their successfully completed past events along with the average rating each event received from attendees. This provides social proof of their hosting quality.
 
 ---
 
@@ -186,6 +228,7 @@ Defines a specific event created by a host. The event's location, timing, and fa
 | `host_id`          | `uuid`       | Foreign key to `host_profiles.id`.                                                 |
 | `title`            | `text`       | The name of the event.                                                             |
 | `description`      | `text`       | Detailed description of the event.                                                 |
+| `cover_image_url`  | `text`       | Optional. A publicly accessible URL for the event's cover image.                   |
 | `host_is_attendee` | `boolean`    | Defaults to `false`. If true, the host is also a participant.                      |
 | `min_participants` | `integer`    | Minimum number of attendees required.                                              |
 | `max_participants` | `integer`    | Maximum number of attendees allowed.                                               |
@@ -199,14 +242,15 @@ Defines a specific event created by a host. The event's location, timing, and fa
 
 Tracks the status of each invitation sent for an event. When an event is created with `host_is_attendee` set to `true`, application logic should automatically create a corresponding record here for the host's social profile with a `status` of `'confirmed'`.
 
-| Column       | Type         | Description                                                                                                       |
-| ------------ | ------------ | ----------------------------------------------------------------------------------------------------------------- |
-| `id`         | `uuid`       | Primary Key.                                                                                                      |
-| `event_id`   | `uuid`       | Foreign key to `events.id`.                                                                                       |
-| `profile_id` | `uuid`       | Foreign key to `social_profiles.id` (the invitee).                                                                |
-| `status`     | `text`       | e.g., 'sent', 'confirmed', 'declined', 'expired', 'payment_failed'. 'confirmed' means the user accepted and paid. |
-| `created_at` | `timestampz` |                                                                                                                   |
-| `updated_at` | `timestampz` |                                                                                                                   |
+| Column           | Type         | Description                                                                                                       |
+| ---------------- | ------------ | ----------------------------------------------------------------------------------------------------------------- |
+| `id`             | `uuid`       | Primary Key.                                                                                                      |
+| `event_id`       | `uuid`       | Foreign key to `events.id`.                                                                                       |
+| `profile_id`     | `uuid`       | Foreign key to `social_profiles.id` (the invitee).                                                                |
+| `status`         | `text`       | e.g., 'sent', 'confirmed', 'declined', 'expired', 'payment_failed'. 'confirmed' means the user accepted and paid. |
+| `decline_reason` | `text`       | Optional. Stores the reason a user declined, e.g., 'busy', 'not_interested', 'wants_variety'.                     |
+| `created_at`     | `timestampz` |                                                                                                                   |
+| `updated_at`     | `timestampz` |                                                                                                                   |
 
 ### `attendance` Table
 
@@ -397,6 +441,14 @@ This section clarifies how to retrieve common sets of related data using the sch
 - **Query** the `events` table.
 - **Filter** by the user's `host_profiles.id` in the `host_id` column.
 - This will return a list of all events created by that host.
+
+### How to get a host's rated past events:
+
+- **Query** the `events` table and filter by the `host_id`.
+- **Join** with the `ratings` table on `event_id`.
+- **Filter** for events that have a `status` of `'completed'`.
+- **Group** by `event_id` and aggregate the `event_rating_value` to get the average rating for each past event.
+- This can be used to populate the "Event History" section on a host's public profile.
 
 ### How to calculate a host's average rating:
 

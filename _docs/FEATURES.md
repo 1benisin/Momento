@@ -1,19 +1,60 @@
 # App Features
 
+This document is organized into the following sections.
+
+- [1. User Profiles & Verification](#1-user-profiles--verification)
+  - [Phone-First Authentication](#phone-first-authentication--us-only-launch)
+  - [The Authentic Photo](#the-authentic-photo)
+  - [User Verification](#user-verification)
+- [2. Monetization & Payments](#2-monetization--payments)
+- [3. Hosting](#3-hosting)
+  - [Host Tools & Controls](#host-tools)
+- [4. Interest Building Flow: The Momento Preview](#4-interest-building-flow-the-momento-preview)
+- [5. The Invitation](#5-the-invitation)
+  - [Declining an Invitation](#declining-an-invitation-capturing-user-intent)
+  - [Calendar Integration](#post-confirmation--calendar-integration)
+- [6. The Arrival Experience: The Signal](#6-the-arrival-experience-the-signal)
+  - [The Host Sets the Stage](#the-host-sets-the-stage)
+  - [The Deck of Cards](#the-arrival-flow-the-deck-of-cards)
+- [7. Post-Event Interaction](#7-post-event-interaction)
+  - [Peer-to-Peer Kudos](#peer-to-peer-kudos)
+- [8. The Memory Book & The Face Card](#8-the-memory-book--the-face-card)
+  - [The Face Card Lifecycle](#the-face-card-lifecycle)
+  - [Social Connect](#social-connect-effortless-social-sharing)
+- [9. Shared Event Galleries & Camera Roll](#9-shared-event-galleries--camera-roll)
+- [10. User Safety: Blocking & Reporting](#10-user-safety-blocking--reporting)
+  - [A Three-Tiered System](#a-three-tiered-system)
+  - [Reporting & Consequence Framework](#reporting--consequence-framework)
+- [11. Discovery Feed: Refining Preferences with Past Events](#11-discovery-feed-refining-preferences-with-past-events)
+- [12. Browsing Profiles](#12-browsing-profiles)
+- [13. Notifications](#13-notifications)
+
+---
+
 This document outlines the core features of the Momento application.
 
-## 1. User Profiles
+## 1. User Profiles & Verification
 
 User profiles will contain three categories of information:
 
 - **Public Information**: Profile images, first name, etc.
-- **Private Information**: Phone number, email, etc., visible only to the user.
+- **Private Information**: Phone number for authentication and SMS notifications, an optional email for account recovery, etc. All private information is visible only to the user.
 - **Internal Information**: Data used by the app for ranking and matching purposes, not visible to the user. This includes:
   - A record of profiles the user has liked.
   - An "absentee rating" (for tracking no-shows or lateness).
   - An internal "attractiveness rating" to assist in matching users with others in a similar range.
   - A "contribution score" that gamifies positive social engagement. This score is influenced by receiving "kudos" from peers, good attendance, and participating in pre-event activities. The system will track the counts of each type of kudo received, allowing for metrics like a kudos-per-event ratio. A higher score can increase a user's likelihood of being invited to high-demand events.
-- **Future Experiment**: Requiring at least one profile picture to be taken through the in-app camera to ensure it is recent and unedited.
+
+> **Future Enhancement (Phase 3):** > **Feature:** In-App Camera Requirement.
+> **Rationale:** Requiring at least one profile picture to be taken through the in-app camera (instead of just incentivizing it) would more strongly guarantee that photos are recent and unedited, further increasing platform trust.
+
+### Phone-First Authentication & US-Only Launch
+
+To create a seamless onboarding experience that ties directly into our core SMS invitation feature, Momento will use phone-first authentication.
+
+- **US-Only for MVP:** For the initial launch, sign-up will be limited to users with a valid US phone number.
+- **International Waitlist:** If a user attempts to sign up with a non-US number, the app will inform them that we are not yet available in their country. It will offer to save their number to a waitlist, and we will notify them via SMS when Momento launches in their region.
+- **One-Time Passwords (OTP):** Both sign-up and login will be handled via a secure one-time password to the user's phone, eliminating the need for users to remember a traditional password.
 
 ### The Authentic Photo
 
@@ -23,28 +64,63 @@ To build a foundation of trust and authenticity, Momento will include a feature 
 - **"Authentic" Badge:** A photo taken this way receives a special "Authentic" badge, which is displayed on the user's profile and on their Face Card in the Memory Book.
 - **12-Month Expiry:** To ensure photos remain current, the "Authentic" status and badge for a photo will automatically expire after 12 months. The user will then be prompted to take a new one.
 
-## 2. Interest Building Flow
+## 2. Monetization & Payments
 
-This is a critical onboarding process to understand users' passions and interests.
+- **Model**: Participants will be charged a $5 fee upon accepting an event invitation. This fee confirms their spot and helps reduce no-shows. Hosts who choose to be an attendee for their own event are exempt from this fee.
+- **Payment Flow**: Users can add a credit card to their private profile information at any time. If a user does not have a payment method on file when they accept their first invitation, they will be prompted to add one before their acceptance is confirmed.
+- **Integration**: This requires integration with a third-party payment processor (e.g., Stripe) to securely handle credit card storage and transactions.
+- **User-Facing Features**:
+  - A dedicated "Payment Methods" screen where users can add or remove credit cards.
+  - A "Transaction History" screen where users can see a list of their past payments.
+  - Clear in-app prompts and confirmations for all charges.
+  - Email receipts for successful payments, sent to the user's optional email address if provided.
+- **Backend Requirements**:
+  - Server-side logic to create and manage Stripe Customer objects.
+  - Secure endpoints to handle payment intent creation and confirmation.
+  - Webhooks to listen for payment status updates from Stripe (e.g., `charge.succeeded`).
 
-- The flow will walk users through theoretical event scenarios to gauge their interest.
-- The goal is to build a multidimensional map of interests to create user clusters for better matching.
-- It will include deeper questions about life goals, values, and political views.
-- **Future Experiment**: An AI-driven voice conversation to conduct a user interview, with key information extracted from the transcript.
-- **Future Experiment**: Allowing a user's selected friends or family to have a conversation with the AI to provide an outside perspective on the user.
+## 3. Hosting
 
-## 3. Browsing Profiles
+- Users and businesses can both create and host events.
+- Hosts will have a dedicated Host Profile with ratings from past events.
+- **Host Tools**:
+  - Access to information and best practices for creating highly-rated events.
+  - Insights from feedback on previous successful events.
+  - A notification 15 minutes after their event starts, informing them if any attendees have not yet checked in.
+- **Host Controls**:
+  - Hosts must be present at their events; they can be both host and participant. They can also be a business host.
+  - **Minimum Age:** Hosts can set a minimum age requirement for their event (e.g., 21+). Our matching algorithm will not match users who do not meet this requirement.
+  - **Host as Attendee:** A checkbox on the event creation screen for the host to indicate they will be participating in the event, not just organizing it. If selected, the host will occupy one spot, counting towards the `max_participants` limit. They are automatically considered "confirmed" for the event and are exempt from the $5 event fee.
+  - **Event Itinerary:** Hosts can build dynamic events with one or more stops. For each stop, they must define both a **start time** and an **end time**, and can add a location by either searching for a business (e.g., a restaurant via Google Maps) or dropping a precise pin on the map for locations without a formal address (e.g., a specific spot in a park). This ensures a clear schedule for attendees and for calendar integrations.
+  - **Collaborators:** Hosts can add other people involved in the event, such as a co-host, instructor, or guide. If the collaborator is a Momento user, the host can link directly to their profile. If they are not, the host can simply enter their name and role. This provides clarity and recognizes everyone contributing to the experience.
 
-- Users will be able to browse a selection of other user profiles.
-- They can "like" profiles, which provides data for the matching algorithm and helps determine the user's "type."
+> **Future Enhancement (Phase 2):** > **Feature:** Event Encore Signals.
+> **Rationale:** To encourage hosts to repeat successful events, we can provide them with anonymous, aggregated feedback. On their dashboard, a host could see a highly-rated past event with a note like "✨ 26 people have expressed interest in an event like this again!" This signal would be sourced from "likes" on the event in the public Discovery Feed.
 
-## 4. The Invitation
+> **Future Enhancement (Phase 3):** > **Feature:** AI-Powered Hosting Assistant.
+> **Rationale:** Providing hosts with AI tools for event name/description generation and suggesting event enhancements based on historical data would lower the barrier to hosting high-quality events and improve the overall ecosystem.
+
+## 4. Interest Building Flow: The Momento Preview
+
+This is a critical onboarding process designed to feel like the start of an adventure, not a boring survey. It gives the user a tantalizing glimpse of the experiences to come while simultaneously building a deep, multi-dimensional map of their interests. This is the foundation of our matching algorithm. For full technical details, see `_docs/MATCHING_ALGORITHM.md`.
+
+- **The "Possibility Card" Deck:** Instead of a simple checklist, the user is presented with a beautiful, full-screen, swipeable deck of 8-10 fictitious "Event Cards."
+- **Evocative Content:** Each card features a stunning image, an intriguing title (e.g., "Secret Garden Soirée"), and a short, evocative description of the experience.
+- **Interactive Swiping:** The user swipes right ("I'm Interested") or left ("Not for Me"). This interaction is designed to be fluid, premium, and satisfying.
+- **Backend Vector Creation:** Each swipe is a powerful signal.
+  - A "like" helps form the user's **`positive_interest_vector`**, defining the experiences they are drawn to.
+  - A "dislike" helps form a **`negative_interest_vector`**, defining the things they want to avoid.
+  - These vectors place the user within our multi-dimensional "interest space," allowing for nuanced, concept-based matching that goes far beyond simple keywords.
+
+> **Future Enhancement (Phase 3):** > **Feature:** AI-Assisted Interest Building.
+> **Rationale:** An AI-driven voice conversation to conduct a user interview could capture more nuance and personality than a standard questionnaire. The AI could also interview a user's friends to provide an outside perspective, creating a richer, more holistic profile for matching. The transcript from this conversation would be converted into a highly accurate set of interest vectors, as described in the matching algorithm documentation.
+
+## 5. The Invitation
 
 The invitation is a core part of the weekly user experience.
 
 - Ideally, users receive one event invitation per week and have 24 hours to respond.
 - Invitations will be sent via text message, featuring an image and a link to the app.
-- **Future Ideal**: The host can choose from several AI-generated invitation images. The chosen image could be a looping GIF with subtle animations (e.g., leaves moving in a breeze, a sparkling line art design).
 - The in-app invitation page will provide full details:
   - Event description, time, and a full itinerary, including an interactive map of all locations.
   - Estimated costs (e.g., average menu prices, ticket fees).
@@ -54,6 +130,18 @@ The invitation is a core part of the weekly user experience.
 - A balanced male-to-female ratio will be a goal.
 - Participants will not see who else is attending until after they arrive (or possibly after they accept).
 - Participants will be able to message the host before the event for logistical questions.
+
+#### Declining an Invitation: Capturing User Intent
+
+To avoid misinterpreting a user's reason for declining an event, the app will ask for a reason. This provides a powerful signal to the matching algorithm to improve future invitations. When a user taps "Decline," they will be presented with a few options:
+
+- **"I'm busy that day"**: This signals a logistical conflict, not a lack of interest. The user's interest profile will not be negatively affected.
+- **"This event isn't for me"**: This is a strong negative signal. The event's characteristics will be used to update the user's `negative_interest_vector`, making them less likely to see similar events.
+- **"I'm looking to try new things"**: This is an explicit request for variety. The algorithm will temporarily increase the "exploration" factor for this user, prioritizing events outside their typical interests.
+- **"The vibe doesn't feel right"**: A softer "no" that can be logged for analytics without heavily penalizing the event type in the user's profile.
+
+> **Future Enhancement (Phase 3):** > **Feature:** AI-Generated Animated Invitations.
+> **Rationale:** Allowing hosts to generate unique, subtly animated invitation images would elevate the user experience, making each invitation feel like a special, magical artifact. This aligns with the "living blueprint" design concept from the `DESIGN_SYSTEM.md`.
 
 #### Post-Confirmation & Calendar Integration
 
@@ -66,25 +154,45 @@ Once a user's attendance is confirmed (payment successful), they will be present
   - Start and End Times
   - A link back to the event page in the Momento app.
 
-## 5. Hosting
+## 6. The Arrival Experience: The Signal
 
-- Users and businesses can both create and host events.
-- Hosts will have a dedicated Host Profile with ratings from past events.
-- **Host Tools**:
-  - Access to information and best practices for creating highly-rated events.
-  - Insights from feedback on previous successful events.
-- **Host Controls**:
-  - Hosts must be present at their events; they can be both host and participant. They can also be a business host.
-  - **Minimum Age:** Hosts can set a minimum age requirement for their event (e.g., 21+). Our matching algorithm will not match users who do not meet this requirement.
-  - **Host as Attendee:** A checkbox on the event creation screen for the host to indicate they will be participating in the event, not just organizing it. If selected, the host will occupy one spot, counting towards the `max_participants` limit. They are automatically considered "confirmed" for the event and are exempt from the $5 event fee.
-  - **Event Itinerary:** Hosts can build dynamic events with one or more stops. For each stop, they must define both a **start time** and an **end time**, and can add a location by either searching for a business (e.g., a restaurant via Google Maps) or dropping a precise pin on the map for locations without a formal address (e.g., a specific spot in a park). This ensures a clear schedule for attendees and for calendar integrations.
-  - **Collaborators:** Hosts can add other people involved in the event, such as a co-host, instructor, or guide. If the collaborator is a Momento user, the host can link directly to their profile. If they are not, the host can simply enter their name and role. This provides clarity and recognizes everyone contributing to the experience.
-- **Future Experiment**: AI tools to help with event creation, including:
-  - AI-generated event names and descriptions.
-  - AI-generated invitation images.
-  - AI-powered idea generation and augmentation, suggesting ways to make an event more memorable based on feedback from similar events.
+One of the most intimidating moments of any social event is the arrival—that brief, awkward period of finding your group. Momento transforms this moment of friction into a standardized, confidence-building ritual with a "secret society" feel. We call it **"The Signal."**
 
-## 6. Post-Event Interaction
+The goal is to eliminate ambiguity and give both hosts and attendees a clear, simple set of actions so they can connect with confidence.
+
+### The Host Sets the Stage
+
+When creating an event, the host defines one key element for the arrival:
+
+1.  **The Signpost (Physical Cue):** A required text field where the host describes the real-world identifier for the group. This tells attendees exactly what to look for.
+    - _Example: "I'll be at a table near the back of the cafe, look for a small potted succulent."_
+    - _Example: "Ask the restaurant hostess for the reservation under 'Momento'."_
+
+### The Arrival Flow: The Deck of Cards
+
+Instead of a "secret password," the arrival is centered around a "Deck of Cards"—a simple, glanceable UI that helps people find each other without getting lost in their phones.
+
+1.  **Attendee Checks In:** An attendee arrives, finds the spot described in the **Signpost**, and taps the **"I'm Here"** button. This action records their location for verification purposes and adds them to the event's check-in list.
+
+2.  **The Deck is Revealed:** Once at least two people have checked in (including any combination of attendees and the host), the **Deck of Cards** UI is revealed to all of them. This is designed to solve the "I'm here, but is that person also here for the event?" problem.
+    - The UI is a simple, horizontally swipeable set of cards. Each card displays a large profile picture and the person's first name.
+    - **The Host Card:** The first card in the deck is always the host. It is visually distinct and displays a clear status stamp, such as "ARRIVED" or "NOT YET ARRIVED." This gives attendees an immediate anchor point.
+    - **Attendee Cards:** Subsequent cards show every other checked-in attendee in the order they arrived.
+
+This flow ensures that even if attendees arrive before the host, they can still identify and connect with each other, turning a moment of potential awkwardness into the first moment of connection. When the host finally does check in, their card's status updates, and a notification can be sent to all attendees: **"Your host, Sarah, has arrived!"**
+
+### Automated Check-in Reminder
+
+To ensure accurate attendance data and help users who forget, the app will send a time-based reminder to check in shortly after an event begins.
+
+- **Functionality:** This is a simple, server-side cron job or scheduled function.
+- **Trigger:** Approximately 15 minutes after an event's official `start_time`, the system will check for any confirmed attendees who have not yet checked in.
+- **User Experience:** Those users receive a simple push notification: "'[Event Title]' has started! If you've arrived, don't forget to check in to find your group." This gently nudges the user without needing complex location permissions for the MVP.
+
+> **Future Enhancement (Phase 2):** > **Feature:** Geofenced Check-in Reminders.
+> **Rationale:** A geofenced reminder would provide a more magical, context-aware experience than the time-based one. By triggering the check-in prompt the moment a user arrives in the event's vicinity, we reduce friction and improve the accuracy of arrival data.
+
+## 7. Post-Event Interaction
 
 - The day after the event, participants will be prompted to provide feedback on the event and the host.
 - They will also report if any participants were late or did not show up.
@@ -92,27 +200,14 @@ Once a user's attendance is confirmed (payment successful), they will be present
 - **Peer-to-Peer Kudos**: To encourage a culture of positive participation, after rating the host, users will be prompted to give anonymous, private "kudos" to fellow attendees who made the experience special. These are presented as collectible badges that the recipient can see in their own profile.
   - **Example Kudos Badges:** "Great Listener," "Made Me Laugh," "Welcoming Vibe," "Amazing Storyteller," "Brought the Energy," "Deep Thinker."
   - This feedback is a key input for the internal "Contribution Score." While the giver is anonymous, the recipient collects the badge, reinforcing positive community behavior.
-- **Future Experiment**:
-  - To combat "check-in and bail" scenarios, we will request and store the user's location at the moment they tap "I'm Here". If a user is reported as a "no-show" after having checked in, this creates a "disputed" attendance status. Such cases will be reviewed, and if a user is found to have left after checking in, it will negatively impact their internal rating more severely than a standard no-show.
-  - Allowing message posting on the event page itself (e.g., for a thank-you note from the host).
-  - A feature for attendees to post pictures they took at the event.
 
-The design will subtly encourage users to wait until after the event to exchange contact information, reinforcing that they can connect through the app.
+> **Future Enhancement (Phase 2):** > **Feature:** Enhanced Post-Event Interaction.
+> **Rationale:**
+>
+> - **Dispute No-Shows:** To combat "check-in and bail" scenarios, we can request location at check-in. Disputed no-shows (where a user checked in but was reported absent) would negatively impact internal ratings more severely.
+> - **Public Event Feed:** Allowing message posting on the event page itself (e.g., for a thank-you note from the host) would add another layer of community interaction.
 
-## 7. Monetization & Payments
-
-- **Model**: Participants will be charged a $5 fee upon accepting an event invitation. This fee confirms their spot and helps reduce no-shows. Hosts who choose to be an attendee for their own event are exempt from this fee.
-- **Payment Flow**: Users can add a credit card to their private profile information at any time. If a user does not have a payment method on file when they accept their first invitation, they will be prompted to add one before their acceptance is confirmed.
-- **Integration**: This requires integration with a third-party payment processor (e.g., Stripe) to securely handle credit card storage and transactions.
-- **User-Facing Features**:
-  - A dedicated "Payment Methods" screen where users can add or remove credit cards.
-  - A "Transaction History" screen where users can see a list of their past payments.
-  - Clear in-app prompts and confirmations for all charges.
-  - Email receipts for successful payments.
-- **Backend Requirements**:
-  - Server-side logic to create and manage Stripe Customer objects.
-  - Secure endpoints to handle payment intent creation and confirmation.
-  - Webhooks to listen for payment status updates from Stripe (e.g., `charge.succeeded`).
+The design will subtly encourage users to wait until after the event to exchange contact information, reinforcing that they can connect through the app after the event.
 
 ## 8. The Memory Book & The Face Card
 
@@ -148,7 +243,27 @@ To bridge the gap between a memorable event and an ongoing connection, users can
 - **Reciprocal Flow:** When a user receives a shared social link, it appears on the sender's Face Card in their Memory Book. A prompt will ask if they'd like to "Share back," making reciprocation seamless.
 - **User Control:** A user can revoke a shared link at any time, removing it from the other person's view.
 
-## 9. User Safety: Blocking & Reporting
+## 9. Shared Event Galleries & Camera Roll
+
+To extend the life of an event and give attendees a way to share their collective memories, the app will feature a robust photo-sharing system.
+
+### Shared Event Galleries
+
+- **Functionality:** After an event has concluded and attendance has been verified, a "Photos" tab will appear on the post-event screen. This is a collaborative gallery visible only to those who attended.
+- **Uploading:** Any attendee can upload photos from their phone's library to the shared gallery.
+- **Downloading:** Users can download any single photo they wish. They will also have an option to download the entire event album as a single compressed (`.zip`) file.
+- **Host Moderation:** The event host has the ability to remove any photo from the gallery.
+- **User Reporting:** Any attendee can report a photo for being inappropriate or for privacy reasons (e.g., "I'm in this photo and I want it removed"). Reports are sent to the host and/or a central moderation team.
+
+### Personal Camera Roll
+
+To give users a central place for all their visual memories within the app, a "My Camera Roll" section will be accessible from their main profile. This area will be organized into distinct sections:
+
+- **My Profile Photos:** Manage photos used for their public `social_profile`.
+- **My Event Uploads:** A view of every photo they have personally uploaded across all their events.
+- **Event Albums:** A chronological gallery of all events attended, acting as shortcuts to each event's shared gallery.
+
+## 10. User Safety: Blocking & Reporting
 
 To build a safe and trustworthy community, users will have access to a multi-tiered system for managing their interactions with others. The design prioritizes user comfort and provides clear, distinct tools for different situations.
 
@@ -193,69 +308,28 @@ To ensure accountability, reports will trigger specific, escalating actions.
     - **Trigger:** A violation that represents a serious threat to the community.
     - **Consequence:** A **Permanent Ban** from the platform.
 
-## 10. User Verification
+## 11. Discovery Feed: Refining Preferences with Past Events
 
-User verification is a cornerstone of accountability. It will be implemented in phases to balance trust-building with user convenience. The process will be handled by a secure, third-party service (Stripe Identity) to ensure user privacy.
+To solve the "invite rut" problem and allow users to continuously refine their tastes, the app will feature a "Discovery Feed." This serves both as an interest-building tool and an internal marketing feature that showcases the quality of experiences on Momento without sacrificing the exclusivity of future events.
 
-### A Phased Approach
+- **Functionality**: A dedicated screen where users are presented with a swipeable, full-screen deck of cards.
+- **Content**: Each card represents a **real, highly-rated past event**. It will feature the event's title, its evocative description, and the public, host-provided **cover image**. All information about the host and attendees is kept anonymous.
+- **Interaction**: Users can swipe right ("I'm Interested") or left ("Not for Me").
+- **Backend Signal**: Each right swipe provides a strong, positive signal to the user's `positive_interest_vector`, helping the algorithm understand their current tastes. This is a primary mechanism for evolving a user's preferences over time.
 
-1.  **Phase 1: Optional Verification (The "Verified" Badge)**
+## 12. Browsing Profiles
 
-    - **Functionality:** Any user can choose to verify their identity using a government-issued ID. We will never store the ID itself, only a confirmation of validity.
-    - **User Experience:** Verified users receive a "Verified" badge on their profile, signaling trustworthiness to other users.
+- Users will be able to browse a selection of other user profiles.
+- They can "like" profiles, which provides data for the matching algorithm and helps determine the user's "type."
 
-2.  **Phase 1: Mandatory Host Verification**
+## 13. Notifications
 
-    - **Functionality:** All hosts (both User and Business hosts) are required to complete identity verification before they are allowed to create a Host Profile or host their first event.
-    - **User Experience:** This is a one-time, mandatory step during the host onboarding process, ensuring a high level of accountability for all event organizers.
+A robust notification system is critical to the user experience, ensuring users are informed about timely events like invitations, reminders, and social interactions. The system will use a combination of Push Notifications (via Expo) and SMS (via Twilio), with all logic orchestrated by secure backend functions.
 
-3.  **Phase 2: Triggered, Mandatory Verification**
-    - **Functionality:** As part of the safety framework, a user who is reported will have a mandatory verification check triggered.
-    - **User Experience:** Their account is temporarily limited until they complete verification. Refusal or failure results in suspension or a ban.
-
-## 11. The Arrival Experience: The Signal
-
-One of the most intimidating moments of any social event is the arrival—that brief, awkward period of finding your group. Momento transforms this moment of friction into a standardized, confidence-building ritual with a "secret society" feel. We call it **"The Signal."**
-
-The goal is to eliminate ambiguity and give both hosts and attendees a clear, simple set of actions so they can connect with confidence.
-
-### The Host Sets the Stage
-
-When creating an event, the host defines one key element for the arrival:
-
-1.  **The Signpost (Physical Cue):** A required text field where the host describes the real-world identifier for the group. This tells attendees exactly what to look for.
-    - _Example: "I'll be at a table near the back of the cafe, look for a small potted succulent."_
-    - _Example: "Ask the restaurant hostess for the reservation under 'Momento'."_
-
-### The Arrival Flow: The Deck of Cards
-
-Instead of a "secret password," the arrival is centered around a "Deck of Cards"—a simple, glanceable UI that helps people find each other without getting lost in their phones.
-
-1.  **Attendee Checks In:** An attendee arrives, finds the spot described in the **Signpost**, and taps the **"I'm Here"** button. This action records their location for verification purposes and adds them to the event's check-in list.
-
-2.  **The Deck is Revealed:** Once at least two people have checked in (including any combination of attendees and the host), the **Deck of Cards** UI is revealed to all of them. This is designed to solve the "I'm here, but is that person also here for the event?" problem.
-    - The UI is a simple, horizontally swipeable set of cards. Each card displays a large profile picture and the person's first name.
-    - **The Host Card:** The first card in the deck is always the host. It is visually distinct and displays a clear status stamp, such as "ARRIVED" or "NOT YET ARRIVED." This gives attendees an immediate anchor point.
-    - **Attendee Cards:** Subsequent cards show every other checked-in attendee in the order they arrived.
-
-This flow ensures that even if attendees arrive before the host, they can still identify and connect with each other, turning a moment of potential awkwardness into the first moment of connection. When the host finally does check in, their card's status updates, and a notification can be sent to all attendees: **"Your host, Sarah, has arrived!"**
-
-## 12. Shared Event Galleries & Camera Roll
-
-To extend the life of an event and give attendees a way to share their collective memories, the app will feature a robust photo-sharing system.
-
-### Shared Event Galleries
-
-- **Functionality:** After an event has concluded and attendance has been verified, a "Photos" tab will appear on the post-event screen. This is a collaborative gallery visible only to those who attended.
-- **Uploading:** Any attendee can upload photos from their phone's library to the shared gallery.
-- **Downloading:** Users can download any single photo they wish. They will also have an option to download the entire event album as a single compressed (`.zip`) file.
-- **Host Moderation:** The event host has the ability to remove any photo from the gallery.
-- **User Reporting:** Any attendee can report a photo for being inappropriate or for privacy reasons (e.g., "I'm in this photo and I want it removed"). Reports are sent to the host and/or a central moderation team.
-
-### Personal Camera Roll
-
-To give users a central place for all their visual memories within the app, a "My Camera Roll" section will be accessible from their main profile. This area will be organized into distinct sections:
-
-- **My Profile Photos:** Manage photos used for their public `social_profile`.
-- **My Event Uploads:** A view of every photo they have personally uploaded across all their events.
-- **Event Albums:** A chronological gallery of all events attended, acting as shortcuts to each event's shared gallery.
+- **Granular User Control:** Users will have a dedicated "Notification Settings" screen to opt in or out of different categories of notifications (e.g., `sms_invitations`, `push_direct_messages`). The backend will always respect these preferences.
+- **Event-Driven:** Notifications will be triggered by key events in the app lifecycle:
+  - **Invitations:** New and expiring invitations.
+  - **Event Logistics:** Confirmations, reminders (24-hour, 1-hour), updates, and cancellations.
+  - **Social:** New direct messages, kudos received, and mutual connection matches.
+  - **Account & Safety:** Payment confirmations and report status updates.
+- **Intelligent Delivery:** The system will employ strategies like message bundling for chat to avoid overwhelming users and deep linking to take users directly to the relevant content in the app.

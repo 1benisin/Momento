@@ -1,4 +1,14 @@
-Momento Product Roadmap
+# Momento Product Roadmap
+
+This document is organized into the following sections:
+
+- [Guiding Principles](#guiding-principles)
+- [Phase 1: Foundation (The Core MVP Loop)](#phase-1-foundation-the-core-mvp-loop)
+- [Phase 2: Growth (Enriching the Experience)](#phase-2-growth-enriching-the-experience)
+- [Phase 3: Scale & Intelligence (Future Vision)](#phase-3-scale--intelligence-future-vision)
+
+---
+
 This document outlines the planned development journey for Momento. It serves as a strategic guide to prioritize features and organize our work into logical phases.
 
 This is a living document. Priorities may shift based on user feedback and development learnings. The phases represent a general order of implementation, not strict deadlines.
@@ -20,9 +30,10 @@ This phase focuses on building the absolute essential features required for the 
 
 **[Epic #001] User Authentication & Basic Profiles:**
 
-- Sign up/Login with Supabase Auth.
+- Sign up/Login with a US-based phone number and OTP (one-time password).
+- Implement logic to handle non-US numbers by adding them to a waitlist.
 - Basic user profiles: name, profile image, public bio.
-- Storage for private info (email, phone, credit card).
+- Storage for private info (phone number, optional email, etc.).
 - Optional ID verification flow for users to get a "Verified" badge.
 
 **[Epic #002] User Host Profiles (V1):**
