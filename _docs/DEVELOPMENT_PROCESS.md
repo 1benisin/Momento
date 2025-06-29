@@ -1,5 +1,15 @@
 # Development Process
 
+This document outlines the scalable and efficient development process for Momento.
+
+- **[Core Development Principles](#core-development-principles)**: Establishes the "Expo First" rule and the philosophy of using the file system for artifacts and dedicated tools for tracking state.
+- **[Recommended Directory Structure](#recommended-directory-structure)**: Introduces the `/_epics` directory for feature-specific planning documents.
+- **[The 3-Step Workflow, Redesigned](#the-3-step-workflow-redesigned)**: Details the process of defining epics, generating tasks, and implementing features using GitHub Issues and feature branches.
+- **[Getting Started](#getting-started)**: Provides the standard setup instructions for a new developer to get the project running locally.
+- **[Summary](#summary)**: Recaps the benefits of this professional workflow, including durable documentation and traceability.
+
+---
+
 This document outlines a scalable and efficient development process for Momento. The system is designed to be simple, repeatable, and scale from a solo developer to a full team.
 
 ## Core Development Principles

@@ -1,6 +1,11 @@
 # Notification Strategy & Implementation Plan
 
-This document outlines the strategy for implementing user notifications within the Momento app. It covers the services to be used, the backend architecture, database schema additions, and a detailed list of notification triggers.
+This document outlines the complete plan for user notifications, covering four key areas:
+
+- **[Services & Architecture](#1-services--architecture)**: Details the technology stack (Expo for Push, Twilio for SMS) and the Supabase Edge Function architecture that will power the system.
+- **[Database Schema Additions](#2-database-schema-additions)**: Defines the new `push_notification_tokens` and `user_notification_settings` tables required to store device tokens and user preferences.
+- **[Notification Triggers & Content](#3-notification-triggers--content)**: A comprehensive list of every notification in the app, categorized by type (Event, Social, Account) with suggested message content.
+- **[Advanced Scenarios & Best Practices](#4-advanced-scenarios--best-practices)**: Discusses implementation details for more complex features like chat message bundling, deep linking, and in-app notifications.
 
 ---
 
@@ -70,22 +75,24 @@ Here is a brainstormed list of potential notifications, their triggers, and sugg
 
 ### Event-Related Notifications
 
-| Event Trigger                                       | Type | Audience              | Message Content                                                                                |
-| --------------------------------------------------- | ---- | --------------------- | ---------------------------------------------------------------------------------------------- |
-| **New Invitation**                                  | Push | Invited User          | "You have a new event invitation! ✨ Tap to see what's in store."                              |
-|                                                     | SMS  | Invited User (Opt-in) | "You're invited! A new Momento event is waiting for you. Tap to view: [link]"                  |
-| **Invitation Expires Soon** (e.g., 1hr left)        | Push | Invited User          | "Your invitation to '[Event Title]' expires in 1 hour. Don't miss out!"                        |
-| **Event Confirmed**                                 | Push | Attendee              | "You're confirmed for '[Event Title]'! Get ready for a great time."                            |
-| **Event Reminder (24hr)**                           | Push | Confirmed Attendees   | "Get ready! '[Event Title]' is tomorrow at [Time]."                                            |
-| **Event Reminder (1hr)**                            | Push | Confirmed Attendees   | "It's almost time for '[Event Title]'! It starts in 1 hour."                                   |
-|                                                     | SMS  | Confirmed Attendees   | "Reminder: '[Event Title]' starts in 1 hour at [Location Name]. See you there!"                |
-| **Event Details Updated** (Time, Location, etc.)    | Push | Confirmed Attendees   | "Update for '[Event Title]': The [start time] has changed. Tap to see the new details."        |
-|                                                     | SMS  | Confirmed Attendees   | "Update for Momento event '[Event Title]': The details have changed. View them here: [link]"   |
-| **Event Cancelled**                                 | Push | Confirmed Attendees   | "Unfortunately, '[Event Title]' has been cancelled. We've processed your refund."              |
-|                                                     | SMS  | Confirmed Attendees   | "Momento event cancelled: '[Event Title]' has been cancelled. Your refund has been processed." |
-| **New Post in Event Feed**                          | Push | Host & Attendees      | `'[User Name]' posted in '[Event Title]': "[Post Preview...]"`                                 |
-| **Host Has Arrived**                                | Push | Checked-in Attendees  | "Your host, [Host Name], has arrived at '[Event Title]'!"                                      |
-| **Post-Event Feedback Reminder** (e.g., 12hr after) | Push | Attended Users        | "How was '[Event Title]'? Share your feedback to unlock messaging and see who you met."        |
+| Event Trigger                                       | Type | Audience               | Message Content                                                                                    |
+| --------------------------------------------------- | ---- | ---------------------- | -------------------------------------------------------------------------------------------------- |
+| **New Invitation**                                  | Push | Invited User           | "You have a new event invitation! ✨ Tap to see what's in store."                                  |
+|                                                     | SMS  | Invited User (Opt-in)  | "You're invited! A new Momento event is waiting for you. Tap to view: [link]"                      |
+| **Invitation Expires Soon** (e.g., 1hr left)        | Push | Invited User           | "Your invitation to '[Event Title]' expires in 1 hour. Don't miss out!"                            |
+| **Event Confirmed**                                 | Push | Attendee               | "You're confirmed for '[Event Title]'! Get ready for a great time."                                |
+| **Event Reminder (24hr)**                           | Push | Confirmed Attendees    | "Get ready! '[Event Title]' is tomorrow at [Time]."                                                |
+| **Event Reminder (1hr)**                            | Push | Confirmed Attendees    | "It's almost time for '[Event Title]'! It starts in 1 hour."                                       |
+|                                                     | SMS  | Confirmed Attendees    | "Reminder: '[Event Title]' starts in 1 hour at [Location Name]. See you there!"                    |
+| **15m after start, if not checked-in**              | Push | Un-checked-in Attendee | "'[Event Title]' has started! If you've arrived, don't forget to check in to find your group."     |
+| **Event Details Updated** (Time, Location, etc.)    | Push | Confirmed Attendees    | "Update for '[Event Title]': The [start time] has changed. Tap to see the new details."            |
+|                                                     | SMS  | Confirmed Attendees    | "Update for Momento event '[Event Title]': The details have changed. View them here: [link]"       |
+| **Event Cancelled**                                 | Push | Confirmed Attendees    | "Unfortunately, '[Event Title]' has been cancelled. We've processed your refund."                  |
+|                                                     | SMS  | Confirmed Attendees    | "Momento event cancelled: '[Event Title]' has been cancelled. Your refund has been processed."     |
+| **Host Check-in Reminder** (15m after start)        | Push | Event Host             | "Looks like a few guests haven't checked in to '[Event Title]'. You can see who on the dashboard." |
+| **New Post in Event Feed**                          | Push | Host & Attendees       | `'[User Name]' posted in '[Event Title]': "[Post Preview...]"`                                     |
+| **Host Has Arrived**                                | Push | Checked-in Attendees   | "Your host, [Host Name], has arrived at '[Event Title]'!"                                          |
+| **Post-Event Feedback Reminder** (e.g., 12hr after) | Push | Attended Users         | "How was '[Event Title]'? Share your feedback to unlock messaging and see who you met."            |
 
 ### Social & Messaging Notifications
 
