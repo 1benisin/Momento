@@ -49,6 +49,12 @@ We will separate private user data from public profile data. This enhances secur
 
 Stores private data directly linked to the Supabase Auth user. This information is never public.
 
+A `user` record can be associated with a `social_profiles` record, a `host_profiles` record, or both. This combination defines the user's roles and capabilities within the app.
+
+- **Social-Only User**: Has one `users` record and one `social_profiles` record.
+- **Host-Only User (Community Host)**: Has one `users` record and one `host_profiles` record.
+- **Hybrid User (User Host)**: Has one `users` record linked to both a `social_profiles` and a `host_profiles` record.
+
 | Column                | Type         | Description                                                                                            |
 | --------------------- | ------------ | ------------------------------------------------------------------------------------------------------ |
 | `id`                  | `uuid`       | Primary Key. Foreign key to `auth.users.id`.                                                           |
@@ -58,6 +64,8 @@ Stores private data directly linked to the Supabase Auth user. This information 
 | `birth_date`          | `date`       | User's date of birth, for age calculation.                                                             |
 | `is_verified`         | `boolean`    | Defaults to `false`. True if user completed ID verification.                                           |
 | `status`              | `text`       | e.g., 'active', 'suspended', 'verification_pending', 'banned'.                                         |
+| `active_role`         | `text`       | For Hybrid Users, stores the last active role ('participant' or 'host'). Defaults to 'participant'.    |
+| `user_number`         | `bigserial`  | A unique, sequential number assigned to the user upon creation to identify early adopters.             |
 | `payment_customer_id` | `text`       | Stripe (or other payment provider) customer ID.                                                        |
 | `created_at`          | `timestampz` |                                                                                                        |
 
@@ -75,13 +83,13 @@ This table captures users from outside the initial US-only launch area who wish 
 
 This table stores internal, system-generated data and metrics about a user. This data is never exposed to the user and is used exclusively for algorithms related to matching and event curation. In the future, this may also include qualitative data like AI interview transcripts.
 
-| Column                           | Type         | Description                                                                                    |
-| -------------------------------- | ------------ | ---------------------------------------------------------------------------------------------- |
-| `user_id`                        | `uuid`       | Primary Key. Foreign key to `users.id`. (One-to-One)                                           |
-| `absentee_rating`                | `float`      | Tracks no-shows or lateness. A lower score is worse. Calculated from the `attendance` table.   |
-| `contribution_score`             | `float`      | An internal score rewarding positive social behavior (e.g., receiving kudos, good attendance). |
-| `internal_attractiveness_rating` | `float`      | Internal score for matching. Not visible to user.                                              |
-| `updated_at`                     | `timestampz` | Records the last time the metrics were updated.                                                |
+| Column                           | Type         | Description                                                                                                                                                                          |
+| -------------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `user_id`                        | `uuid`       | Primary Key. Foreign key to `users.id`. (One-to-One)                                                                                                                                 |
+| `absentee_rating`                | `float`      | An internal score tracking reliability. A lower score is worse. Calculated from the `attendance` table based on statuses like `cancelled_late`, `no_show`, and `check_in_abandoned`. |
+| `contribution_score`             | `float`      | An internal score rewarding positive social behavior (e.g., receiving kudos, good attendance).                                                                                       |
+| `internal_attractiveness_rating` | `float`      | Internal score for matching. Not visible to user.                                                                                                                                    |
+| `updated_at`                     | `timestampz` | Records the last time the metrics were updated.                                                                                                                                      |
 
 ### `user_interest_vectors` Table
 
@@ -97,7 +105,7 @@ This table stores the vector embeddings that represent a user's interests. This 
 
 ### `social_profiles` Table
 
-The default public profile for every user. This is what other participants see when browsing.
+The default public profile for every user who participates in events. The existence of this record, linked to a `users` record, designates a user as a `Participant`.
 
 | Column                       | Type         | Description                                                               |
 | ---------------------------- | ------------ | ------------------------------------------------------------------------- |
@@ -128,18 +136,32 @@ A user's collection of profile photos, including ones taken in-app for authentic
 
 ### `host_profiles` Table
 
-A separate profile that a user can have if they choose to become a host.
+A separate profile that a user can have if they choose to become a host. The existence of this record, linked to a `users` record, designates a user as a `Host`.
 
 | Column           | Type         | Description                                                      |
 | ---------------- | ------------ | ---------------------------------------------------------------- |
 | `id`             | `uuid`       | Primary Key.                                                     |
 | `user_id`        | `uuid`       | Foreign Key, linking to the `users` table. (One-to-One)          |
+| `host_type`      | `text`       | The type of host, e.g., 'user' or 'community'.                   |
 | `host_name`      | `text`       | Public name of the host (can be different from their user name). |
 | `host_bio`       | `text`       | A biography specific to their hosting activities.                |
 | `average_rating` | `float`      | Calculated average from all event/host ratings.                  |
 | `created_at`     | `timestampz` |                                                                  |
 
-This profile will also feature an "Event History" section, displaying a list of their successfully completed past events along with the average rating each event received from attendees. This provides social proof of their hosting quality.
+This profile will also feature an "Event History" section, displaying a list of their successfully completed past events along with the average rating each event received from attendees. This provides social proof of their hosting quality. Publicly visible social media links, managed in the `user_social_links` table, can also be displayed here.
+
+### `host_photos` Table
+
+This table stores brand and marketing photos for a `host_profile`, such as logos or pictures of a venue. This is distinct from a user's personal `profile_photos`.
+
+| Column       | Type         | Description                                              |
+| ------------ | ------------ | -------------------------------------------------------- |
+| `id`         | `uuid`       | Primary Key.                                             |
+| `host_id`    | `uuid`       | Foreign key to `host_profiles.id`.                       |
+| `image_url`  | `text`       | URL of the photo.                                        |
+| `photo_type` | `text`       | The type of photo, e.g., 'logo', 'venue', 'promotional'. |
+| `caption`    | `text`       | Optional caption for the photo.                          |
+| `created_at` | `timestampz` |                                                          |
 
 ---
 
@@ -173,7 +195,7 @@ To support dynamic, multi-stop events and give hosts powerful tools to describe 
 
 ### `locations` Table
 
-This table stores structured data for any physical location, whether it's a commercial business fetched from Google Maps or a custom-pinned spot in a park.
+This table stores structured data for any physical location, whether it's a commercial venue or business fetched from Google Maps or a custom-pinned spot in a park.
 
 | Column            | Type    | Description                                                              |
 | ----------------- | ------- | ------------------------------------------------------------------------ |
@@ -242,30 +264,30 @@ Defines a specific event created by a host. The event's location, timing, and fa
 
 Tracks the status of each invitation sent for an event. When an event is created with `host_is_attendee` set to `true`, application logic should automatically create a corresponding record here for the host's social profile with a `status` of `'confirmed'`.
 
-| Column           | Type         | Description                                                                                                       |
-| ---------------- | ------------ | ----------------------------------------------------------------------------------------------------------------- |
-| `id`             | `uuid`       | Primary Key.                                                                                                      |
-| `event_id`       | `uuid`       | Foreign key to `events.id`.                                                                                       |
-| `profile_id`     | `uuid`       | Foreign key to `social_profiles.id` (the invitee).                                                                |
-| `status`         | `text`       | e.g., 'sent', 'confirmed', 'declined', 'expired', 'payment_failed'. 'confirmed' means the user accepted and paid. |
-| `decline_reason` | `text`       | Optional. Stores the reason a user declined, e.g., 'busy', 'not_interested', 'wants_variety'.                     |
-| `created_at`     | `timestampz` |                                                                                                                   |
-| `updated_at`     | `timestampz` |                                                                                                                   |
+| Column           | Type         | Description                                                                                                                    |
+| ---------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| `id`             | `uuid`       | Primary Key.                                                                                                                   |
+| `event_id`       | `uuid`       | Foreign key to `events.id`.                                                                                                    |
+| `profile_id`     | `uuid`       | Foreign key to `social_profiles.id` (the invitee).                                                                             |
+| `status`         | `text`       | e.g., 'sent', 'confirmed', 'declined', 'expired', 'payment_failed', 'cancelled'. 'confirmed' means the user accepted and paid. |
+| `decline_reason` | `text`       | Optional. Stores the reason a user declined, e.g., 'busy', 'not_interested', 'wants_variety'.                                  |
+| `created_at`     | `timestampz` |                                                                                                                                |
+| `updated_at`     | `timestampz` |                                                                                                                                |
 
 ### `attendance` Table
 
 Tracks who actually attended an event, as reported post-event.
 
-| Column                   | Type         | Description                                                                  |
-| ------------------------ | ------------ | ---------------------------------------------------------------------------- |
-| `id`                     | `uuid`       | Primary Key.                                                                 |
-| `event_id`               | `uuid`       | Foreign key to `events.id`.                                                  |
-| `profile_id`             | `uuid`       | Foreign key to `social_profiles.id` of the attendee.                         |
-| `status`                 | `text`       | e.g., 'attended', 'no_show', 'late', 'disputed'. Reported by attendees/host. |
-| `check_in_latitude`      | `float`      | Optional. The latitude recorded at the moment of check-in.                   |
-| `check_in_longitude`     | `float`      | Optional. The longitude recorded at the moment of check-in.                  |
-| `reported_by_profile_id` | `uuid`       | Foreign key to `social_profiles.id` of who is reporting.                     |
-| `created_at`             | `timestampz` |                                                                              |
+| Column                   | Type         | Description                                                                                      |
+| ------------------------ | ------------ | ------------------------------------------------------------------------------------------------ |
+| `id`                     | `uuid`       | Primary Key.                                                                                     |
+| `event_id`               | `uuid`       | Foreign key to `events.id`.                                                                      |
+| `profile_id`             | `uuid`       | Foreign key to `social_profiles.id` of the attendee.                                             |
+| `status`                 | `text`       | e.g., 'attended', 'cancelled_late', 'no_show', 'check_in_abandoned'. Reported by attendees/host. |
+| `check_in_latitude`      | `float`      | Optional. The latitude recorded at the moment of check-in.                                       |
+| `check_in_longitude`     | `float`      | Optional. The longitude recorded at the moment of check-in.                                      |
+| `reported_by_profile_id` | `uuid`       | Foreign key to `social_profiles.id` of who is reporting.                                         |
+| `created_at`             | `timestampz` |                                                                                                  |
 
 ---
 
@@ -303,15 +325,15 @@ This table stores positive, private affirmations given from one attendee to anot
 
 ### `event_posts` Table
 
-The public message feed for an event. Anonymized roles ("Host", "Attendee", "Invitee") will be handled by the application logic.
+The public message feed for an event. The application logic will determine what name and avatar to show based on whether the posting user is the host or a participant.
 
-| Column       | Type         | Description                                        |
-| ------------ | ------------ | -------------------------------------------------- |
-| `id`         | `uuid`       | Primary Key.                                       |
-| `event_id`   | `uuid`       | Foreign key to `events.id`.                        |
-| `profile_id` | `uuid`       | Foreign key to `social_profiles.id` of the poster. |
-| `content`    | `text`       | The message content.                               |
-| `created_at` | `timestampz` |                                                    |
+| Column       | Type         | Description                              |
+| ------------ | ------------ | ---------------------------------------- |
+| `id`         | `uuid`       | Primary Key.                             |
+| `event_id`   | `uuid`       | Foreign key to `events.id`.              |
+| `user_id`    | `uuid`       | Foreign key to `users.id` of the poster. |
+| `content`    | `text`       | The message content.                     |
+| `created_at` | `timestampz` |                                          |
 
 ### Post-Event Direct Messaging
 
@@ -366,19 +388,20 @@ To support the "Memory Book" feature, this table stores the relationship between
 
 ### `user_social_links` Table
 
-Stores the social media links a user has associated with their account. This information is private by default and only shared explicitly.
+Stores the social media links a user has associated with their account. This information is private by default and only shared explicitly via the "Social Connect" feature, unless a host chooses to make a link public on their Host Profile.
 
-| Column       | Type         | Description                                                           |
-| ------------ | ------------ | --------------------------------------------------------------------- |
-| `id`         | `uuid`       | Primary Key.                                                          |
-| `user_id`    | `uuid`       | Foreign key to `users.id`.                                            |
-| `platform`   | `text`       | The social media platform (e.g., 'instagram', 'twitter', 'linkedin'). |
-| `url`        | `text`       | The full URL to the user's profile.                                   |
-| `created_at` | `timestampz` |                                                                       |
+| Column                      | Type         | Description                                                                                                                                                |
+| --------------------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                        | `uuid`       | Primary Key.                                                                                                                                               |
+| `user_id`                   | `uuid`       | Foreign key to `users.id`.                                                                                                                                 |
+| `platform`                  | `text`       | The social media platform (e.g., 'instagram', 'twitter', 'linkedin').                                                                                      |
+| `url`                       | `text`       | The full URL to the user's profile.                                                                                                                        |
+| `is_public_on_host_profile` | `boolean`    | Defaults to `false`. If `true`, this link will be publicly visible on the user's `host_profile`. Can only be set to `true` if the user has a host profile. |
+| `created_at`                | `timestampz` |                                                                                                                                                            |
 
 ### `social_connections` Table
 
-This join table acts as a permissions layer, tracking which user has shared which social link with whom.
+This join table acts as a permissions layer, tracking which user has shared which social link with whom. This is a silent action that does not trigger a notification.
 
 | Column                | Type         | Description                                                             |
 | --------------------- | ------------ | ----------------------------------------------------------------------- |
@@ -394,14 +417,14 @@ _Note: To ensure a link is only shared once between two people, the primary key 
 
 This table stores photos uploaded by attendees to a shared event gallery.
 
-| Column                | Type         | Description                                                          |
-| --------------------- | ------------ | -------------------------------------------------------------------- |
-| `id`                  | `uuid`       | Primary Key.                                                         |
-| `event_id`            | `uuid`       | Foreign key to `events.id`. Links the photo to a specific event.     |
-| `uploader_profile_id` | `uuid`       | Foreign key to `social_profiles.id`. Tracks who uploaded the photo.  |
-| `image_url`           | `text`       | URL of the photo (likely in a Supabase Storage bucket).              |
-| `status`              | `text`       | For moderation, e.g., 'visible', 'hidden_by_host', 'pending_review'. |
-| `created_at`          | `timestampz` |                                                                      |
+| Column             | Type         | Description                                                          |
+| ------------------ | ------------ | -------------------------------------------------------------------- |
+| `id`               | `uuid`       | Primary Key.                                                         |
+| `event_id`         | `uuid`       | Foreign key to `events.id`. Links the photo to a specific event.     |
+| `uploader_user_id` | `uuid`       | Foreign key to `users.id`. Tracks who uploaded the photo.            |
+| `image_url`        | `text`       | URL of the photo (likely in a Supabase Storage bucket).              |
+| `status`           | `text`       | For moderation, e.g., 'visible', 'hidden_by_host', 'pending_review'. |
+| `created_at`       | `timestampz` |                                                                      |
 
 ---
 
@@ -424,102 +447,31 @@ This table will store a record for each payment attempt made by a user.
 | `stripe_charge_id` | `text`       | The unique charge identifier from Stripe for reconciliation. Unique.                  |
 | `created_at`       | `timestampz` |                                                                                       |
 
----
-
-## 8. Common Queries & Data Relationships
-
-This section clarifies how to retrieve common sets of related data using the schemas defined above. This approach avoids data duplication by querying for relationships rather than storing lists on individual records.
-
-### How to find events a user has attended:
-
-- **Query** the `attendance` table.
-- **Filter** by the user's `social_profiles.id` in the `profile_id` column and where `status` is `'attended'`.
-- This will return a list of all `event_id`s the user has successfully attended.
-
-### How to find events a user has hosted:
-
-- **Query** the `events` table.
-- **Filter** by the user's `host_profiles.id` in the `host_id` column.
-- This will return a list of all events created by that host.
-
-### How to get a host's rated past events:
-
-- **Query** the `events` table and filter by the `host_id`.
-- **Join** with the `ratings` table on `event_id`.
-- **Filter** for events that have a `status` of `'completed'`.
-- **Group** by `event_id` and aggregate the `event_rating_value` to get the average rating for each past event.
-- This can be used to populate the "Event History" section on a host's public profile.
-
-### How to calculate a host's average rating:
-
-- **Query** the `ratings` table.
-- **Filter** by the `rated_host_id` to get all ratings for a specific host.
-- **Aggregate** the `host_rating_value` column (e.g., calculate the average). This result can then be updated on the `host_profiles.average_rating` field.
-
-### How to find the average rating of events a user has attended:
-
-- **Query** the `attendance` table to find all `event_id`s for a given `profile_id` where `status` is `'attended'`.
-- **Query** the `ratings` table using those `event_id`s.
-- **Aggregate** the `event_rating_value` column from the results to calculate the average.
-
-### How to get a user's interests:
-
-- **Query** the `profile_interests` join table.
-- **Filter** by the user's `social_profiles.id` to get all corresponding `interest_id`s.
-- **Join** with the `interests` table to retrieve the names of each interest.
-
-### How to count a user's kudos:
-
-- **Query** the `attendee_kudos` table.
-- **Filter** by the user's `social_profiles.id` in the `receiver_profile_id` column.
-- **Group** the results by the `kudo` column.
-- **Count** the records in each group to get a total for each type of kudo (e.g., "Made Me Laugh": 5, "Great Listener": 3).
-
-### How to get social links shared with a user:
-
-- **Query** the `social_connections` table.
-- **Filter** by the user's `social_profiles.id` in the `receiver_profile_id` column to get all `social_link_id`s they have been granted access to.
-- **Join** with the `user_social_links` table on `social_link_id` to retrieve the `platform` and `url`.
-- **Join** with the `social_profiles` table on `sharer_profile_id` to link the social link back to the sharer's profile.
-
-### How to find mutual "Connect Again" matches:
-
-- **Join** the `connections` table with itself.
-- **Match** where `c1.user_profile_id = c2.connected_profile_id` and `c1.connected_profile_id = c2.user_profile_id`.
-- **Filter** for records where `c1.wants_to_connect_again = true` and `c2.wants_to_connect_again = true`.
-- This will produce pairs of users who have mutually expressed interest in connecting again.
-
----
-
-## 9. Safety & Moderation
-
-To support user safety and community health, the following tables will be used to manage blocks and formal reports.
-
 ### `blocked_users` Table
 
 This table stores a record of which users have blocked others, creating a hard stop for all interactions.
 
-| Column               | Type         | Description                                                          |
-| -------------------- | ------------ | -------------------------------------------------------------------- |
-| `blocker_profile_id` | `uuid`       | Foreign key to `social_profiles.id` (the user initiating the block). |
-| `blocked_profile_id` | `uuid`       | Foreign key to `social_profiles.id` (the user being blocked).        |
-| `created_at`         | `timestampz` |                                                                      |
+| Column            | Type         | Description                                                |
+| ----------------- | ------------ | ---------------------------------------------------------- |
+| `blocker_user_id` | `uuid`       | Foreign key to `users.id` (the user initiating the block). |
+| `blocked_user_id` | `uuid`       | Foreign key to `users.id` (the user being blocked).        |
+| `created_at`      | `timestampz` |                                                            |
 
-_Note: The primary key for this table would be a composite of (`blocker_profile_id`, `blocked_profile_id`)._
+_Note: The primary key for this table would be a composite of (`blocker_user_id`, `blocked_user_id`)._
 
 ### `reports` Table
 
 This table logs formal reports submitted by users for review by the Momento team.
 
-| Column                | Type         | Description                                                      |
-| --------------------- | ------------ | ---------------------------------------------------------------- |
-| `id`                  | `uuid`       | Primary Key.                                                     |
-| `reporter_profile_id` | `uuid`       | Foreign key to `social_profiles.id` (who filed the report).      |
-| `reported_profile_id` | `uuid`       | Foreign key to `social_profiles.id` (who is being reported).     |
-| `category`            | `text`       | The category of violation (e.g., 'harassment', 'spam').          |
-| `comments`            | `text`       | The detailed comments provided by the reporter.                  |
-| `status`              | `text`       | The internal status of the report (e.g., 'pending', 'resolved'). |
-| `created_at`          | `timestampz` |                                                                  |
+| Column             | Type         | Description                                                      |
+| ------------------ | ------------ | ---------------------------------------------------------------- |
+| `id`               | `uuid`       | Primary Key.                                                     |
+| `reporter_user_id` | `uuid`       | Foreign key to `users.id` (who filed the report).                |
+| `reported_user_id` | `uuid`       | Foreign key to `users.id` (who is being reported).               |
+| `category`         | `text`       | The category of violation (e.g., 'harassment', 'spam').          |
+| `comments`         | `text`       | The detailed comments provided by the reporter.                  |
+| `status`           | `text`       | The internal status of the report (e.g., 'pending', 'resolved'). |
+| `created_at`       | `timestampz` |                                                                  |
 
 ---
 
@@ -531,27 +483,6 @@ To handle push and SMS notifications and respect user preferences, the following
 
 This table stores the unique push tokens for each of a user's devices, allowing the backend to send notifications via a service like Expo Push Notifications.
 
-| Column        | Type         | Description                                                      |
-| ------------- | ------------ | ---------------------------------------------------------------- |
-| `id`          | `uuid`       | Primary Key.                                                     |
-| `user_id`     | `uuid`       | Foreign key to `users.id`.                                       |
-| `token`       | `text`       | The push token from the notification service. Must be unique.    |
-| `device_info` | `text`       | Optional, human-readable info about the device (e.g., "iPhone"). |
-| `created_at`  | `timestampz` |                                                                  |
-
-### `user_notification_settings` Table
-
-This table provides granular control for users to opt in or out of different categories of notifications. The backend logic must always check these settings before sending any communication.
-
-| Column                    | Type         | Description                                                                 |
-| ------------------------- | ------------ | --------------------------------------------------------------------------- |
-| `user_id`                 | `uuid`       | Primary Key. Foreign key to `users.id`.                                     |
-| `sms_invitations`         | `boolean`    | Defaults to `true`. User agrees to receive new invitations via SMS.         |
-| `sms_reminders`           | `boolean`    | Defaults to `true`. User agrees to receive event start reminders via SMS.   |
-| `push_event_invitations`  | `boolean`    | Defaults to `true`. Push notifications for new & expiring invitations.      |
-| `push_event_updates`      | `boolean`    | Defaults to `true`. Push notifications for event changes and confirmations. |
-| `push_event_reminders`    | `boolean`    | Defaults to `true`. Push notifications for upcoming events.                 |
-| `push_direct_messages`    | `boolean`    | Defaults to `true`. Push notifications for new DMs.                         |
-| `push_social`             | `boolean`    | Defaults to `true`. Push notifications for kudos, matches, etc.             |
-| `push_account_and_safety` | `boolean`    | Defaults to `true`. Push notifications for payments, reports, etc.          |
-| `updated_at`              | `timestampz` |                                                                             |
+| Column | Type   | Description |
+| ------ | ------ | ----------- |
+| `id`   | `uuid` |

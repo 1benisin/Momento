@@ -35,18 +35,15 @@ This phase focuses on building the absolute essential features required for the 
 - Basic user profiles: name, profile image, public bio.
 - Storage for private info (phone number, optional email, etc.).
 - Optional ID verification flow for users to get a "Verified" badge.
+- Includes a separate email/password sign-up flow for host-only accounts (for venues/organizations).
 
-**[Epic #002] User Host Profiles (V1):**
+**[Epic #002] Host Profiles & Verification:**
 
-- Ability for a basic user to upgrade to a "User Host" profile.
-- **Mandatory ID verification** required before a host profile can be created.
-- Displays ratings from past events they've hosted.
-
-**[Epic #003] Business Host Profiles (V1):**
-
-- Separate profile type for businesses/service providers.
-- **Mandatory ID verification** for the primary business contact.
-- Basic info: name, location, pictures, description.
+- Ability for any user to apply to become a host.
+- **Mandatory ID verification** required before any host profile can be created.
+- A unified onboarding flow that asks the applicant if they are hosting as an individual (`user`) or on behalf of a venue/organization (`community`).
+- **User Host:** The profile is linked to their existing `social_profile`.
+- **Community Host:** A separate profile for venues or organizations, with fields for brand name, location, photos, etc. The primary contact must be verified.
 
 **[Epic #004] Basic Interest Building Flow:**
 
@@ -65,9 +62,9 @@ This phase focuses on building the absolute essential features required for the 
 
 **[Epic #006] Simple Event Hosting Flow:**
 
-- A user or business host can create a new event.
+- Any verified host (`user` or `community`) can create a new event.
 - Fields: Title, Description, Date/Time, Location, Min/Max participants, optional Minimum Age.
-- Add a checkbox for the host to join as an attendee, counting them toward the participant total.
+- Add a checkbox for the host to join as an attendee, counting them toward the participant total. (This only applies to `user` hosts).
 
 **[Epic #007] Core Invitation Flow (App-Curated):**
 
@@ -125,6 +122,7 @@ With the core loop in place, this phase is about making the experience richer, m
 - Build the multi-tiered system for user safety: "Don't Connect Again," "Block," and "Report."
 - Implement the "Block" functionality, which prevents all interaction and visibility between two users.
 - Create the guided, educational reporting flow that automatically blocks the reported user.
+- **Develop and implement the Community Reliability framework for non-refundable cancellations, no-shows, and "check-in & bail" scenarios.**
 - Develop the necessary database tables (`blocked_users`, `reports`) and backend logic for logging and aggregation.
 - Establish an internal review process for handling formal reports.
 - **Build the triggered verification system:** A report against a user triggers a mandatory verification check.
@@ -141,6 +139,8 @@ With the core loop in place, this phase is about making the experience richer, m
 
 **[Epic #XXX] The Memory Book & Enhanced Connections:**
 
+(Note: This epic is focused on the participant experience.)
+
 - Build the dedicated "Memory Book" screen for users to see a log of people they've met.
 - Implement features for adding private notes, favoriting, and signaling a desire to "Connect Again."
 - The "Connect Again" signal will be used by the event curation algorithm.
@@ -155,6 +155,8 @@ With the core loop in place, this phase is about making the experience richer, m
 
 **[Epic #XXX] Social Connect in Memory Book:**
 
+(Note: This epic is focused on the participant experience.)
+
 - **User Story:** As a user, I want to securely share my social media profiles with people I've met to continue our connection outside the app.
 - **Task:** Create a new "My Social Links" section in the user's private profile settings.
 - **Task:** Build the UI in the Memory Book to allow a user to select and share one or more of their saved social links with a specific connection.
@@ -162,12 +164,12 @@ With the core loop in place, this phase is about making the experience richer, m
 - **Task:** Create the `user_social_links` and `social_connections` tables in the database.
 - **Task:** Develop backend logic to manage sharing permissions, including revoking access.
 
-**[Epic #XXX] Shared Event Galleries & Camera Roll:**
+**[Epic #XXX] Shared Event Galleries:**
 
 - Build a shared photo gallery for each event, visible only to verified attendees.
 - Implement functionality for attendees to upload one or more photos to the gallery.
 - Provide options for users to download a single photo or all photos from an event album (e.g., as a zip file).
-- Create a personal "Camera Roll" screen where users can view and manage all photos they've uploaded across events, as well as their profile photos.
+- Create a personal "Camera Roll" screen for participants to view and manage all photos they've uploaded across events, as well as their profile photos.
 - The event host will have moderation privileges to remove photos from their event's gallery.
 - Attendees will be able to report inappropriate photos for review.
 - This feature requires adding an `event_photos` table to the database.
@@ -175,7 +177,7 @@ With the core loop in place, this phase is about making the experience richer, m
 **[Epic #XXX] Advanced Host Tools & Ratings:**
 
 - Display host ratings on their profiles.
-- Display business/venue ratings.
+- Display venue ratings.
 - Provide hosts with a dashboard of ideas and tips.
 
 **[Epic #XXX] Photo Sharing:**
