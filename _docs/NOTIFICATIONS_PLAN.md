@@ -80,7 +80,9 @@ Here is a brainstormed list of potential notifications, their triggers, and sugg
 | **New Invitation**                                  | Push | Invited User           | "You have a new event invitation! ✨ Tap to see what's in store."                                  |
 |                                                     | SMS  | Invited User (Opt-in)  | "You're invited! A new Momento event is waiting for you. Tap to view: [link]"                      |
 | **Invitation Expires Soon** (e.g., 1hr left)        | Push | Invited User           | "Your invitation to '[Event Title]' expires in 1 hour. Don't miss out!"                            |
-| **Event Confirmed**                                 | Push | Attendee               | "You're confirmed for '[Event Title]'! Get ready for a great time."                                |
+| **Event Confirmed (Participant)**                   | Push | Attendee               | "You're confirmed for '[Event Title]'! Get ready for a great time."                                |
+| **Event Confirmed (Host)**                          | Push | Event Host             | "Your event '[Event Title]' is now confirmed! We're sending out the invitations."                  |
+| **Event is Full**                                   | Push | Event Host             | "Your event '[Event Title]' is now full! Get ready to host a great experience."                    |
 | **Event Reminder (24hr)**                           | Push | Confirmed Attendees    | "Get ready! '[Event Title]' is tomorrow at [Time]."                                                |
 | **Event Reminder (1hr)**                            | Push | Confirmed Attendees    | "It's almost time for '[Event Title]'! It starts in 1 hour."                                       |
 |                                                     | SMS  | Confirmed Attendees    | "Reminder: '[Event Title]' starts in 1 hour at [Location Name]. See you there!"                    |

@@ -13,3 +13,26 @@ This diagram illustrates the composition of the `EventDetailScreen`, showing how
 This sequence diagram details the end-to-end process of a user receiving an event invitation, accepting it, completing payment, and getting confirmed for the event.
 
 [![](https://mermaid.ink/svg/pako:eNqdVU1vgzAM_SuCnqokBqgNGtA-9MQeadtNCw4h2eIAsZGThE3w75cAJ52mdgkhP_f7vO-d8NBDcYA0RlsDXlSFl-Z1i_5evWwqlfL5e9mC_j18Pq7SjU_QOqY_621t4dO-_vH82e752_X1131v3S5f2-9z-U6-t3_j93v_v-8-x_o4P0_7k35t8T16S_iX-v1_Xf_q9L-Hn10cR_gR8D7p-2t1aV9O2gH-x2wM46J6rW9iW5mR5jU_D11q7G2e_WqY7d_l0yWlO2_yTj1yY_w-Ua996-5Jt9-iX8-e-n24c7F55c7yS5P44T4S2zQc2K2a3TId_h_g5p-Tf2l2xT4-eUf8f2MOMz6b5Sfe-L0F-rYw2qO8eQyN8WbI-bT69-I-a_xP17vP9u_c9b78H8i_84L78H8i_o8h74v_T1g_5b76-yv-F8gfiL7L6fX31v1_5v6nsv6_g_WPs_wP6P2X_Z-z_A_o_Yf9n7P8D-v8C5jJ2dw)](#)
+
+## 3. UI Architecture: Role-Based Navigation & Mode Switching
+
+To provide a focused and intuitive experience for all user types, Momento's UI will be **role-based**. A user's account can have different roles (`Participant`, `Host`), and the app's interface, particularly the main tab bar navigation, will adapt to the role they are currently acting in.
+
+This architecture solves the challenge of a user who is both a participant and a host, preventing cognitive overload by ensuring they only see the tools relevant to their current goal.
+
+There are three primary user types:
+
+1.  **Social-Only User (`Participant`)**: The default user who attends events. Their UI is focused on discovery and connection.
+2.  **Host-Only User (`Community Host`)**: A business or organization whose goal is to create and manage events. Their UI is a streamlined professional dashboard. They do not have social features like a Memory Book.
+3.  **Hybrid User (`User Host`)**: An individual who both hosts and participates in events. This user has access to both UI paradigms.
+
+### The "Mode Switcher"
+
+The lynchpin of this design is the **"Mode Switcher,"** a clear control within the `Profile` tab that allows a Hybrid User to toggle between "Social Mode" and "Host Mode."
+
+- **Social Mode**: The UI is identical to the Social-Only user's experience.
+- **Host Mode**: The UI transforms into the professional dashboard identical to the Host-Only user's experience.
+
+This approach ensures that single-role users have a simple, dedicated experience, while hybrid users have the power to switch contexts without clutter.
+
+[![](https://mermaid.ink/svg/pako:eNqNVM1vgzAM_R_Fp9ZJBqwNGrA-9MQeadtNGw5JsuIAsZFThk3w75cAJ52mdmkhP_f7vO-d8NB9cYA0plsDXlSFl-Z1i35evWwqlfL5e9mC_j18Pq7SjU_QOqY_621t4dO-_vH82e752_X1131v3S5f2-9z-U6-t3_j93v_v-8-x_o4P0_7k35t8T16S_iX-v1_Xf_q9L-Hn10cR_gR8D7p-2t1aV9O2gH-x2wM46J6rW9iW5mR5jU_D11q7G2e_WqY7d_l0yWlO2_yTj1yY_w-Ua996-5Jt9-iX8-e-n24c7F55c7yS5P44T4S2zQc2K2a3TId_h_g5p-Tf2l2xT4-eUf8f2MOMz6b5Sfe-L0F-rYw2qO8eQyN8WbI-bT69-I-a_xP17vP9u_c9b78H8i_84L78H8i_o8h74v_T1g_5b76-yv-F8gfiL7L6fX31v1_5v6nsv6_g_WPs_wP6P2X_Z-z_A_o_Yf9n7P8D-v8Cg753MA)](#)

@@ -24,6 +24,7 @@ This document is organized into the following sections.
 - [9. Shared Event Galleries & Camera Roll](#9-shared-event-galleries--camera-roll)
 - [10. User Safety: Blocking & Reporting](#10-user-safety-blocking--reporting)
   - [A Three-Tiered System](#a-three-tiered-system)
+  - [Community Reliability: Cancellations & No-Shows](#community-reliability-cancellations--no-shows)
   - [Reporting & Consequence Framework](#reporting--consequence-framework)
 - [11. Discovery Feed: Refining Preferences with Past Events](#11-discovery-feed-refining-preferences-with-past-events)
 - [12. Browsing Profiles](#12-browsing-profiles)
@@ -81,7 +82,7 @@ To build a foundation of trust and authenticity, Momento will include a feature 
 
 ## 3. Hosting
 
-- Users and businesses can both create and host events.
+- Individuals and organizations can both create and host events.
 - Hosts will have a dedicated Host Profile with ratings from past events.
 - **Host Tools**:
   - Access to information and best practices for creating highly-rated events.
@@ -90,8 +91,9 @@ To build a foundation of trust and authenticity, Momento will include a feature 
 - **Host Controls**:
   - Hosts must be present at their events; they can be both host and participant. They can also be a business host.
   - **Minimum Age:** Hosts can set a minimum age requirement for their event (e.g., 21+). Our matching algorithm will not match users who do not meet this requirement.
-  - **Host as Attendee:** A checkbox on the event creation screen for the host to indicate they will be participating in the event, not just organizing it. If selected, the host will occupy one spot, counting towards the `max_participants` limit. They are automatically considered "confirmed" for the event and are exempt from the $5 event fee.
-  - **Event Itinerary:** Hosts can build dynamic events with one or more stops. For each stop, they must define both a **start time** and an **end time**, and can add a location by either searching for a business (e.g., a restaurant via Google Maps) or dropping a precise pin on the map for locations without a formal address (e.g., a specific spot in a park). This ensures a clear schedule for attendees and for calendar integrations.
+  - **Host as Attendee:** A checkbox on the event creation screen for the host to indicate they will be participating in the event, not just organizing it. If selected, the host will occupy one spot, counting towards the `max_participants` limit. They are automatically considered "confirmed" for the event and are exempt from the $5 event fee. This option is only available for hosts who also have a participant social profile.
+  - **Public Social Links for Hosts**: `User Hosts` have the option to make specific social media profiles public on their Host Profile. This allows potential attendees to vet the host and get a better sense of their style and offerings, building trust and transparency. `Community Hosts` (venues, organizations) can also publicly display links like their official website or Instagram page.
+  - **Event Itinerary:** Hosts can build dynamic events with one or more stops. For each stop, they must define both a **start time** and an **end time**, and can add a location by either searching for a venue or business (e.g., a restaurant via Google Maps) or dropping a precise pin on the map for locations without a formal address (e.g., a specific spot in a park). This ensures a clear schedule for attendees and for calendar integrations.
   - **Collaborators:** Hosts can add other people involved in the event, such as a co-host, instructor, or guide. If the collaborator is a Momento user, the host can link directly to their profile. If they are not, the host can simply enter their name and role. This provides clarity and recognizes everyone contributing to the experience.
 
 > **Future Enhancement (Phase 2):** > **Feature:** Event Encore Signals.
@@ -239,7 +241,7 @@ The core of the Memory Book is the **Face Card**, a dynamic, collectible memento
 To bridge the gap between a memorable event and an ongoing connection, users can privately share their social media profiles through the Memory Book. This feature removes the awkwardness of asking for handles and keeps the focus on in-person connection during the event.
 
 - **Private by Default:** Users can add their social media links (Instagram, Twitter, etc.) in their private profile settings. This information is never public on their profile.
-- **One-to-One Sharing:** From a connection's Face Card in the Memory Book, a user can choose to share one or more of their saved social links. This is a deliberate, one-way action.
+- **Silent, One-to-One Sharing:** From a connection's Face Card in the Memory Book, a user can choose to share one or more of their saved social links. This is a deliberate, one-way action. The other user is **not** notified; they will discover the shared link the next time they view the sharer's Face Card, creating a moment of quiet discovery.
 - **Reciprocal Flow:** When a user receives a shared social link, it appears on the sender's Face Card in their Memory Book. A prompt will ask if they'd like to "Share back," making reciprocation seamless.
 - **User Control:** A user can revoke a shared link at any time, removing it from the other person's view.
 
@@ -250,7 +252,7 @@ To extend the life of an event and give attendees a way to share their collectiv
 ### Shared Event Galleries
 
 - **Functionality:** After an event has concluded and attendance has been verified, a "Photos" tab will appear on the post-event screen. This is a collaborative gallery visible only to those who attended.
-- **Uploading:** Any attendee can upload photos from their phone's library to the shared gallery.
+- **Uploading:** Any attendee or the event host can upload photos from their phone's library to the shared gallery.
 - **Downloading:** Users can download any single photo they wish. They will also have an option to download the entire event album as a single compressed (`.zip`) file.
 - **Host Moderation:** The event host has the ability to remove any photo from the gallery.
 - **User Reporting:** Any attendee can report a photo for being inappropriate or for privacy reasons (e.g., "I'm in this photo and I want it removed"). Reports are sent to the host and/or a central moderation team.
@@ -263,6 +265,8 @@ To give users a central place for all their visual memories within the app, a "M
 - **My Event Uploads:** A view of every photo they have personally uploaded across all their events.
 - **Event Albums:** A chronological gallery of all events attended, acting as shortcuts to each event's shared gallery.
 
+_Note: The "My Camera Roll" feature is for participants. Community hosts (representing a venue or organization) manage their brand photos (e.g., logos, venue shots) through their dedicated Host Dashboard._
+
 ## 10. User Safety: Blocking & Reporting
 
 To build a safe and trustworthy community, users will have access to a multi-tiered system for managing their interactions with others. The design prioritizes user comfort and provides clear, distinct tools for different situations.
@@ -271,7 +275,7 @@ To build a safe and trustworthy community, users will have access to a multi-tie
 
 1.  **Preference Signal: "Don't Connect Again"**
 
-    - **Functionality:** This is a private, lightweight signal to the matching algorithm. It is the inverse of the "Connect Again" feature. The user is indicating a preference to not be placed in future events with a specific person.
+    - **Functionality:** This is a private, lightweight signal to the matching algorithm. It is the inverse of the "Connect Again" feature. The user is indicating a preference to not be placed in future events with a specific person. This feature governs interactions between participants who have met at an event.
     - **User Experience:** This is a "soft block." The two users can still see each other in their Memory Books and message one another. It simply tells our system to avoid future pairings. This is handled via the `connections` table.
 
 2.  **Safety Control: "Block"**
@@ -289,6 +293,41 @@ To build a safe and trustworthy community, users will have access to a multi-tie
       - **Guided Flow:** The user is asked to categorize the violation from a predefined list (e.g., Harassment, Inappropriate Content, Misrepresentation, In-Person Misconduct).
       - **Educational Messaging:** The interface will provide clear examples of what constitutes a reportable offense, while also presenting the "Block" feature as the appropriate tool for situations that don't violate guidelines (e.g., "I just didn't enjoy their vibe").
       - **Managed Expectations:** The app will clearly state that a review team will assess the report and take appropriate action based on the evidence and our internal policies.
+
+### Community Reliability: Cancellations & No-Shows
+
+To protect the quality of events and respect the commitment of hosts and fellow attendees, Momento has a clear, non-refundable cancellation policy. This framework is designed to create a reliable and committed community.
+
+- **Non-Refundable Fee:** The $5 event confirmation fee is **non-refundable** in all cancellation scenarios. This fee represents a commitment to attend.
+
+The system distinguishes between several scenarios, each with a different impact on a user's internal `absentee_rating`:
+
+1.  **Early Cancellation (Outside 24 hours of event start)**
+
+    - **Action:** User cancels via the app.
+    - **Outcome:** No penalty to their internal rating. The system will attempt to fill the vacant spot by sending a new, time-sensitive invitation to another well-matched user.
+
+2.  **Late Cancellation (Within 24 hours of event start)**
+
+    - **Action:** User cancels via the app.
+    - **Outcome:** A **moderate penalty** is applied to the user's `absentee_rating`. This is seen as less reliable than an early cancellation. The spot will not be filled.
+
+3.  **The "No-Show"**
+
+    - **Action:** The user does not cancel and does not check in to the event. They are marked as a no-show by the host or other attendees during post-event feedback.
+    - **Outcome:** A **severe penalty** is applied to the user's `absentee_rating`.
+
+4.  **The "Check-in & Bail" (Worst-Case Scenario)**
+    - **Action:** The user checks in upon arrival (or spoofs their location) and then leaves the event without participating. This is the most disruptive behavior as it misleads the host and attendees.
+    - **Outcome:** This must be reported by the host or another attendee post-event. It results in the **most severe penalty** to a user's `absentee_rating` and, if repeated, could lead to temporary suspension from the platform.
+
+> **💡 Design Philosophy: The "Cost of a Handshake"**
+>
+> The decision to make the $5 event fee non-refundable is intentional. It's not primarily a revenue driver; it's a behavioral mechanism. We call it the "Cost of a Handshake."
+>
+> - **It Represents Commitment:** The small financial stake elevates the RSVP from a casual "maybe" to a firm commitment, which is the foundation of a reliable community. It ensures that when a user accepts, they have skin in the game, just like the host who is investing their time and effort.
+> - **It Simplifies the System:** A universal no-refund policy eliminates the complexity of tiered refunds, payment processor fees for reversals, and potential user confusion. The rule is simple and applies to everyone equally.
+> - **It Defines Our "Worst Case":** We've defined the worst-case scenario not as someone who doesn't show up, but as someone who shows up and _then_ bails. This is the most damaging action to the social fabric of an event. Our penalty system is weighted to reflect this, punishing deception more than absence. By having users commit financially, we can focus our "punishments" on the behavioral metrics that truly matter for community health.
 
 ### Reporting & Consequence Framework
 

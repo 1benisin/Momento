@@ -16,8 +16,8 @@ The application will be organized into several key user flows and screen groups.
 ### 1. Onboarding & Authentication Flow
 
 - **`SplashScreen`**: Initial launch screen.
-- **`AuthScreen`**: Options for "Log In" or "Sign Up".
-- **`SignUpFlow`**:
+- **`AuthScreen`**: Options for "Log In", "Sign Up", and "Become a Host".
+- **`SignUpFlow (Participant)`**:
   - `PhoneInputScreen`: For entering a US-based phone number. This screen will also handle non-US numbers by directing them to the `InternationalWaitlistScreen`.
   - `OTPScreen`: For entering the one-time password received via SMS to verify the phone number.
   - `ProfileSetupScreen`: For entering initial public profile information (name, bio).
@@ -27,14 +27,37 @@ The application will be organized into several key user flows and screen groups.
 - **`InternationalWaitlistScreen`**: A screen that informs non-US users that Momento is not yet available in their country and invites them to join a waitlist.
 - **`AIOnboardingInterviewScreen` (Future)**: A guided, AI-driven voice conversation to conduct a user interview, as an enhancement to the standard `InterestBuilderScreen`.
 
-### 2. Core App Navigation (Tab Bar)
+### 2. Host Onboarding Flow (for Organizations)
 
-- **`HomeTab`**: The main dashboard. Displays upcoming events and pending invitations. Can be expanded in the future to include curated content (articles, videos).
-- **`EventsTab`**: Hub for all event-related activities.
-  - Contains sub-views for "Invitations," "Confirmed," and "Past" events.
+- **`HostSignUpScreen`**: For hosts to sign up with an email and password.
+- **`HostProfileSetupScreen`**: A dedicated flow for hosts to enter their organization or venue name, bio, and address, and upload brand photos (logo, venue pictures) for their `host_profiles` record.
+
+### 3. Core App Navigation (Tab Bar)
+
+_This tab bar represents the primary navigation. The visible tabs and their functionality are determined by the user's active **mode**. A `Hybrid User` can switch between these modes, while single-role users will have a static view._
+
+#### Social Mode Navigation
+
+_This is the view for `Social-Only` and `Hybrid` users who are in "Social Mode." It is focused on participation and connection._
+
+- **`HomeTab`**: The main dashboard. Displays upcoming events and pending invitations.
+- **`EventsTab`**: Hub for all event-related activities, including "Invitations," "Confirmed," and "Past" events.
+- **`DiscoveryFeedTab` (or nested here)**: The swipeable deck of past events for refining interests.
 - **`MemoryBookTab`**: Gallery of "Face Cards" for every person met.
-- **`MessagesTab`**: List of all 1-on-1 conversations.
-- **`ProfileTab`**: The user's own profile view, showing their `Social Profile` and `Host Profile` (if applicable). This is the main entry point for the `SettingsScreen` and `My Camera Roll`.
+- **`MessagesTab`**: List of all 1-on-1 conversations with other participants.
+- **`ProfileTab`**: The user's own `Social Profile`. This is the entry point for `Settings` and contains the **`ModeSwitcher`** component for `Hybrid Users`.
+
+#### Host Mode Navigation
+
+_This is the view for `Host-Only` and `Hybrid` users who are in "Host Mode." It is a streamlined dashboard focused on event management._
+
+- **`DashboardTab`**: Key metrics at a glance: revenue, ratings, upcoming event headcounts.
+- **`EventsTab`**: Manage all created events (drafts, upcoming, past). Entry point to the `CreateEventFlow`.
+- **`InboxTab`**: A dedicated inbox for messages from attendees of the host's events.
+- **`ProfileTab`**: Manage the public `Host Profile`, brand photos, payout settings, etc. Contains the **`ModeSwitcher`** for `Hybrid Users`.
+
+---
+
 - **`EventDetailScreen`**: A multi-state screen for a confirmed event.
   - **Upcoming State**: Shows full itinerary, logistics, and collaborator info.
   - **Arrival State**: Reveals the "Deck of Cards" UI for check-in once at least two attendees have arrived.
@@ -52,6 +75,7 @@ The application will be organized into several key user flows and screen groups.
   - Private notes section.
   - Toggles for "Connect Again" and "Don't Connect Again" preference signals.
   - A button to launch the `ShareSocialsModal`.
+  - Display of any social media links shared by the other user.
 - **`UserProfileScreen`**: The public profile view of another user.
 - **`FaceCardStylingScreen`**: Where a user can apply AI-driven styles, borders, and other customizations to their Face Card photo after an event.
 - **`ShareSocialsModal`**: A modal launched from the `ConnectionDetailScreen` that allows a user to select which of their saved social media links they want to share with a specific connection.
@@ -61,7 +85,9 @@ The application will be organized into several key user flows and screen groups.
   - **My Profile Photos**: Photos used for their public `social_profile`.
   - **My Event Uploads**: A grid of every photo they have personally uploaded across all event galleries.
   - **Event Albums**: A list of all attended events, acting as shortcuts to each `SharedEventGalleryScreen`.
+    _Note: This screen is for participants. Business hosts manage their photos from the `HostDashboardScreen`._
 - **`InAppNotificationBanner`**: A banner/toast for displaying notifications while the user is inside the app.
+- **`ModeSwitcher`**: A UI control, likely a dropdown or segmented control in the `ProfileTab`, that allows a `Hybrid User` to toggle between "Social Mode" and "Host Mode."
 
 ### 5. Settings & User Management
 
@@ -70,10 +96,13 @@ The application will be organized into several key user flows and screen groups.
 - **`NotificationSettingsScreen`**: For managing push and SMS notification preferences.
 - **`PaymentMethodsScreen`**: For adding/removing payment methods.
 - **`TransactionHistoryScreen`**: For viewing past payments.
-- **`MySocialLinksScreen`**: For managing the user's own social media links to be shared via "Social Connect."
+- **`MySocialLinksScreen`**: For managing the user's own social media links to be shared via "Social Connect." For hosts, this screen includes a toggle for each link to make it publicly visible on their Host Profile.
 - **`SecurityAndPrivacyScreen`**: Hub for safety features, including the blocked users list.
 - **`BlockedUsersScreen`**: A screen to view and manage blocked users.
 - **`VerificationScreen`**: The UI flow for identity verification.
+- **`ReportUserFlow`**: A guided flow for submitting a formal report against another user.
+- **`ReportPhotoModal`**: A modal for reporting an inappropriate photo from the `SharedEventGalleryScreen`.
+- **`CoachingModuleScreen`**: A guided, mandatory walkthrough on community standards for users who have received a serious report.
 
 ### 6. Hosting Flow
 
@@ -89,60 +118,7 @@ The application will be organized into several key user flows and screen groups.
 ### 7. Safety & Moderation
 
 - **`ReportAndBlockModal`**: Presents the user with clear options to "Block" or "Report" another user.
-- **`ReportUserFlow`**: A guided flow for submitting a formal report against another user.
-- **`ReportPhotoModal`**: A modal for reporting an inappropriate photo from the `SharedEventGalleryScreen`.
-- **`CoachingModuleScreen`**: A guided, mandatory walkthrough on community standards for users who have received a serious report.
 
 ### 8. Discovery & Content
 
-- **`ProfileBrowseScreen`**: A dedicated screen for browsing and "liking" other user profiles to feed the matching algorithm.
-- **`Card`**: The base container for previews and info, with Art Deco/gilded styling.
-- **`Avatar`**: For user profile pictures.
-- **`Icon`**: A consistent wrapper for our icon library.
-- **`Modal`**: A generic component for pop-ups.
-- **`ActionSheet`**: A slide-up menu from the bottom of the screen, used for contextual actions like "Block" or "Report".
-- **`Spinner`**: To indicate loading states.
-- **`Switch`**: For settings toggles.
-- **`EmptyState`**: A reusable component for screens that have no content yet (e.g., no invitations, no memories), typically containing an icon, title, and message.
-- **`StyledText`**: To enforce consistent typography (`title`, `heading`, `body`).
-
----
-
-## Components
-
-### 1. Core UI Primitives (The Building Blocks)
-
-- **`Button`**: For all primary actions (`primary`, `secondary`, `outline` variants).
-- **`Input`**: Standard text input for forms.
-- **`AddNoteInput`**: A larger text area, specifically for the private notes feature on the `ConnectionDetailScreen`.
-- **`Card`**: The base container for previews and info, with Art Deco/gilded styling.
-- **`Avatar`**: For user profile pictures.
-- **`Icon`**: A consistent wrapper for our icon library.
-- **`Modal`**: A generic component for pop-ups.
-- **`Spinner`**: To indicate loading states.
-- **`Switch`**: For settings toggles.
-- **`StyledText`**: To enforce consistent typography (`title`, `heading`, `body`).
-
-### 2. Layout & Navigation Components
-
-- **`ScreenWrapper`**: Handles safe areas, backgrounds, and scrolling for every screen.
-- **`Header`**: A custom header with title, back button, and action buttons.
-- **`MapView`**: A wrapper for an interactive map component to display event locations and itineraries.
-
-### 3. Domain-Specific Components (The App's "Lego Bricks")
-
-- **`EventListItem`**: A compact preview of an event for lists, used on the `EventsTab` to show invitations, confirmed events, and past events.
-- **`EventPostFeed`**: A component for the `EventDetailScreen` that displays a list of `EventPostItem` components.
-- **`EventPostItem`**: A component to render a single message in an event's public message feed.
-- **`FaceCard`**: The signature, highly-stylized component for the Memory Book.
-- **`PastEventCard`**: A full-screen, visually rich card used in the `DiscoveryFeedScreen`. It displays the details of a real, highly-rated past event to help users refine their interest profile.
-- **`PossibilityCard`**: The swipeable, interactive card used in the `InterestDiscoveryScreen` during onboarding to gauge a user's interest in fictitious events.
-- **`ItineraryStop`**: Renders a single stop in an event's itinerary.
-- **`CollaboratorInput`**: A form component in the `CreateEventFlow` for adding collaborators, which launches the `CollaboratorSearchScreen`.
-- **`ConversationListItem`**: A row in the messages list (avatar, name, message preview).
-- **`ChatMessage`**: The chat bubble for DMs.
-- **`KudoBadge`**: The small, collectible badge for peer-to-peer kudos.
-- **`RatingInput`**: Interactive star-based rating component.
-- **`SettingRow`**: A reusable row for settings screens.
-- **`DeckOfCardsAttendee`**: The card used in the arrival flow showing an attendee's photo. This must have a visually distinct **`HostCard`** variant to clearly identify the host in the arrival deck.
-- **`AIImageGenerator` (Future)**: A component for the `CreateEventFlow` that allows hosts to generate unique invitation images based on event details.
+- \*\*`

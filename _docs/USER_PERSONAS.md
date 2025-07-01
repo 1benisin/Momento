@@ -4,7 +4,7 @@ This document defines the key user roles within the Momento ecosystem through de
 
 - **[The Participant: "Alex, the Newcomer"](#1-the-participant-alex-the-newcomer)**: Represents the core user who is looking to attend events, meet new people, and find genuine connections.
 - **[The User Host: "David, the Curator"](#2-the-user-host-david-the-curator)**: Represents the individual user who is passionate about creating and hosting unique events for others.
-- **[The Business Host: "The Juniper Cafe"](#3-the-business-host-the-juniper-cafe)**: Represents a local business using Momento to drive foot traffic and build community by hosting events.
+- **[The Community Host: "The Juniper Cafe"](#3-the-community-host-the-juniper-cafe)**: Represents a local business using Momento to drive foot traffic and build community by hosting events.
 
 ---
 
@@ -71,9 +71,9 @@ The Momento ecosystem is comprised of three key roles. An individual account can
 
 ---
 
-## 3. The Business Host: "The Juniper Cafe"
+## 3. The Community Host: "The Juniper Cafe"
 
-- **Role:** `Business Host`
+- **Role:** `Community Host`
 - **Bio:** The Juniper Cafe is a local, independent coffee shop with a passion for community. They have a beautiful space but struggle with inconsistent foot traffic, especially on weeknights. They want to find creative ways to bring new customers in the door.
 - **Photo:** [Image of a cozy, well-lit cafe interior, maybe with a "Community" chalkboard sign]
 
