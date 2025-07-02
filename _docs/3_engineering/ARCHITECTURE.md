@@ -36,3 +36,36 @@ The lynchpin of this design is the **"Mode Switcher,"** a clear control within t
 This approach ensures that single-role users have a simple, dedicated experience, while hybrid users have the power to switch contexts without clutter.
 
 [![](https://mermaid.ink/svg/pako:eNqNVM1vgzAM_R_Fp9ZJBqwNGrA-9MQeadtNGw5JsuIAsZFThk3w75cAJ52mdmkhP_f7vO-d8NB9cYA0plsDXlSFl-Z1i35evWwqlfL5e9mC_j18Pq7SjU_QOqY_621t4dO-_vH82e752_X1131v3S5f2-9z-U6-t3_j93v_v-8-x_o4P0_7k35t8T16S_iX-v1_Xf_q9L-Hn10cR_gR8D7p-2t1aV9O2gH-x2wM46J6rW9iW5mR5jU_D11q7G2e_WqY7d_l0yWlO2_yTj1yY_w-Ua996-5Jt9-iX8-e-n24c7F55c7yS5P44T4S2zQc2K2a3TId_h_g5p-Tf2l2xT4-eUf8f2MOMz6b5Sfe-L0F-rYw2qO8eQyN8WbI-bT69-I-a_xP17vP9u_c9b78H8i_84L78H8i_o8h74v_T1g_5b76-yv-F8gfiL7L6fX31v1_5v6nsv6_g_WPs_wP6P2X_Z-z_A_o_Yf9n7P8D-v8Cg753MA)](#)
+
+## 4. Backend & Database Architecture
+
+### Geospatial Indexing for Efficient Location Queries
+
+A core feature of Momento's matching algorithm is filtering events based on a user's `distance_preference`. As the number of users and events grows, performing a naive distance calculation for every event for every user will become a significant performance bottleneck.
+
+To solve this, we will leverage geospatial indexing in our PostgreSQL database (via Supabase).
+
+1.  **Enable PostGIS Extension**: The first step is to enable the `postgis` extension in our Supabase instance, which provides powerful geospatial functions and data types.
+
+2.  **Use Geographic Data Types**: In the `locations` table, we will store coordinates not as simple `float` columns, but as a single `geography` or `geometry` point. The `geography` type is often preferred as it accounts for the Earth's curvature, providing more accurate distance calculations over larger areas.
+
+3.  **Create a GIST Index**: We will create a **GiST (Generalized Search Tree) index** on the new geospatial column. This type of index is specifically designed to accelerate spatial queries.
+
+4.  **Efficient Queries**: With the index in place, we can use PostGIS functions like `ST_DWithin` to perform highly efficient searches. The query will look something like this:
+
+    ```sql
+    -- Find all events within 25 miles (approx. 40233.6 meters) of a user's location
+    SELECT event.*
+    FROM events
+    JOIN event_itinerary_stops AS stops ON events.id = stops.event_id
+    JOIN locations ON stops.location_id = locations.id
+    WHERE ST_DWithin(
+      locations.point,
+      -- User's home location, cast to geography
+      ST_MakePoint(user_longitude, user_latitude)::geography,
+      -- Distance in meters
+      40233.6
+    );
+    ```
+
+This architectural decision is critical for ensuring the matching process remains fast and scalable as the platform grows. It allows the database to quickly eliminate the vast majority of events that are outside a user's radius, rather than calculating the distance for each one.

@@ -51,6 +51,17 @@ When a new event is created, we generate an `EventVector` for its description. T
 - `CosineSimilarity` is a standard metric that measures the similarity between two vectors. A score of `1` means they are identical, `-1` means they are opposite, and `0` means they are unrelated.
 - This formula rewards events similar to a user's likes and penalizes events similar to their dislikes.
 
+#### Hard Filters (Pre-computation)
+
+Before calculating the `MatchScore`, the system will first apply a set of hard filters to exclude any events that are definitively not a match. This is more efficient than calculating vector similarity for every event in the system.
+
+An event will be **excluded** from a user's potential matches if:
+
+- `Event.location` is outside the user's `profile.distancePreference` radius. We can add soft buffer and a negative match score to anything that is in the buffer.
+- `Event.estimatedEventCost` is above the user's `profile.priceSensitivity` setting. We can add a buffer and a negative match score the farther out of the user's price sensitivity the event is.
+
+Only events that pass these hard filters will proceed to the vector-based scoring stage.
+
 #### The "Holistic" User Profile
 
 The user's vectors are not static and aren't just from the onboarding flow. They will be a weighted average of multiple text sources to create a richer profile:
@@ -67,24 +78,40 @@ A user's interests are not static. To prevent an "invite rut" where a user is on
 
 ### Primary Evolution Mechanisms
 
-1.  **The Discovery Feed:**
+1.  **The "Discover your Interests" Feed:**
 
-    - The primary tool for post-onboarding interest refinement. Users can browse a feed of real, highly-rated past events and "like" the ones that appeal to them.
-    - A "like" on a past event in the Discovery Feed is a strong, explicit signal that adds the event's vector to the user's `positive_interest_vector`.
+    - The primary tool for post-onboarding interest refinement. Users can browse a feed of real, highly-rated past events and indicate their interest.
+    - An affirmative swipe on a past event is a strong, explicit signal that adds the event's vector to the user's `positive_interest_vector`.
 
-2.  **Post-Event Ratings:**
+2.  **The "Discover your People" Feed:**
+
+    - This is the primary tool for understanding a user's "type." Users browse a feed of other user profiles and indicate potential connection.
+    - An affirmative swipe ("I'd like to create a memory with them") is a signal used to build a `person_attraction_vector` for the user. This helps the algorithm match them with more compatible people in future events.
+
+3.  **Post-Event Ratings:**
 
     - When a user rates an event highly (e.g., 4-5 stars), the system can slightly "nudge" their `positive_interest_vector` closer to that event's vector. This reinforces preferences with real-world, positive experiences.
 
-3.  **Explicit Decline Reasons:**
+4.  **Explicit Decline Reasons:**
     - When a user declines an invitation, their stated reason provides a crucial signal.
     - **"This event isn't for me"**: Strongly updates the `negative_interest_vector`.
     - **"I'm looking to try new things"**: Temporarily increases an "exploration" parameter for the user's next few invites, encouraging the algorithm to suggest events outside their core cluster.
+    - **"Too short notice"**: Does not affect the interest vector, but provides a signal to incrementally increase the user's `min_lead_time_days` preference in the `users` table.
+    - **"Too far away" / "Too expensive"**: Does not affect the interest vector. Instead, this provides a strong signal to trigger the "Contextual Nudge" UI flow, prompting the user to set their `distancePreference` or `priceSensitivity` if they haven't already.
 
 ### Secondary Evolution Mechanisms (Future)
 
 - A user's vectors should evolve over time. When a user attends an event and rates it highly, their corresponding persona vector can be "nudged" slightly closer to that event's vector, reinforcing their preferences with real-world behavior.
 - **Vector Time Decay:** The influence of past actions on a user's profile should fade over time, giving more weight to recent signals.
+
+### Lead-Time & Availability Scoring
+
+To respect user preferences without creating rigid filters, we introduce a "penalty" system that adjusts the final `MatchScore` based on event timing. This ensures users might still see a "perfect but last-minute" event, but are less likely to be bothered by invites that don't fit their schedule.
+
+**`FinalScore = MatchScore - LeadTimePenalty - AvailabilityPenalty`**
+
+- **`LeadTimePenalty`**: A score reduction applied if `event.lead_time < user.min_lead_time_days`. The penalty is proportional to how far inside the user's preferred window the event is.
+- **`AvailabilityPenalty`**: A score reduction applied if the event falls on a day/time the user has marked as "yellow" or "red" in their `availability_preferences`. The penalty is higher for red days than yellow days.
 
 ---
 

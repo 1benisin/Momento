@@ -42,7 +42,9 @@ _This is the view for `Social-Only` and `Hybrid` users who are in "Social Mode."
 
 - **`HomeTab`**: The main dashboard. Displays upcoming events and pending invitations.
 - **`EventsTab`**: Hub for all event-related activities, including "Invitations," "Confirmed," and "Past" events.
-- **`DiscoveryFeedTab` (or nested here)**: The swipeable deck of past events for refining interests.
+- **`DiscoveryTab`**: A main tab with two modes for discovering new things.
+  - **Interests Mode**: The "Help us Discover your Interests" flow, with a swipeable deck of past events.
+  - **People Mode**: The "Help us Discover your Type" flow, with a swipeable deck of user profiles.
 - **`MemoryBookTab`**: Gallery of "Face Cards" for every person met.
 - **`MessagesTab`**: List of all 1-on-1 conversations with other participants.
 - **`ProfileTab`**: The user's own `Social Profile`. This is the entry point for `Settings` and contains the **`ModeSwitcher`** component for `Hybrid Users`.
@@ -59,7 +61,7 @@ _This is the view for `Host-Only` and `Hybrid` users who are in "Host Mode." It 
 ---
 
 - **`EventDetailScreen`**: A multi-state screen for a confirmed event.
-  - **Upcoming State**: Shows full itinerary, logistics, and collaborator info.
+  - **Upcoming State**: Shows full itinerary, logistics, collaborator info, and a clear `CostBreakdown` component that separates the **Confirmation Fee** (paid to Momento) from the **Estimated Event Cost** (paid to the host/venue).
   - **Arrival State**: Reveals the "Deck of Cards" UI for check-in once at least two attendees have arrived.
   - **Post-Event State**: Hub for feedback, messaging, the shared photo gallery, and an event-specific message board (`EventPostFeed`).
 - **`FirstEventCheckInPhotoScreen`**: A one-time screen shown when a user checks into their first event, prompting them to take their initial "authentic" photo to create their first Face Card.
@@ -79,7 +81,8 @@ _This is the view for `Host-Only` and `Hybrid` users who are in "Host Mode." It 
 - **`UserProfileScreen`**: The public profile view of another user.
 - **`FaceCardStylingScreen`**: Where a user can apply AI-driven styles, borders, and other customizations to their Face Card photo after an event.
 - **`ShareSocialsModal`**: A modal launched from the `ConnectionDetailScreen` that allows a user to select which of their saved social media links they want to share with a specific connection.
-- **`DiscoveryFeedScreen`**: A dedicated screen, potentially a main tab, where users can browse and interact with a swipeable deck of `PastEventCard` components to signal their current interests to the matching algorithm.
+- **`InterestDiscoveryScreen`**: The swipeable deck of `PastEventCard` components used to discover a user's interests.
+- **`ProfileDiscoveryScreen`**: The swipeable deck of user profile cards used to discover a user's type.
 - **`ContentDetailScreen`**: For displaying long-form content like articles or videos, likely launched from the `HomeTab`.
 - **`CameraRollScreen`**: A personal gallery for a user to manage their photos, organized into three sections:
   - **My Profile Photos**: Photos used for their public `social_profile`.
@@ -97,6 +100,8 @@ _This is the view for `Host-Only` and `Hybrid` users who are in "Host Mode." It 
 - **`PaymentMethodsScreen`**: For adding/removing payment methods.
 - **`TransactionHistoryScreen`**: For viewing past payments.
 - **`MySocialLinksScreen`**: For managing the user's own social media links to be shared via "Social Connect." For hosts, this screen includes a toggle for each link to make it publicly visible on their Host Profile.
+- **`InvitationPreferencesScreen`**: Screen for configuring soft invite preferences; includes a `NoticePreferenceSlider` component for lead-time settings and day-of-week availability toggles.
+- **`EventPreferencesScreen`**: Screen for configuring hard event filters. Contains the `DistancePreferenceSlider` and `PriceSensitivitySelector`. This screen is typically reached via a deep link from a contextual nudge.
 - **`SecurityAndPrivacyScreen`**: Hub for safety features, including the blocked users list.
 - **`BlockedUsersScreen`**: A screen to view and manage blocked users.
 - **`VerificationScreen`**: The UI flow for identity verification.
@@ -104,7 +109,22 @@ _This is the view for `Host-Only` and `Hybrid` users who are in "Host Mode." It 
 - **`ReportPhotoModal`**: A modal for reporting an inappropriate photo from the `SharedEventGalleryScreen`.
 - **`CoachingModuleScreen`**: A guided, mandatory walkthrough on community standards for users who have received a serious report.
 
-### 6. Hosting Flow
+### 6. Help & Support Flow
+
+- **`HelpCenterScreen`**: The main entry point for support, accessed from `Settings`. It presents a list of categories to guide the user.
+  - "Report a Technical Issue"
+  - "Suggest an Improvement"
+  - "Help with a Payment"
+  - "Hosting Question"
+  - "Account or Profile Issue"
+  - "Report Another User" (This initiates the `ReportUserFlow` from a new context).
+  - "General Inquiry"
+- **`SupportTicketFormScreen`**: A dynamic form screen whose content changes based on the category selected in the `HelpCenterScreen`. It includes pre-filled, selectable dropdowns where applicable.
+  - **For Payments**: Includes a dropdown of the user's recent transactions.
+  - **For Hosting**: Includes a dropdown of the host's created events.
+  - All dropdowns will include a "General Question" or "Other" option.
+
+### 7. Hosting Flow
 
 - **`HostDashboardScreen`**: A dashboard for hosts to manage their events.
 - **`CreateEventFlow`**: A multi-step process for creating and defining a new event. The flow must support:
@@ -115,10 +135,43 @@ _This is the view for `Host-Only` and `Hybrid` users who are in "Host Mode." It 
 - **`ManageEventScreen`**: The host's view for managing an active or upcoming event.
 - **`CollaboratorSearchScreen`**: A sub-screen or modal for hosts to find and add collaborators by searching for other Momento users.
 
-### 7. Safety & Moderation
+### 8. Safety & Moderation
 
 - **`ReportAndBlockModal`**: Presents the user with clear options to "Block" or "Report" another user.
 
-### 8. Discovery & Content
+### 9. Discovery & Content
 
 - \*\*`
+
+---
+
+## Components
+
+This section catalogs the reusable UI elements that form the building blocks of the application's screens.
+
+### Modals & Overlays
+
+- **`DeclineFeedbackModal`**: A modal presented after a user declines an invitation, asking for a reason. Includes options for "Too short notice," "Too far away," and "Too expensive."
+- **`ContextualNudgeModal`**: A one-time, educational modal that appears after a user action (like declining an event for being "Too far away") to deep-link them to a relevant setting.
+
+### Indicators & Badges
+
+- **`ShortNoticeBadge`**: A small, non-intrusive badge displayed on invitation cards for events with a lead-time shorter than the user's preference.
+
+### Domain-Specific Components
+
+- **`CostBreakdown`**: A UI component used on the `EventDetailScreen` that clearly distinguishes between the two types of costs.
+  - **Line Item 1**: "Confirmation Fee: $5" with a subtitle explaining this is paid to Momento to secure a spot and encourage commitment.
+  - **Line Item 2**: "Estimated Event Cost: $$" with a subtitle explaining this is an estimate paid directly to the host or venue and is not processed by Momento.
+
+### Controls & Inputs
+
+- **`NoticePreferenceSlider`**: A slider control allowing users to set their ideal lead-time for event invitations (from 0 to 14 days).
+- **`DistancePreferenceSlider`**: A slider control allowing a user to set their maximum travel distance for events (e.g., 1-25 miles). Ideally, this control would be overlaid on a map that visually adjusts a circle representing their travel radius from their home address.
+- **`PriceSensitivitySelector`**: A segmented control allowing a user to set their typical price comfort level for events.
+  - `$` (e.g., Free - $15)
+  - `$$` (e.g., $15 - $40)
+  - `$$$` (e.g., $40 - $75)
+  - `$$$$` (e.g., $75+)
+- **`DayWeekendToggle`**: A simple toggle or segmented control for setting basic "Weekday" vs. "Weekend" availability preferences.
+- **`AvailabilityGrid`**: A 7x2 grid for setting detailed availability preferences for each day and night of the week. Activated via an "Advanced" dropdown in the `InvitationPreferencesScreen`.

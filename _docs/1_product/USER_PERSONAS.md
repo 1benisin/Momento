@@ -20,7 +20,7 @@ The Momento ecosystem is comprised of three key roles. An individual account can
 
 ### Goals:
 
-- To find genuine, platonic connections without the romantic pressure of traditional dating apps.
+- To find genuine connections and meet like-minded people in a low-pressure setting. She's open to dating, but tired of the high-stakes, one-on-one nature of traditional apps.
 - To discover interesting, off-the-beaten-path activities in her new city.
 - To feel safe and comfortable in social settings with strangers.
 - To build a "memory book" of people she's met and experiences she's had.

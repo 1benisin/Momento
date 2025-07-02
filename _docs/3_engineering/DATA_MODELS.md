@@ -36,6 +36,7 @@ This document is organized into the following data models. Each model represents
 - **[Payments](#payments-table)**: Tracks payment transactions for events.
 - **[Blocked Users](#blocked_users-table)**: Manages user-to-user blocking.
 - **[Reports](#reports-table)**: Logs formal reports submitted by users for moderation.
+- **[Support Tickets](#support_tickets-table)**: Logs support requests submitted by users to the Momento team.
 - **[Push Notification Tokens](#push_notification_tokens-table)**: Stores device tokens for push notifications.
 - **[User Notification Settings](#user_notification_settings-table)**: Manages user's notification preferences.
 
@@ -55,19 +56,23 @@ A `user` record can be associated with a `social_profiles` record, a `host_profi
 - **Host-Only User (Community Host)**: Has one `users` record and one `host_profiles` record.
 - **Hybrid User (User Host)**: Has one `users` record linked to both a `social_profiles` and a `host_profiles` record.
 
-| Column                | Type         | Description                                                                                            |
-| --------------------- | ------------ | ------------------------------------------------------------------------------------------------------ |
-| `id`                  | `uuid`       | Primary Key. Foreign key to `auth.users.id`.                                                           |
-| `phone_number`        | `text`       | User's private phone number. Used for authentication. For MVP, this must be a US-based number. Unique. |
-| `email`               | `text`       | Optional. User's private email, used for account recovery or payment receipts.                         |
-| `last_name`           | `text`       | User's private last name.                                                                              |
-| `birth_date`          | `date`       | User's date of birth, for age calculation.                                                             |
-| `is_verified`         | `boolean`    | Defaults to `false`. True if user completed ID verification.                                           |
-| `status`              | `text`       | e.g., 'active', 'suspended', 'verification_pending', 'banned'.                                         |
-| `active_role`         | `text`       | For Hybrid Users, stores the last active role ('participant' or 'host'). Defaults to 'participant'.    |
-| `user_number`         | `bigserial`  | A unique, sequential number assigned to the user upon creation to identify early adopters.             |
-| `payment_customer_id` | `text`       | Stripe (or other payment provider) customer ID.                                                        |
-| `created_at`          | `timestampz` |                                                                                                        |
+| Column                     | Type         | Description                                                                                                                                                                                                                    |
+| -------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `id`                       | `uuid`       | Primary Key. Foreign key to `auth.users.id`.                                                                                                                                                                                   |
+| `phone_number`             | `text`       | User's private phone number. Used for authentication. For MVP, this must be a US-based number. Unique.                                                                                                                         |
+| `email`                    | `text`       | Optional. User's private email, used for account recovery or payment receipts.                                                                                                                                                 |
+| `last_name`                | `text`       | User's private last name.                                                                                                                                                                                                      |
+| `birth_date`               | `date`       | User's date of birth, for age calculation.                                                                                                                                                                                     |
+| `is_verified`              | `boolean`    | Defaults to `false`. True if user completed ID verification.                                                                                                                                                                   |
+| `status`                   | `text`       | e.g., 'active', 'suspended', 'verification_pending', 'banned'.                                                                                                                                                                 |
+| `active_role`              | `text`       | For Hybrid Users, stores the last active role ('participant' or 'host'). Defaults to 'participant'.                                                                                                                            |
+| `user_number`              | `bigserial`  | A unique, sequential number assigned to the user upon creation to identify early adopters.                                                                                                                                     |
+| `payment_customer_id`      | `text`       | Stripe (or other payment provider) customer ID.                                                                                                                                                                                |
+| `min_lead_time_days`       | `integer`    | User's preferred minimum notice for event invites, in days. Defaults to 3.                                                                                                                                                     |
+| `availability_preferences` | `jsonb`      | Stores day/week availability. e.g., `{ "mon": { "day": "green", "night": "yellow" } }`                                                                                                                                         |
+| `distance_preference`      | `integer`    | User's max travel distance in miles. Defaults to 25. A hard filter in the matching algorithm.                                                                                                                                  |
+| `price_sensitivity`        | `integer`    | User's max price comfort level (e.g., 1-4). A hard filter in the matching algorithm. If unset, the system defaults to showing all events (equivalent to the max level) to avoid unintentionally hiding options from new users. |
+| `created_at`               | `timestampz` |                                                                                                                                                                                                                                |
 
 ### `waitlist_users` Table
 
@@ -244,25 +249,26 @@ This table links an event to the people who are helping make it happen, replacin
 
 Defines a specific event created by a host. The event's location, timing, and facilitators are now handled by the `event_itinerary_stops` and `event_collaborators` tables, respectively.
 
-| Column             | Type         | Description                                                                        |
-| ------------------ | ------------ | ---------------------------------------------------------------------------------- |
-| `id`               | `uuid`       | Primary Key.                                                                       |
-| `host_id`          | `uuid`       | Foreign key to `host_profiles.id`.                                                 |
-| `title`            | `text`       | The name of the event.                                                             |
-| `description`      | `text`       | Detailed description of the event.                                                 |
-| `cover_image_url`  | `text`       | Optional. A publicly accessible URL for the event's cover image.                   |
-| `host_is_attendee` | `boolean`    | Defaults to `false`. If true, the host is also a participant.                      |
-| `min_participants` | `integer`    | Minimum number of attendees required.                                              |
-| `max_participants` | `integer`    | Maximum number of attendees allowed.                                               |
-| `minimum_age`      | `integer`    | Optional minimum age requirement for attendees.                                    |
-| `arrival_signpost` | `text`       | A real-world visual cue for attendees (e.g., "Look for the green picnic blanket"). |
-| `estimated_cost`   | `text`       | A text description of potential costs (e.g., "$20-30 for dinner").                 |
-| `status`           | `text`       | e.g., 'planned', 'confirmed', 'completed', 'cancelled'.                            |
-| `created_at`       | `timestampz` |                                                                                    |
+| Column                 | Type         | Description                                                                                                                             |
+| ---------------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                   | `uuid`       | Primary Key.                                                                                                                            |
+| `host_id`              | `uuid`       | Foreign key to `host_profiles.id`.                                                                                                      |
+| `title`                | `text`       | Title of the event.                                                                                                                     |
+| `description`          | `text`       | A detailed, rich-text description of the event.                                                                                         |
+| `event_vector`         | `vector`     | The vector embedding of the event's description, used for matching.                                                                     |
+| `status`               | `text`       | e.g., 'draft', 'published', 'completed', 'cancelled'.                                                                                   |
+| `min_attendees`        | `integer`    | Minimum number of attendees for the event to happen.                                                                                    |
+| `max_attendees`        | `integer`    | Maximum number of attendees for the event.                                                                                              |
+| `age_min`              | `integer`    | Minimum age requirement for attendees.                                                                                                  |
+| `age_max`              | `integer`    | Maximum age requirement for attendees.                                                                                                  |
+| `arrival_signpost`     | `text`       | A clear, real-world cue for attendees to find the group (e.g., "Look for the red balloon").                                             |
+| `confirmation_fee`     | `integer`    | The non-refundable fee in cents paid to Momento to confirm attendance (e.g., 500 for $5.00).                                            |
+| `estimated_event_cost` | `jsonb`      | An object representing the expected cost paid at the event. e.g., `{ "range": "$$", "details": "for food" }`. Not processed by Momento. |
+| `created_at`           | `timestampz` |                                                                                                                                         |
 
 ### `invitations` Table
 
-Tracks the status of each invitation sent for an event. When an event is created with `host_is_attendee` set to `true`, application logic should automatically create a corresponding record here for the host's social profile with a `status` of `'confirmed'`.
+Tracks which users are invited to which events and their status.
 
 | Column           | Type         | Description                                                                                                                    |
 | ---------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------ |
@@ -463,15 +469,41 @@ _Note: The primary key for this table would be a composite of (`blocker_user_id`
 
 This table logs formal reports submitted by users for review by the Momento team.
 
-| Column             | Type         | Description                                                      |
-| ------------------ | ------------ | ---------------------------------------------------------------- |
-| `id`               | `uuid`       | Primary Key.                                                     |
-| `reporter_user_id` | `uuid`       | Foreign key to `users.id` (who filed the report).                |
-| `reported_user_id` | `uuid`       | Foreign key to `users.id` (who is being reported).               |
-| `category`         | `text`       | The category of violation (e.g., 'harassment', 'spam').          |
-| `comments`         | `text`       | The detailed comments provided by the reporter.                  |
-| `status`           | `text`       | The internal status of the report (e.g., 'pending', 'resolved'). |
-| `created_at`       | `timestampz` |                                                                  |
+| Column             | Type         | Description                                                           |
+| ------------------ | ------------ | --------------------------------------------------------------------- |
+| `id`               | `uuid`       | Primary Key.                                                          |
+| `reporter_user_id` | `uuid`       | Foreign key to `users.id` (who filed the report).                     |
+| `reported_user_id` | `uuid`       | Foreign key to `users.id` (who is being reported).                    |
+| `category`         | `text`       | The category of violation (e.g., 'harassment', 'spam').               |
+| `comments`         | `text`       | The detailed comments provided by the reporter.                       |
+| `status`           | `text`       | The internal status of the report (e.g., 'pending', 'resolved').      |
+| `event_id`         | `uuid`       | **Nullable**. Foreign key to `events.id` where the incident occurred. |
+| `created_at`       | `timestampz` |                                                                       |
+
+---
+
+## 8. App Support & Moderation
+
+This section defines the data models for user safety, moderation, and direct user-to-app support channels.
+
+### `support_tickets` Table
+
+This table logs direct support requests from a user to the Momento team. It is separate from the user-to-user `reports` system.
+
+| Column                  | Type         | Description                                                                                                                |
+| ----------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| `id`                    | `uuid`       | Primary Key.                                                                                                               |
+| `ticket_number`         | `bigserial`  | A unique, sequential, user-facing ID for reference (#1001, #1002).                                                         |
+| `submitter_user_id`     | `uuid`       | Foreign Key to `users.id`. The backend can check if this user also has a `host_profiles` record to determine their role.   |
+| `reply_to_email`        | `text`       | The email address to which support replies will be sent. Captured at the time of ticket submission.                        |
+| `category`              | `text`       | The main category selected by the user (e.g., 'technical_issue', 'payment_question', 'hosting_question', 'account_issue'). |
+| `body`                  | `text`       | The main message content from the user.                                                                                    |
+| `status`                | `text`       | Internal status (e.g., 'new', 'open', 'resolved', 'closed').                                                               |
+| `associated_event_id`   | `uuid`       | **Nullable**. Foreign key to `events.id`. For issues related to a specific event.                                          |
+| `associated_payment_id` | `uuid`       | **Nullable**. Foreign key to `payments.id`. For issues related to a specific transaction.                                  |
+| `metadata`              | `jsonb`      | Flexible field for auto-attached, non-user-facing diagnostic info (e.g., `{ "app_version": "1.2.3", "os": "iOS 17.1" }`).  |
+| `created_at`            | `timestampz` |                                                                                                                            |
+| `updated_at`            | `timestampz` |                                                                                                                            |
 
 ---
 

@@ -1,6 +1,6 @@
 # Momento
 
-Momento is a social app designed to help people connect through curated, invite-only events. The goal is to move beyond traditional dating apps and foster genuine connections, both platonic and romantic, in small group settings.
+Momento is a social app designed to help people meet more organically through curated, small-group experiences. It's a smarter, lower-pressure way to meet potential romantic partners, with the wonderful side effect of making friends along the way.
 
 ## About The App
 

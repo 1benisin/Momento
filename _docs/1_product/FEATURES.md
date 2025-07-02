@@ -13,22 +13,23 @@ This document is organized into the following sections.
 - [5. The Invitation](#5-the-invitation)
   - [Declining an Invitation](#declining-an-invitation-capturing-user-intent)
   - [Calendar Integration](#post-confirmation--calendar-integration)
-- [6. The Arrival Experience: The Signal](#6-the-arrival-experience-the-signal)
+- [6. Event Preferences & Filtering](#6-event-preferences-filtering)
+- [7. The Arrival Experience: The Signal](#7-the-arrival-experience-the-signal)
   - [The Host Sets the Stage](#the-host-sets-the-stage)
   - [The Deck of Cards](#the-arrival-flow-the-deck-of-cards)
-- [7. Post-Event Interaction](#7-post-event-interaction)
+- [8. Post-Event Interaction](#8-post-event-interaction)
   - [Peer-to-Peer Kudos](#peer-to-peer-kudos)
-- [8. The Memory Book & The Face Card](#8-the-memory-book--the-face-card)
+- [9. The Memory Book & The Face Card](#9-the-memory-book--the-face-card)
   - [The Face Card Lifecycle](#the-face-card-lifecycle)
   - [Social Connect](#social-connect-effortless-social-sharing)
-- [9. Shared Event Galleries & Camera Roll](#9-shared-event-galleries--camera-roll)
-- [10. User Safety: Blocking & Reporting](#10-user-safety-blocking--reporting)
+- [10. Shared Event Galleries & Camera Roll](#10-shared-event-galleries--camera-roll)
+- [11. User Safety: Blocking & Reporting](#11-user-safety-blocking--reporting)
   - [A Three-Tiered System](#a-three-tiered-system)
   - [Community Reliability: Cancellations & No-Shows](#community-reliability-cancellations--no-shows)
   - [Reporting & Consequence Framework](#reporting--consequence-framework)
-- [11. Discovery Feed: Refining Preferences with Past Events](#11-discovery-feed-refining-preferences-with-past-events)
-- [12. Browsing Profiles](#12-browsing-profiles)
-- [13. Notifications](#13-notifications)
+- [12. Discovering Your Interests](#12-discovering-your-interests)
+- [13. Discovering Your Type](#13-discovering-your-type)
+- [14. Notifications](#14-notifications)
 
 ---
 
@@ -67,8 +68,9 @@ To build a foundation of trust and authenticity, Momento will include a feature 
 
 ## 2. Monetization & Payments
 
-- **Model**: Participants will be charged a $5 fee upon accepting an event invitation. This fee confirms their spot and helps reduce no-shows. Hosts who choose to be an attendee for their own event are exempt from this fee.
-- **Payment Flow**: Users can add a credit card to their private profile information at any time. If a user does not have a payment method on file when they accept their first invitation, they will be prompted to add one before their acceptance is confirmed.
+- **Model**: Participants will be charged a flat **`Confirmation Fee`** (e.g., $5) upon accepting an event invitation. This fee secures their spot and is the primary monetization for Momento's curation service.
+- **Host Costs**: Any additional costs (e.g., tickets, food) are handled directly between the participant and the host/venue. These are clearly labeled in the app as the **`Estimated Event Cost`** to avoid confusion. Momento does not process these payments or take a cut.
+- **Payment Flow**: Users can add a credit card to their private profile. If a user does not have a payment method on file when they accept their first invitation, they will be prompted to add one before their acceptance is confirmed.
 - **Integration**: This requires integration with a third-party payment processor (e.g., Stripe) to securely handle credit card storage and transactions.
 - **User-Facing Features**:
   - A dedicated "Payment Methods" screen where users can add or remove credit cards.
@@ -140,6 +142,7 @@ To avoid misinterpreting a user's reason for declining an event, the app will as
 - **"I'm busy that day"**: This signals a logistical conflict, not a lack of interest. The user's interest profile will not be negatively affected.
 - **"This event isn't for me"**: This is a strong negative signal. The event's characteristics will be used to update the user's `negative_interest_vector`, making them less likely to see similar events.
 - **"I'm looking to try new things"**: This is an explicit request for variety. The algorithm will temporarily increase the "exploration" factor for this user, prioritizing events outside their typical interests.
+- **"Too far away"** or **"Too expensive"**: This signals a logistical or financial mismatch. It does not negatively affect the user's interest profile. Instead, it triggers a **Contextual Nudge**, a one-time prompt asking the user if they'd like to set their travel or price preferences to receive more relevant invitations in the future.
 - **"The vibe doesn't feel right"**: A softer "no" that can be logged for analytics without heavily penalizing the event type in the user's profile.
 
 > **Future Enhancement (Phase 3):** > **Feature:** AI-Generated Animated Invitations.
@@ -156,7 +159,16 @@ Once a user's attendance is confirmed (payment successful), they will be present
   - Start and End Times
   - A link back to the event page in the Momento app.
 
-## 6. The Arrival Experience: The Signal
+## 6. Event Preferences & Filtering
+
+To give users more control over their invitations and reduce noise, Momento provides a set of powerful, optional preferences. These are introduced contextually when a user declines an event for a related reason, rather than overwhelming them during onboarding.
+
+- **Distance Preference**: Users can set a maximum travel radius from their home (e.g., 5, 10, or 25 miles). The matching algorithm will use this as a **hard filter**, meaning the user will not receive invitations for events outside this radius.
+- **Price Sensitivity**: Users can select a general price comfort level (e.g., $, $$, $$$). This is also a **hard filter**. The app will only show them events whose `Estimated Event Cost` falls within their selected range.
+
+These features ensure that the invitations a user sees are not only a good match for their interests but also for their real-world logistics and budget.
+
+## 7. The Arrival Experience: The Signal
 
 One of the most intimidating moments of any social event is the arrival—that brief, awkward period of finding your group. Momento transforms this moment of friction into a standardized, confidence-building ritual with a "secret society" feel. We call it **"The Signal."**
 
@@ -194,7 +206,7 @@ To ensure accurate attendance data and help users who forget, the app will send 
 > **Future Enhancement (Phase 2):** > **Feature:** Geofenced Check-in Reminders.
 > **Rationale:** A geofenced reminder would provide a more magical, context-aware experience than the time-based one. By triggering the check-in prompt the moment a user arrives in the event's vicinity, we reduce friction and improve the accuracy of arrival data.
 
-## 7. Post-Event Interaction
+## 8. Post-Event Interaction
 
 - The day after the event, participants will be prompted to provide feedback on the event and the host.
 - They will also report if any participants were late or did not show up.
@@ -211,7 +223,7 @@ To ensure accurate attendance data and help users who forget, the app will send 
 
 The design will subtly encourage users to wait until after the event to exchange contact information, reinforcing that they can connect through the app after the event.
 
-## 8. The Memory Book & The Face Card
+## 9. The Memory Book & The Face Card
 
 To foster lasting connections beyond a single event, the app will feature a dedicated "Memory Book." This screen serves as a private, organized record of every person a user has met at Momento events. It is a gallery of collected memories, not just a list of contacts.
 
@@ -245,7 +257,7 @@ To bridge the gap between a memorable event and an ongoing connection, users can
 - **Reciprocal Flow:** When a user receives a shared social link, it appears on the sender's Face Card in their Memory Book. A prompt will ask if they'd like to "Share back," making reciprocation seamless.
 - **User Control:** A user can revoke a shared link at any time, removing it from the other person's view.
 
-## 9. Shared Event Galleries & Camera Roll
+## 10. Shared Event Galleries & Camera Roll
 
 To extend the life of an event and give attendees a way to share their collective memories, the app will feature a robust photo-sharing system.
 
@@ -267,7 +279,7 @@ To give users a central place for all their visual memories within the app, a "M
 
 _Note: The "My Camera Roll" feature is for participants. Community hosts (representing a venue or organization) manage their brand photos (e.g., logos, venue shots) through their dedicated Host Dashboard._
 
-## 10. User Safety: Blocking & Reporting
+## 11. User Safety: Blocking & Reporting
 
 To build a safe and trustworthy community, users will have access to a multi-tiered system for managing their interactions with others. The design prioritizes user comfort and provides clear, distinct tools for different situations.
 
@@ -347,21 +359,28 @@ To ensure accountability, reports will trigger specific, escalating actions.
     - **Trigger:** A violation that represents a serious threat to the community.
     - **Consequence:** A **Permanent Ban** from the platform.
 
-## 11. Discovery Feed: Refining Preferences with Past Events
+## 12. Discovering Your Interests
 
-To solve the "invite rut" problem and allow users to continuously refine their tastes, the app will feature a "Discovery Feed." This serves both as an interest-building tool and an internal marketing feature that showcases the quality of experiences on Momento without sacrificing the exclusivity of future events.
+To solve the "invite rut" problem and allow users to continuously refine their tastes, the app will feature a dedicated discovery mode. This serves both as an interest-building tool and an internal marketing feature that showcases the quality of experiences on Momento without sacrificing the exclusivity of future events.
 
-- **Functionality**: A dedicated screen where users are presented with a swipeable, full-screen deck of cards.
-- **Content**: Each card represents a **real, highly-rated past event**. It will feature the event's title, its evocative description, and the public, host-provided **cover image**. All information about the host and attendees is kept anonymous.
-- **Interaction**: Users can swipe right ("I'm Interested") or left ("Not for Me").
+- **Headline:** **"Help us Discover your Interests"**
+- **Functionality**: Users are presented with a swipeable, full-screen deck of cards representing real, highly-rated **past events**.
+- **Content**: Each card will feature the event's title, its evocative description, and the public, host-provided **cover image**. All information about the host and attendees is kept anonymous.
+- **Interaction**: Users can swipe right or left. This action is primarily a signal for the matching algorithm and does not mean the user will be invited to that specific event if it runs again.
 - **Backend Signal**: Each right swipe provides a strong, positive signal to the user's `positive_interest_vector`, helping the algorithm understand their current tastes. This is a primary mechanism for evolving a user's preferences over time.
 
-## 12. Browsing Profiles
+## 13. Discovering Your Type
 
-- Users will be able to browse a selection of other user profiles.
-- They can "like" profiles, which provides data for the matching algorithm and helps determine the user's "type."
+To help the matching algorithm understand a user's "type" in potential connections, the app features a second discovery mode focused on people. This moves beyond simple "liking" and frames the action as an intentional search for compatibility.
 
-## 13. Notifications
+- **Headline:** **"Help us Discover your Type"**
+- **Functionality**: Users are presented with a swipeable deck of profile cards, showing them only users of the opposite sex (for the initial implementation).
+- **Interaction**: The language is designed to be intentional and aligned with Momento's values.
+  - **Swipe Right:** The button or action is labeled **"I'd like to create a memory with them."** This signals a potential for genuine connection.
+  - **Swipe Left:** The button or action is labeled **"Not the connection I'm looking for."**
+- **Backend Signal**: Each right swipe provides a signal that helps define a user's `person_attraction_vector`, which is used by the matching algorithm to suggest more compatible attendees for future events. This is not a direct "like" that is sent to the other user; it is a private signal for the system.
+
+## 14. Notifications
 
 A robust notification system is critical to the user experience, ensuring users are informed about timely events like invitations, reminders, and social interactions. The system will use a combination of Push Notifications (via Expo) and SMS (via Twilio), with all logic orchestrated by secure backend functions.
 

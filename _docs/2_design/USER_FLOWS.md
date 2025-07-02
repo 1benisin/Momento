@@ -12,10 +12,15 @@ This document maps out the key user journeys within the Momento application.
 - **[User Safety: Reporting Another User](#7-user-safety-reporting-another-user)**: The flow for formally reporting another user for a community standards violation.
 - **[A Social User Becomes a Host](#8-a-social-user-becomes-a-host)**: The journey for an existing participant to create a host profile and gain access to "Host Mode."
 - **[Switching Between Social & Host Modes](#9-switching-between-social--host-modes)**: How a `Hybrid User` navigates between the participant and host experiences.
-- **[Refining Tastes with the Discovery Feed](#10-refining-tastes-with-the-discovery-feed)**: The flow for continuously evolving a user's interest profile after onboarding.
-- **[Managing Photos in a Shared Event Gallery](#11-managing-photos-in-a-shared-event-gallery)**: The flow for attendees to share memories and hosts to maintain a safe environment in a shared event photo album.
-- **[Customizing a Face Card](#12-customizing-a-face-card)**: The flow for personalizing a user's public-facing `FaceCard` after their first event.
-- **[Cancelling Event Attendance](#8-cancelling-event-attendance)**: The flow for a confirmed attendee to formally cancel attendance and understand the consequences.
+- **[Discovering Your Interests](#10-discovering-your-interests)**: The flow for continuously evolving a user's interest profile after onboarding.
+- **[Discovering Your Type](#11-discovering-your-type)**: The flow for helping the algorithm understand what types of people a user connects with.
+- **[Managing Photos in a Shared Event Gallery](#12-managing-photos-in-a-shared-event-gallery)**: The flow for attendees to share memories and hosts to maintain a safe environment in a shared event photo album.
+- **[Customizing a Face Card](#13-customizing-a-face-card)**: The flow for personalizing a user's public-facing `FaceCard` after their first event.
+- **[Cancelling Event Attendance](#14-cancelling-event-attendance)**: The flow for a confirmed attendee to formally cancel attendance and understand the consequences.
+- **[Contacting Support](#15-contacting-support)**: The flow for a user to send a direct message to the Momento support team.
+- **[User Safety: Reporting a User (via Help Center)](#16-user-safety-reporting-a-user-via-help-center)**: The flow for reporting a user through the help center, which is critical if the reporting user has already been blocked.
+- **[Invitation Preferences](#17-invitation-preferences)**: The flow for configuring soft invite lead-time and day/week availability preferences.
+- **[User Declines Invite (Contextual Onboarding)](#18-user-declines-invite-contextual-onboarding)**: The flow for when a user declines an event, and how the app uses that moment to contextually introduce preference settings.
 
 ---
 
@@ -66,8 +71,13 @@ This flow describes the journey of a brand new user from first launch to accepti
 
 6.  **Viewing the Invitation**:
 
-    - `->` **`InvitationDetailScreen`**: Displays all details for the event: itinerary, host info, description, etc.
-    - **User Action**: Taps "Accept."
+    - `->` **`InvitationDetailScreen`**: Displays all details for the event: itinerary, host info, description, etc. The UI will prominently display a `ShortNoticeBadge` if the event's lead-time is less than the user's preference.
+    - **User Actions**:
+      - Taps "Accept." (Proceeds to Step 7)
+      - Taps "Decline."
+        - `->` **`DeclineFeedbackModal`**: A modal appears asking for a reason.
+        - **User Action**: Selects the "Too short notice" option.
+        - **System Action**: The user's `min_lead_time` preference is slightly increased. The invitation is dismissed.
 
 7.  **First-Time Payment**:
 
@@ -289,12 +299,119 @@ This flow describes the journey for a business or service provider who wants to 
     - **Step 3 (Confirm)**: The user reviews and submits the report.
 6.  **System Action**:
     - A "Block" is automatically and silently triggered between the two users.
-    - A record is created in the `reports` table for the Momento review team.
+    - A record is created in the `reports` table for the Momento review team, including a link to the `event_id` if the report was initiated from an event context.
     - The reporter receives a push notification confirming the report was received and will be reviewed.
 
 ---
 
-## 8. Cancelling Event Attendance
+## 8. A Social User Becomes a Host
+
+This flow describes the journey for an existing participant to create a host profile.
+
+- **Role:** `Participant` -> `Hybrid User`
+- **Goal:** To gain the ability to create and manage events.
+
+### Flow Steps:
+
+1.  **Entry Point**: A `Social-Only` user is in their `ProfileTab`.
+2.  **User Action**: Taps a "Become a Host" or "Start Hosting" call-to-action button.
+3.  `->` **Host Onboarding Intro Screen**: A screen explaining the benefits and responsibilities of hosting.
+4.  **User Action**: Confirms they want to proceed.
+5.  `->` **`VerificationScreen`**: The user is required to complete mandatory ID verification. This is a critical trust and safety step.
+6.  `->` **`HostProfileSetupScreen`**: After verification, the user sets up their public `host_profiles` record. For a `User Host`, this is simpler than for a `Community Host`, focusing on their host bio and name.
+7.  **System Action**:
+    - A `host_profiles` record is created and linked to the user's `users.id`. The user is now a `Hybrid User`.
+    - The **`ModeSwitcher`** component now appears in their `ProfileTab`.
+8.  **Completion**: The user is returned to their `ProfileTab`. They can now switch to "Host Mode" to begin creating events.
+
+---
+
+## 9. Switching Between Social & Host Modes
+
+This flow describes how a `Hybrid User` navigates between the two core app experiences.
+
+- **Role:** `Hybrid User`
+- **Goal:** To seamlessly switch between managing hosting duties and participating socially.
+
+### Flow Steps:
+
+1.  **Entry Point**: A `Hybrid User` is in the app, either in "Social Mode" or "Host Mode."
+2.  **User Action**: Navigates to their `ProfileTab`.
+3.  The `ProfileTab` displays their currently active profile (`Social` or `Host`). At the top of the screen is the `ModeSwitcher` component.
+4.  **User Action**: Taps on the `ModeSwitcher`.
+5.  `->` A simple modal or dropdown appears with the options:
+    - "Switch to Host Mode" (if currently in Social)
+    - "Switch to Social Mode" (if currently in Host)
+6.  **User Action**: Selects the desired mode.
+7.  **System Action**:
+    - The app's entire UI instantly reconfigures. The tab bar changes to the navigation set for the selected mode.
+    - The user's `users.active_role` is updated in the database to remember their choice for their next session.
+    - The user is now in the chosen mode and can access all its features. For example, switching to "Host Mode" reveals the `DashboardTab` and `CreateEventFlow`. Switching to "Social Mode" reveals the `MemoryBookTab` and `MessagesTab`.
+
+---
+
+## 10. Discovering Your Interests
+
+- **Role:** `Participant`
+- **Goal:** Continuously evolve their interest profile after onboarding.
+
+### Flow Steps:
+
+1.  **Entry Point**: User navigates to the `DiscoveryTab` and selects the "Interests" mode.
+2.  `->` **`InterestDiscoveryScreen`**: The user sees the headline **"Help us Discover your Interests"**.
+3.  **Interaction**: The user is presented with a full-screen, swipeable deck of `PastEventCard` components. Each card represents a real, highly-rated past event.
+4.  **User Action**: The user swipes right or left on each card.
+5.  **System Action**: Each swipe provides a new signal to the matching algorithm. This allows the user's taste profile to adapt and change over time.
+
+---
+
+## 11. Discovering Your Type
+
+- **Role:** `Participant`
+- **Goal:** To provide signals to the matching algorithm about the types of people they would like to connect with.
+
+### Flow Steps:
+
+1.  **Entry Point**: User navigates to the `DiscoveryTab` and selects the "People" mode.
+2.  `->` **`ProfileDiscoveryScreen`**: The user sees the headline **"Help us Discover your Type"**.
+3.  **Interaction**: The user is presented with a swipeable deck of profile cards, showing only users of the opposite sex.
+4.  **User Action**: The user swipes using the intention-driven labels:
+    - **Right**: "I'd like to create a memory with them."
+    - **Left**: "Not the connection I'm looking for."
+5.  **System Action**: Each right swipe provides a private signal to the matching algorithm, influencing the user's `person_attraction_vector`. The other user is not notified.
+
+---
+
+## 12. Managing Photos in a Shared Event Gallery
+
+This flow covers how attendees share memories and how hosts maintain a safe environment.
+
+- **Role:** `Participant`, `User Host`
+- **Goal:** Collaboratively build and moderate a shared event photo album.
+
+### Flow A: Uploading a Photo
+
+1.  **Entry Point**: A user (attendee or host) has attended an event, submitted feedback (if an attendee), and is viewing the `EventDetailScreen` (Post-Event State).
+2.  **User Action**: Navigates to the "Photos" tab and enters the `SharedEventGalleryScreen`.
+3.  **User Action**: Taps the "Upload Photos" button.
+4.  The user selects one or more photos from their device's native photo library.
+5.  **User Action**: Confirms the upload.
+6.  **System Action**: The photos are uploaded to the event's gallery and become visible to all other verified attendees. Other attendees may receive a bundled push notification that new photos have been added.
+
+### Flow B: Host Moderates a Photo
+
+1.  **Entry Point**: A host can either be proactively reviewing photos in their `SharedEventGalleryScreen` or receive a `ReportPhotoModal` notification if an attendee has reported a photo.
+2.  **User Action**: The host taps on a photo to view it and finds a "Remove Photo" option.
+3.  **User Action**: Confirms the removal in a confirmation dialog.
+4.  **System Action**: The photo's `status` is updated in the `event_photos` table, and it is hidden from the gallery. The original uploader may be notified that their photo was removed by the host.
+
+---
+
+## 13. Customizing a Face Card
+
+- **Role:** `Participant`
+
+## 14. Cancelling Event Attendance
 
 This flow outlines what happens when a confirmed attendee decides they can no longer make it to an event.
 
@@ -332,94 +449,125 @@ This flow outlines what happens when a confirmed attendee decides they can no lo
 
 ---
 
-## 9. A Social User Becomes a Host
+## 15. Contacting Support
 
-This flow describes the journey for an existing participant to create a host profile.
+This flow describes how a user sends a direct, categorized message to the Momento support team.
 
-- **Role:** `Participant` -> `Hybrid User`
-- **Goal:** To gain the ability to create and manage events.
-
-### Flow Steps:
-
-1.  **Entry Point**: A `Social-Only` user is in their `ProfileTab`.
-2.  **User Action**: Taps a "Become a Host" or "Start Hosting" call-to-action button.
-3.  `->` **Host Onboarding Intro Screen**: A screen explaining the benefits and responsibilities of hosting.
-4.  **User Action**: Confirms they want to proceed.
-5.  `->` **`VerificationScreen`**: The user is required to complete mandatory ID verification. This is a critical trust and safety step.
-6.  `->` **`HostProfileSetupScreen`**: After verification, the user sets up their public `host_profiles` record. For a `User Host`, this is simpler than for a `Community Host`, focusing on their host bio and name.
-7.  **System Action**:
-    - A `host_profiles` record is created and linked to the user's `users.id`. The user is now a `Hybrid User`.
-    - The **`ModeSwitcher`** component now appears in their `ProfileTab`.
-8.  **Completion**: The user is returned to their `ProfileTab`. They can now switch to "Host Mode" to begin creating events.
-
----
-
-## 10. Switching Between Social & Host Modes
-
-This flow describes how a `Hybrid User` navigates between the two core app experiences.
-
-- **Role:** `Hybrid User`
-- **Goal:** To seamlessly switch between managing hosting duties and participating socially.
+- **Role:** Any
+- **Goal:** To get help with a specific issue, provide feedback, or ask a question.
 
 ### Flow Steps:
 
-1.  **Entry Point**: A `Hybrid User` is in the app, either in "Social Mode" or "Host Mode."
-2.  **User Action**: Navigates to their `ProfileTab`.
-3.  The `ProfileTab` displays their currently active profile (`Social` or `Host`). At the top of the screen is the `ModeSwitcher` component.
-4.  **User Action**: Taps on the `ModeSwitcher`.
-5.  `->` A simple modal or dropdown appears with the options:
-    - "Switch to Host Mode" (if currently in Social)
-    - "Switch to Social Mode" (if currently in Host)
-6.  **User Action**: Selects the desired mode.
-7.  **System Action**:
-    - The app's entire UI instantly reconfigures. The tab bar changes to the navigation set for the selected mode.
-    - The user's `users.active_role` is updated in the database to remember their choice for their next session.
-    - The user is now in the chosen mode and can access all its features. For example, switching to "Host Mode" reveals the `DashboardTab` and `CreateEventFlow`. Switching to "Social Mode" reveals the `MemoryBookTab` and `MessagesTab`.
+1.  **Entry Point**: User navigates to `SettingsScreen` -> `Help & Support`.
+2.  `->` **`HelpCenterScreen`**: The user is presented with a list of categories.
+3.  **User Action**: Selects a category, for example, "Help with a Payment".
+4.  `->` **`SupportTicketFormScreen`**: The form is tailored to the selected category.
+    - **Email Confirmation**: The form checks if the user has an email in their `users` record.
+      - If yes, it displays a message: "We will respond to: `user@example.com`".
+      - If no, it displays a required text input field for the user to enter their email address.
+    - A message reminds the user about the non-refundable fee policy.
+    - A dropdown is pre-populated with their recent transactions. The user can select one, or choose "General Payment Question."
+    - A text field allows them to describe the issue.
+5.  **User Action**: Fills out the form and taps "Submit".
+6.  **System Action**:
+    - A new record is created in the `support_tickets` table, including the `reply_to_email`.
+    - The backend automatically attaches relevant metadata (app version, OS, user role, selected event/payment ID).
+7.  **Confirmation**: The user sees a confirmation message with a user-facing ticket number (e.g., #1001) and is told to expect a response via email.
 
 ---
 
-## 11. Refining Tastes with the Discovery Feed
+## 16. User Safety: Reporting a User (via Help Center)
+
+This flow is a critical alternative to the standard reporting flow, ensuring a user can always report someone, even if they have been blocked by them.
+
+- **Role:** Any
+- **Goal:** To formally report another user when unable to access their profile.
+
+### Flow Steps:
+
+1.  **Entry Point**: User navigates to `SettingsScreen` -> `Help & Support`.
+2.  `->` **`HelpCenterScreen`**: User sees the list of categories.
+3.  **User Action**: Selects "Report Another User".
+4.  `->` The app initiates the standard **`ReportUserFlow`**, now with more context-gathering steps.
+5.  **Step 1: Select Event**:
+    - The user is shown a dropdown of their past events, ordered from most recent.
+    - **User Action**: Selects the event where the incident occurred. An option for "This didn't happen at a specific event" is also available.
+6.  **Step 2: Identify Who/What to Report**:
+    - **Trigger**: The user selected an event.
+    - A new dropdown appears, populated with everyone and everything associated with that event:
+      - The Host
+      - All Attendees
+      - All Collaborators
+      - The Venue / Location
+      - An option for "Someone else not on this list"
+    - **User Action**: Selects the person, venue, or "Someone else".
+7.  **Step 3: Provide Details**:
+    - **If "Someone else" was selected**: A text field appears for the user to describe the person.
+    - **For all selections**: The flow continues to the standard reporting steps of selecting a violation category and providing detailed comments.
+8.  **Step 4: Confirm & Submit**:
+    - The user reviews their report and submits it.
+9.  **System Action**:
+    - A "Block" is automatically triggered between the reporter and the reported user (if a user was selected).
+    - A record is created in the `reports` table with all context (reporter, reported entity, event, etc.).
+    - A notification is sent to the reporter confirming receipt.
+
+## 17. Invitation Preferences
+
+- **Role:** Participant
+- **Goal:** Configure soft invite lead-time and day/week availability preferences.
+
+### Flow Steps:
+
+1.  **Entry Point**: User navigates to `SettingsScreen` → `InvitationPreferencesScreen`.
+2.  `->` **`InvitationPreferencesScreen`**: Displays:
+    - **Lead-Time Slider** (`NoticePreferenceSlider`), default 3 days (range 0–14 days).
+    - **Day/Week Availability**: Soft Day/Weekend toggle (`DayWeekendToggle`).
+    - **[Advanced]** link dropdown to activate `AvailabilityGrid` for detailed day/night preferences.
+3.  **User Action**: Adjusts preferences and taps "Save".
+4.  **System Action**: Preferences (`user.min_lead_time`, `user.availability`) saved; invites outside preferences show a "Short-Notice" badge for soft deprioritization.
+
+## 18. User Declines Invite (Contextual Onboarding)
 
 - **Role:** `Participant`
-- **Goal:** Continuously evolve their interest profile after onboarding.
+- **Goal:** To decline an event invitation and be gently onboarded to a relevant preference setting.
+
+This flow is critical for progressive discovery, ensuring the user isn't overwhelmed with settings during initial onboarding. We introduce a setting at the exact moment it becomes relevant to them.
 
 ### Flow Steps:
 
-1.  **Entry Point**: User navigates to the `DiscoveryFeedScreen` (potentially from the `HomeTab` or its own dedicated tab).
-2.  **Interaction**: The user is presented with a full-screen, swipeable deck of `PastEventCard` components. Each card represents a real, highly-rated past event.
-3.  **User Action**: The user swipes right ("I'm Interested") or left ("Not for Me") on each card.
-4.  **System Action**: Each swipe provides a new signal to the matching algorithm.
-    - A right swipe updates the user's `positive_interest_vector`.
-    - A left swipe updates the user's `negative_interest_vector`.
-    - This allows the user's taste profile to adapt and change over time.
+1.  **Entry Point**: User is viewing an event invitation.
 
----
+    - `->` **`InvitationDetailScreen`**: Displays all details for an event.
 
-## 12. Managing Photos in a Shared Event Gallery
+2.  **User Action**: Taps the "Decline" button.
 
-This flow covers how attendees share memories and how hosts maintain a safe environment.
+3.  **Decline Reason**:
 
-- **Role:** `Participant`, `User Host`
-- **Goal:** Collaboratively build and moderate a shared event photo album.
+    - `->` **`DeclineFeedbackModal`**: A modal appears asking for a reason (e.g., "Not interested," "Too busy," "Too far away," "Too expensive").
 
-### Flow A: Uploading a Photo
+4.  **Contextual Nudge**:
 
-1.  **Entry Point**: A user (attendee or host) has attended an event, submitted feedback (if an attendee), and is viewing the `EventDetailScreen` (Post-Event State).
-2.  **User Action**: Navigates to the "Photos" tab and enters the `SharedEventGalleryScreen`.
-3.  **User Action**: Taps the "Upload Photos" button.
-4.  The user selects one or more photos from their device's native photo library.
-5.  **User Action**: Confirms the upload.
-6.  **System Action**: The photos are uploaded to the event's gallery and become visible to all other verified attendees. Other attendees may receive a bundled push notification that new photos have been added.
+    - **Trigger 1**: User selects the "Too far away" option.
+    - `->` **`ContextualNudgeModal`**: A one-time, educational modal appears.
+    - **Message**: "Sorry this one was a bit of a trek! Did you know you can set a preferred travel distance? We'll only show you events inside your radius."
+    - **Actions**:
 
-### Flow B: Host Moderates a Photo
+      - **Primary Button**: "Set My Radius"
+      - **Secondary Button**: "Not Now"
 
-1.  **Entry Point**: A host can either be proactively reviewing photos in their `SharedEventGalleryScreen` or receive a `ReportPhotoModal` notification if an attendee has reported a photo.
-2.  **User Action**: The host taps on a photo to view it and finds a "Remove Photo" option.
-3.  **User Action**: Confirms the removal in a confirmation dialog.
-4.  **System Action**: The photo's `status` is updated in the `event_photos` table, and it is hidden from the gallery. The original uploader may be notified that their photo was removed by the host.
+    - **Trigger 2**: User selects the "Too expensive" option.
+    - `->` **`ContextualNudgeModal`**: A one-time, educational modal appears.
+    - **Message**: "We get it, budgets are important. Did you know you can set a price comfort level? We'll only show you events that match your preference."
+    - **Actions**:
+      - **Primary Button**: "Set My Budget"
+      - **Secondary Button**: "Not Now"
 
----
+5.  **Deep-linking to Settings**:
 
-## 13. Customizing a Face Card
+    - **User Action**: User taps "Set My Radius" or "Set My Budget".
+    - `->` **`SettingsScreen`**: The user is taken directly to the `EventPreferencesScreen`, with the relevant setting possibly highlighted.
+    - The user can now configure their preference. The original invitation is dismissed.
 
-- **Role:** `Participant`
+6.  **Dismissal**:
+    - **User Action**: User taps "Not Now".
+    - The modal is dismissed, and the invitation is removed. The app can choose to not show this specific nudge again for a set period.
