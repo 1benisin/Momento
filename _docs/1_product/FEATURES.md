@@ -63,6 +63,15 @@ To create a seamless onboarding experience that ties directly into our core SMS 
 - **International Waitlist:** If a user attempts to sign up with a non-US number, the app will inform them that we are not yet available in their country. It will offer to save their number to a waitlist, and we will notify them via SMS when Momento launches in their region.
 - **One-Time Passwords (OTP):** Both sign-up and login will be handled via a secure one-time password to the user's phone, eliminating the need for users to remember a traditional password.
 
+### Handling Phone Number Recycling
+
+To prevent unauthorized account access and user lockouts due to phone number recycling, Momento will implement a robust verification process.
+
+- **Systematic Detection:** When a user attempts to sign up with a phone number that is already associated with a Momento account, the system will check for signs of dormancy or use on a new device to assess the risk of it being a recycled number.
+- **Clarifying User Intent:** The user will be asked if they are the original owner of the account associated with the number. This creates two distinct paths:
+  1.  **New User (Recycled Number):** If the user indicates they are new, the system will initiate a security waiting period (e.g., 24 hours) to protect the original owner's data. The original owner will be notified via email (if available), and their account will be archived by unlinking it from the phone number. The new user will be notified via SMS when they can complete their sign-up.
+  2.  **Existing User (New Device):** If the user indicates they are the original owner, they will be asked to complete a second-factor authentication step to ensure security. This may involve verifying via a recovery email, completing an ID verification check, or confirming personal details like their date of birth.
+
 ### The Authentic Photo
 
 To build a foundation of trust and authenticity, Momento will include a feature to verify that a user's photo is recent and genuine.

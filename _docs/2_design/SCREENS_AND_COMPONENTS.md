@@ -18,8 +18,10 @@ The application will be organized into several key user flows and screen groups.
 - **`SplashScreen`**: Initial launch screen.
 - **`AuthScreen`**: Options for "Log In", "Sign Up", and "Become a Host".
 - **`SignUpFlow (Participant)`**:
-  - `PhoneInputScreen`: For entering a US-based phone number. This screen will also handle non-US numbers by directing them to the `InternationalWaitlistScreen`.
+  - `PhoneInputScreen`: For entering a US-based phone number. If the number is already registered, the user is diverted to the `PhoneNumberConflictScreen` instead of the `OTPScreen`.
+  - `PhoneNumberConflictScreen`: A screen that asks the user if they are the original owner of the account associated with the phone number, forking the user flow.
   - `OTPScreen`: For entering the one-time password received via SMS to verify the phone number.
+  - `SecondFactorAuthScreen`: A screen that prompts an existing user on a new device to verify their identity through a secondary method (e.g., recovery email, ID verification).
   - `ProfileSetupScreen`: For entering initial public profile information (name, bio).
   - `InitialPhotoScreen`: For taking or uploading the first profile photo. This may include a prompt to use the in-app camera to earn an "Authentic" badge.
   - `InterestDiscoveryScreen`: A swipeable deck of "Possibility Cards" to establish the user's initial interest vectors. This is designed to feel like an adventure, not a survey.

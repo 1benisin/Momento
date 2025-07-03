@@ -5,23 +5,25 @@ This document maps out the key user journeys within the Momento application.
 - **[New User Onboarding & First Invitation Acceptance](#1-new-user-onboarding--first-invitation-acceptance)**: The journey of a brand new user from first launch to accepting their first event invitation.
 - **[Non-US User Onboarding (Waitlist)](#2-non-us-user-onboarding-waitlist)**: The flow for a user who attempts to sign up from outside the initial launch country (US).
 - **[Host Onboarding (for Venues & Organizations)](#3-host-onboarding-for-venues--organizations)**: The journey for a business or service provider to create a host-only account and publish a first event.
-- **[Event Lifecycle (Participant's View)](#3-event-lifecycle-participants-view)**: The complete experience for a participant, from pre-event reminders and arrival to post-event feedback and connection.
-- **[Hosting Journey (User Host's View)](#4-hosting-journey-user-hosts-view)**: The process for a user to become a host, then create, manage, and complete a successful event.
-- **[Making a Connection (Post-Event)](#5-making-a-connection-post-event)**: How users manage their connections in the Memory Book and privately share social media links after an event.
-- **[User Safety: Blocking Another User](#6-user-safety-blocking-another-user)**: The flow for permanently and silently preventing all interaction with another user.
-- **[User Safety: Reporting Another User](#7-user-safety-reporting-another-user)**: The flow for formally reporting another user for a community standards violation.
-- **[A Social User Becomes a Host](#8-a-social-user-becomes-a-host)**: The journey for an existing participant to create a host profile and gain access to "Host Mode."
-- **[Switching Between Social & Host Modes](#9-switching-between-social--host-modes)**: How a `Hybrid User` navigates between the participant and host experiences.
-- **[Discovering Your Interests](#10-discovering-your-interests)**: The flow for continuously evolving a user's interest profile after onboarding.
-- **[Discovering Your Type](#11-discovering-your-type)**: The flow for helping the algorithm understand what types of people a user connects with.
-- **[Managing Photos in a Shared Event Gallery](#12-managing-photos-in-a-shared-event-gallery)**: The flow for attendees to share memories and hosts to maintain a safe environment in a shared event photo album.
-- **[Customizing a Face Card](#13-customizing-a-face-card)**: The flow for personalizing a user's public-facing `FaceCard` after their first event.
-- **[Cancelling Event Attendance](#14-cancelling-event-attendance)**: The flow for a confirmed attendee to formally cancel attendance and understand the consequences.
-- **[Handling Host-Initiated Event Changes](#15-handling-host-initiated-event-changes)**: The automated flow for when a host modifies a key event detail after attendees have already paid.
-- **[Contacting Support](#16-contacting-support)**: The flow for a user to send a direct message to the Momento support team.
-- **[User Safety: Reporting a User (via Help Center)](#17-user-safety-reporting-a-user-via-help-center)**: The flow for reporting a user through the help center, which is critical if the reporting user has already been blocked.
-- **[Invitation Preferences](#18-invitation-preferences)**: The flow for configuring soft invite lead-time and day/week availability preferences.
-- **[User Declines Invite (Contextual Onboarding)](#19-user-declines-invite-contextual-onboarding)**: The flow for when a user declines an event, and how the app uses that moment to contextually introduce preference settings.
+- **[Event Lifecycle (Participant's View)](#4-event-lifecycle-participants-view)**: The complete experience for a participant, from pre-event reminders and arrival to post-event feedback and connection.
+- **[Hosting Journey (User Host's View)](#5-hosting-journey-user-hosts-view)**: The process for a user to become a host, then create, manage, and complete a successful event.
+- **[Making a Connection (Post-Event)](#6-making-a-connection-post-event)**: How users manage their connections in the Memory Book and privately share social media links after an event.
+- **[User Safety: Blocking Another User](#7-user-safety-blocking-another-user)**: The flow for permanently and silently preventing all interaction with another user.
+- **[User Safety: Reporting Another User](#8-user-safety-reporting-another-user)**: The flow for formally reporting another user for a community standards violation.
+- **[A Social User Becomes a Host](#9-a-social-user-becomes-a-host)**: The journey for an existing participant to create a host profile and gain access to "Host Mode."
+- **[Switching Between Social & Host Modes](#10-switching-between-social--host-modes)**: How a `Hybrid User` navigates between the participant and host experiences.
+- **[Discovering Your Interests](#11-discovering-your-interests)**: The flow for continuously evolving a user's interest profile after onboarding.
+- **[Discovering Your Type](#12-discovering-your-type)**: The flow for helping the algorithm understand what types of people a user connects with.
+- **[Managing Photos in a Shared Event Gallery](#13-managing-photos-in-a-shared-event-gallery)**: The flow for attendees to share memories and hosts to maintain a safe environment in a shared event photo album.
+- **[Customizing a Face Card](#14-customizing-a-face-card)**: The flow for personalizing a user's public-facing `FaceCard` after their first event.
+- **[Cancelling Event Attendance](#15-cancelling-event-attendance)**: The flow for a confirmed attendee to formally cancel attendance and understand the consequences.
+- **[Handling Host-Initiated Event Changes](#16-handling-host-initiated-event-changes)**: The automated flow for when a host modifies a key event detail after attendees have already paid.
+- **[Contacting Support](#17-contacting-support)**: The flow for a user to send a direct message to the Momento support team.
+- **[User Safety: Reporting a User (via Help Center)](#18-user-safety-reporting-a-user-via-help-center)**: The flow for reporting a user through the help center, which is critical if the reporting user has already been blocked.
+- **[Invitation Preferences](#19-invitation-preferences)**: The flow for configuring soft invite lead-time and day/week availability preferences.
+- **[User Declines Invite (Contextual Onboarding)](#20-user-declines-invite-contextual-onboarding)**: The flow for when a user declines an event, and how the app uses that moment to contextually introduce preference settings.
+- **[Handling a Recycled Phone Number (New User)](#21-handling-a-recycled-phone-number-new-user)**: The flow for a new user who signs up with a phone number that was previously registered to another, now dormant, account.
+- **[Account Recovery (Existing User on New Device)](#22-account-recovery-existing-user-on-new-device)**: The flow for an existing user to securely access their account from a new device.
 
 ---
 
@@ -628,3 +630,66 @@ This flow is critical for progressive discovery, ensuring the user isn't overwhe
 6.  **Dismissal**:
     - **User Action**: User taps "Not Now".
     - The modal is dismissed, and the invitation is removed. The app can choose to not show this specific nudge again for a set period.
+
+---
+
+## 20. Handling a Recycled Phone Number (New User)
+
+This flow describes the journey for a new user who signs up with a phone number that was previously registered to another, now dormant, account.
+
+- **Role:** `New Participant`
+- **Goal:** To securely create a new account without compromising the old account's data.
+
+### Flow Steps:
+
+1.  **Entry Point**: User opens the app and starts the sign-up process.
+    - `->` **`PhoneInputScreen`**: User enters their phone number.
+2.  **Conflict Detection**:
+    - **System Action**: The backend detects that the number exists and the associated account has been dormant for a significant period (e.g., > 90 days).
+3.  **Clarifying Intent**:
+    - `->` **`PhoneNumberConflictScreen`**: The app presents a choice:
+      - "This phone number is already connected to a Momento account. Did you create this account?"
+      - [Button] Yes, that's my account.
+      - [Button] No, I'm new to Momento.
+    - **User Action**: User taps "No, I'm new to Momento."
+4.  **Initiating Security Cooldown**:
+    - `->` **`SecurityWaitlistScreen`**: A screen informs the user about the situation and the waiting period.
+    - **Message**: "Thanks for letting us know. To protect the previous owner's privacy, we need to disconnect their account from this number. This process includes a 24-hour security waiting period. We'll notify you via SMS as soon as you can complete your sign-up."
+5.  **Backend Process**:
+    - **System Action**:
+      - A final notification is sent to the original account owner's recovery email (if available).
+      - The phone number is removed from the original user's record, and their account status is set to `archived_for_recycling`.
+      - The new user's phone number is added to a temporary waitlist with a 24-hour timer.
+6.  **Completion**:
+    - **Trigger**: 24 hours pass.
+    - **Notification**: The new user receives an SMS with a deep link to continue the sign-up process, starting from the `OTPScreen`.
+
+---
+
+## 21. Account Recovery (Existing User on New Device)
+
+This flow describes how an existing user securely logs into their account from a new, untrusted device.
+
+- **Role:** `Existing Participant`
+- **Goal:** To securely access their account from a new device.
+
+### Flow Steps:
+
+1.  **Entry Point**: User opens the app on a new device and starts the sign-up or login process.
+    - `->` **`PhoneInputScreen`**: User enters their phone number.
+2.  **Conflict Detection**:
+    - **System Action**: The backend detects the number exists. It may also detect the device fingerprint is new.
+3.  **Clarifying Intent**:
+    - `->` **`PhoneNumberConflictScreen`**: The user is presented with the same choice as above.
+    - **User Action**: User taps "Yes, that's my account."
+4.  **Second Factor Authentication**:
+    - `->` **`SecondFactorAuthScreen`**: The app prompts for additional verification.
+    - **Message**: "For your security, since you're on a new device, we need to confirm it's really you."
+    - The screen presents one or more options:
+      - "Send a verification link to your email (`a***@e*****.com`)"
+      - "Verify your identity" (launches Stripe Identity flow)
+      - "Confirm your date of birth"
+5.  **User Action**: The user successfully completes one of the verification methods.
+6.  **Completion**:
+    - The user proceeds to the standard `OTPScreen` to get a one-time password and log in.
+    - **System Action**: Upon successful login, the new device's fingerprint is added to the user's `device_history`.

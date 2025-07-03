@@ -31,6 +31,7 @@ This phase focuses on building the absolute essential features required for the 
 **[Epic #001] User Authentication & Basic Profiles:**
 
 - Sign up/Login with a US-based phone number and OTP (one-time password).
+- Implement the complete, secure flow for handling recycled phone numbers and account recovery on new devices.
 - Implement logic to handle non-US numbers by adding them to a waitlist.
 - Basic user profiles: name, profile image, public bio.
 - Storage for private info (phone number, optional email, etc.).

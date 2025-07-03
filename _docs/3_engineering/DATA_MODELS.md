@@ -64,8 +64,9 @@ A `user` record can be associated with a `social_profiles` record, a `host_profi
 | `last_name`                | `text`       | User's private last name.                                                                                                                                                                                                      |
 | `birth_date`               | `date`       | User's date of birth, for age calculation.                                                                                                                                                                                     |
 | `is_verified`              | `boolean`    | Defaults to `false`. True if user completed ID verification.                                                                                                                                                                   |
-| `status`                   | `text`       | e.g., 'active', 'suspended', 'verification_pending', 'banned'.                                                                                                                                                                 |
+| `status`                   | `text`       | e.g., 'active', 'suspended', 'verification_pending', 'banned', 'archived_for_recycling'.                                                                                                                                       |
 | `active_role`              | `text`       | For Hybrid Users, stores the last active role ('participant' or 'host'). Defaults to 'participant'.                                                                                                                            |
+| `last_active_at`           | `timestampz` | Tracks the last time the user was active in the app. Used to detect dormant accounts.                                                                                                                                          |
 | `user_number`              | `bigserial`  | A unique, sequential number assigned to the user upon creation to identify early adopters.                                                                                                                                     |
 | `payment_customer_id`      | `text`       | Stripe (or other payment provider) customer ID.                                                                                                                                                                                |
 | `min_lead_time_days`       | `integer`    | User's preferred minimum notice for event invites, in days. Defaults to 3.                                                                                                                                                     |
@@ -170,6 +171,19 @@ This table stores brand and marketing photos for a `host_profile`, such as logos
 | `photo_type` | `text`       | The type of photo, e.g., 'logo', 'venue', 'promotional'. |
 | `caption`    | `text`       | Optional caption for the photo.                          |
 | `created_at` | `timestampz` |                                                          |
+
+### `device_history` Table
+
+This table stores a history of devices a user has logged in from. This helps distinguish between a user logging in on a new phone versus a potentially malicious actor or a recycled number scenario.
+
+| Column               | Type         | Description                                                                   |
+| -------------------- | ------------ | ----------------------------------------------------------------------------- |
+| `id`                 | `uuid`       | Primary Key.                                                                  |
+| `user_id`            | `uuid`       | Foreign key to `users.id`.                                                    |
+| `device_fingerprint` | `text`       | A unique identifier for the user's device.                                    |
+| `ip_address`         | `inet`       | The IP address of the last login from this device.                            |
+| `last_login_at`      | `timestampz` | The timestamp of the last successful login from this device.                  |
+| `created_at`         | `timestampz` | The timestamp of when this device was first associated with the user account. |
 
 ---
 
