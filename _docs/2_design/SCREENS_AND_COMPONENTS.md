@@ -70,12 +70,13 @@ _This is the view for `Host-Only` and `Hybrid` users who are in "Host Mode." It 
 
 ### 5. Connection & Profile Details
 
-- **`ConnectionDetailScreen`**: Detailed view of a "Face Card" from the Memory Book. Includes:
+- **`ConnectionDetailScreen`**: Detailed view of a "Face Card" from the Memory Book. This is the primary screen for viewing a connection's full character profile after an event. It includes:
+  - An interactive view that, upon tapping, flips over and reveals the connection's `InterestConstellation`, `KudosShowcase`.
   - Private notes section.
   - Toggles for "Connect Again" and "Don't Connect Again" preference signals.
   - A button to launch the `ShareSocialsModal`.
   - Display of any social media links shared by the other user.
-- **`UserProfileScreen`**: The public profile view of another user.
+- **`UserProfileScreen`**: The public profile view of another user, featuring their photos, bio, their `InterestConstellation`, a `KudosShowcase`, their `EventDNAGallery`, and an optional `VibeSummary`.
 - **`FaceCardStylingScreen`**: Where a user can apply AI-driven styles, borders, and other customizations to their Face Card photo after an event.
 - **`ShareSocialsModal`**: A modal launched from the `ConnectionDetailScreen` that allows a user to select which of their saved social media links they want to share with a specific connection.
 - **`InterestDiscoveryScreen`**: The swipeable deck of `PastEventCard` components used to discover a user's interests.
@@ -181,6 +182,10 @@ This section catalogs the reusable UI elements that form the building blocks of 
 
 ### Domain-Specific Components
 
+- **`InterestConstellation`**: An interactive, minimalist graphic displayed on a user's profile. It visualizes their core "interest personas" as stars in a constellation. Tapping a star reveals keywords and concepts related to that persona (e.g., "Adventurous Side: Hiking, Spontaneous Travel"). This component provides a rich, at-a-glance view of a user's character.
+- **`KudosShowcase`**: A UI component that displays a user's top 2-3 most-received peer-to-peer kudos as elegant badges or icons (e.g., "Welcoming Vibe," "Great Listener"). It provides a qualitative, authentic summary of their social character, validated by others. The design should gracefully handle states with few or no kudos.
+- **`EventDNAGallery`**: A visually rich gallery on a user's profile that displays the event cards for 3-5 of their favorite past events. This component serves as a curated highlight reel of their experiences, showing their interests through action. The design should gracefully handle states with few or no showcased events.
+- **`VibeSummary`**: A text component that displays a short, AI-generated narrative paragraph summarizing a user's personality based on their activity. The user has full control to generate, approve, or hide this summary.
 - **`CostBreakdown`**: A UI component used on the `EventDetailScreen` that clearly distinguishes between the two types of costs.
   - **Line Item 1**: "Confirmation Fee: $5" with a subtitle explaining this is paid to Momento to secure a spot and encourage commitment.
   - **Line Item 2**: "Estimated Event Cost: $$" with a subtitle explaining this is an estimate paid directly to the host or venue and is not processed by Momento.

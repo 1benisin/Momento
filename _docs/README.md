@@ -17,3 +17,5 @@ The documentation is organized into categorized subdirectories, each with a spec
 - **[3_engineering](./3_engineering/index.md)**: Describes the **how** of our technical implementation. It covers architecture, data models, algorithms, and development processes.
 
 - **[4_growth](./4_growth/index.md)**: Contains our strategies for **user acquisition and marketing**.
+
+- **[5_legal](./5_legal/README.md)**: Contains legal documents for the project.

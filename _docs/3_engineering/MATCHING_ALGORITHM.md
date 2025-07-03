@@ -172,6 +172,14 @@ When a new event is created, its `EventVector` is compared against **all** of th
 
 We take the _highest_ score. This ensures that if an event is a perfect match for even one of a user's personas, they are considered a strong candidate for an invitation. The negative vector logic would still apply to filter out undesirable events.
 
+#### Profile Visualization: The Interest Constellation
+
+To make a user's multifaceted nature visible to others, these generated personas will be visualized on their public profile through a feature called the **"Interest Constellation."**
+
+- Each named persona (e.g., "Adventurous Side") becomes a "star" in the user's personal constellation.
+- This provides an at-a-glance, aesthetic representation of their character, moving beyond a simple list of interests to show the actual clusters of passion that define them.
+- For more detail, see the `InterestConstellation` component in `_docs/2_design/SCREENS_AND_COMPONENTS.md`.
+
 ---
 
 ## 4. Future Concepts & Enhancements (Phase 3 & Beyond)

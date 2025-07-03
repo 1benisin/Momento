@@ -52,6 +52,39 @@ User profiles will contain three categories of information:
   - **`interested_in`**: A multiple-selection field indicating the genders they are interested in connecting with.
   - **`pronouns`**: An optional field that, if filled out, is displayed on their public profile.
 
+### The Interest Constellation
+
+To showcase a user's personality beyond a simple list of hobbies, profiles will feature an "Interest Constellation." This data visualization moves beyond superficial tags to show the multifaceted nature of a user's character.
+
+- **How it Works:** The backend will analyze a user's activity—such as liked event cards, attended events, and positive ratings—and use clustering algorithms to group related interests into 2-3 distinct "personas" (e.g., "Thrill Seeker," "Cozy Creative," "Intellectual Explorer").
+- **Profile Visualization:** On the user's profile, these personas will be displayed as a minimalist, interactive constellation graphic. Each major "star" represents a persona. Tapping on a star could reveal the key concepts or types of experiences that define it (e.g., tapping "Thrill Seeker" might show keywords like `Rock Climbing`, `Live Music`, `Spontaneous Travel`).
+- **Impact:** This feature provides a rich, at-a-glance understanding of a user's character, showing _how_ their interests connect rather than just _what_ they are. It emphasizes depth and multifaceted personality, aligning with Momento's core value of fostering genuine connection.
+
+### Kudos Showcase
+
+To offer a form of social proof that is more meaningful than a simple rating, profiles will feature a "Kudos Showcase." This section highlights a user's positive social qualities as recognized by people they have actually met at events.
+
+- **How it Works:** After an event, attendees can give anonymous, private "kudos" to each other (e.g., "Great Listener," "Welcoming Vibe"). The backend system aggregates these kudos over time.
+- **Profile Visualization:** The profile will display a section titled "What people appreciate about [Name]:" showcasing the top 2-3 kudos the user has received most frequently. This is presented visually with elegant icons or badges, not as a raw score, turning peer feedback into a qualitative summary of their social character.
+- **Impact:** This feature provides an authentic, peer-validated glimpse into a user's personality in a social context, which is far more powerful and trustworthy than self-described attributes. It rewards positive community members with a richer profile.
+
+### Event DNA
+
+To give users a way to express their character through their actions, not just their words, profiles will feature an "Event DNA" section. This is a curated gallery of a user's favorite past experiences on Momento.
+
+- **How it Works:** From their event history, a user can select 3-5 past events that they attended and rated highly to showcase on their public profile.
+- **Profile Visualization:** This will be displayed as a visually rich gallery of the selected event cards. Seeing that a user chose to highlight their attendance at a "Backcountry Camping Trip," a "Japanese Pottery Workshop," and a "Silent Book Club" tells a much more compelling and authentic story than a simple list of interests.
+- **Impact:** This feature transforms a user's profile from a static page into a living testament to their adventures and passions. It provides concrete, verifiable examples of their interests, offering a deep and immediate insight into their personality.
+
+### The Vibe Summary (AI-Generated)
+
+As a capstone feature that synthesizes all of a user's activity into a compelling narrative, profiles can feature an AI-generated "Vibe Summary."
+
+- **How it Works:** The system will use a large language model to analyze a user's complete Momento footprint: their interest vectors, the kudos they've received, and their showcased "Event DNA." It then generates a short, narrative paragraph that captures the essence of their character.
+- **Profile Visualization:** The summary will be displayed prominently on the profile. For example: _"Looks like someone who is just as comfortable discussing philosophy over wine as they are on a windswept trail. People who have met them seem to appreciate their thoughtful questions and welcoming energy."_
+- **User Control:** This feature is opt-in. A user can choose to generate their summary, and they will always have the final say. They can approve the generated text, ask for a new version, or choose not to display it at all.
+- **Impact:** This feature provides the ultimate "show, don't tell" profile component. It weaves together disparate data points into a holistic, easy-to-read summary that feels both personal and authentic.
+
 > **Future Enhancement (Phase 3):** > **Feature:** In-App Camera Requirement.
 > **Rationale:** Requiring at least one profile picture to be taken through the in-app camera (instead of just incentivizing it) would more strongly guarantee that photos are recent and unedited, further increasing platform trust.
 
@@ -274,6 +307,16 @@ The core of the Memory Book is the **Face Card**, a dynamic, collectible memento
   - **Private Notes:** Users can add private notes to each Face Card.
   - **Favorites (⭐):** A private bookmarking tool for personal organization.
   - **Connect Again (🔗):** A private signal to the backend that influences future event curation. If mutual, a special indicator is displayed on the Face Card.
+
+### The Interactive Face Card: Revealing Character
+
+The Face Card is more than just a static image; it's an interactive memento that reveals the character of the person behind it. The front of the card will display the user's name and their authentic photo. Tapping the card will reveal its "back," which contains the rich, narrative components of their profile:
+
+- **The Interest Constellation**
+- **The Kudos Showcase**
+- **Their Event DNA gallery**
+
+This interaction model keeps the initial view clean and focused on the person, while allowing users to dive deeper into the story of a connection they've made. For new users, these sections will contain gentle prompts encouraging them to participate in events to build out their own story.
 
 ### Social Connect: Effortless Social Sharing
 

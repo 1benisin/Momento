@@ -89,25 +89,27 @@ This table captures users from outside the initial US-only launch area who wish 
 
 This table stores internal, system-generated data and metrics about a user. This data is never exposed to the user and is used exclusively for algorithms related to matching and event curation. In the future, this may also include qualitative data like AI interview transcripts.
 
-| Column                           | Type         | Description                                                                                                                                                                          |
-| -------------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `user_id`                        | `uuid`       | Primary Key. Foreign key to `users.id`. (One-to-One)                                                                                                                                 |
-| `absentee_rating`                | `float`      | An internal score tracking reliability. A lower score is worse. Calculated from the `attendance` table based on statuses like `cancelled_late`, `no_show`, and `check_in_abandoned`. |
-| `contribution_score`             | `float`      | An internal score rewarding positive social behavior (e.g., receiving kudos, good attendance).                                                                                       |
-| `internal_attractiveness_rating` | `float`      | Internal score for matching. Not visible to user.                                                                                                                                    |
-| `updated_at`                     | `timestampz` | Records the last time the metrics were updated.                                                                                                                                      |
+| Column                           | Type         | Description                                                                                                                                                                             |
+| -------------------------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `user_id`                        | `uuid`       | Primary Key. Foreign key to `users.id`. (One-to-One)                                                                                                                                    |
+| `absentee_rating`                | `float`      | An internal score tracking reliability. A lower score is worse. Calculated from the `attendance` table based on statuses like `cancelled_late`, `no_show`, and `check_in_abandoned`.    |
+| `contribution_score`             | `float`      | An internal score rewarding positive social behavior (e.g., receiving kudos, good attendance).                                                                                          |
+| `internal_attractiveness_rating` | `float`      | Internal score for matching. Not visible to user.                                                                                                                                       |
+| `aggregated_kudos`               | `jsonb`      | **Nullable**. Stores a summary of kudos received, for efficient display on the profile. e.g., `[ { "kudo": "welcoming_vibe", "count": 12 }, { "kudo": "great_listener", "count": 9 } ]` |
+| `updated_at`                     | `timestampz` | Records the last time the metrics were updated.                                                                                                                                         |
 
 ### `user_interest_vectors` Table
 
-This table stores the vector embeddings that represent a user's interests. This data is the foundation of the matching algorithm and is never exposed to the user. For a detailed explanation of the strategy, see `_docs/MATCHING_ALGORITHM.md`.
+This table stores the vector embeddings that represent a user's interests. This data is the foundation of the matching algorithm and is never exposed to the user. For a detailed explanation of the strategy, see `_docs/MATCHING_ALGORITHM.md`. In Phase 2, this table will also store a user's "Interest Personas," which are clusters of related interests, each with a display name.
 
-| Column        | Type         | Description                                                                                               |
-| ------------- | ------------ | --------------------------------------------------------------------------------------------------------- |
-| `id`          | `uuid`       | Primary Key.                                                                                              |
-| `user_id`     | `uuid`       | Foreign key to `users.id`.                                                                                |
-| `vector`      | `vector`     | The interest vector embedding. The size will depend on the embedding model used (e.g., 1536 for OpenAI).  |
-| `vector_type` | `text`       | The type of vector, e.g., 'positive_v1', 'negative_v1'. This allows for versioning and multiple personas. |
-| `updated_at`  | `timestampz` | Records the last time this vector was updated.                                                            |
+| Column         | Type         | Description                                                                                                                             |
+| -------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`           | `uuid`       | Primary Key.                                                                                                                            |
+| `user_id`      | `uuid`       | Foreign key to `users.id`.                                                                                                              |
+| `vector`       | `vector`     | The interest vector embedding. The size will depend on the embedding model used (e.g., 1536 for OpenAI).                                |
+| `vector_type`  | `text`       | The type of vector, e.g., 'positive_v1', 'negative_v1', 'persona_v1'. This allows for versioning and multiple personas.                 |
+| `persona_name` | `text`       | **Nullable**. If `vector_type` is a persona, this stores the user-facing name for the cluster (e.g., "Thrill Seeker," "Cozy Creative"). |
+| `updated_at`   | `timestampz` | Records the last time this vector was updated.                                                                                          |
 
 ### `social_profiles` Table
 
@@ -122,6 +124,7 @@ The default public profile for every user who participates in events. The existe
 | `current_photo_id`           | `uuid`       | Foreign key to `profile_photos.id`, pointing to their main profile photo.                                                                                                                                                   |
 | `current_face_card_photo_id` | `uuid`       | Foreign key to `profile_photos.id`, pointing to their stylized Face Card.                                                                                                                                                   |
 | `bio`                        | `text`       | A short public biography.                                                                                                                                                                                                   |
+| `vibe_summary`               | `text`       | **Nullable**. An AI-generated narrative summary of the user's profile, approved for display by the user.                                                                                                                    |
 | `gender`                     | `text`       | **Required**. User's self-identified gender. A single selection from a predefined list: 'Woman', 'Man', 'Non-binary', 'Transgender Woman', 'Transgender Man', 'Genderqueer', 'Genderfluid', 'Agender'.                      |
 | `pronouns`                   | `text`       | **Optional**. User's pronouns (e.g., 'she/her', 'they/them'). If provided, this is displayed on their profile.                                                                                                              |
 | `interested_in`              | `text[]`     | **Required**. An array of genders the user is interested in connecting with. Multi-select from the same list as the `gender` field. Powers the "Discover Your Type" feed and is a core component of the matching algorithm. |
@@ -303,16 +306,17 @@ Tracks which users are invited to which events and their status.
 
 Tracks who actually attended an event, as reported post-event.
 
-| Column                   | Type         | Description                                                                                      |
-| ------------------------ | ------------ | ------------------------------------------------------------------------------------------------ |
-| `id`                     | `uuid`       | Primary Key.                                                                                     |
-| `event_id`               | `uuid`       | Foreign key to `events.id`.                                                                      |
-| `profile_id`             | `uuid`       | Foreign key to `social_profiles.id` of the attendee.                                             |
-| `status`                 | `text`       | e.g., 'attended', 'cancelled_late', 'no_show', 'check_in_abandoned'. Reported by attendees/host. |
-| `check_in_latitude`      | `float`      | Optional. The latitude recorded at the moment of check-in.                                       |
-| `check_in_longitude`     | `float`      | Optional. The longitude recorded at the moment of check-in.                                      |
-| `reported_by_profile_id` | `uuid`       | Foreign key to `social_profiles.id` of who is reporting.                                         |
-| `created_at`             | `timestampz` |                                                                                                  |
+| Column                   | Type         | Description                                                                                        |
+| ------------------------ | ------------ | -------------------------------------------------------------------------------------------------- |
+| `id`                     | `uuid`       | Primary Key.                                                                                       |
+| `event_id`               | `uuid`       | Foreign key to `events.id`.                                                                        |
+| `profile_id`             | `uuid`       | Foreign key to `social_profiles.id` of the attendee.                                               |
+| `status`                 | `text`       | e.g., 'attended', 'cancelled_late', 'no_show', 'check_in_abandoned'. Reported by attendees/host.   |
+| `is_showcased`           | `boolean`    | Defaults to `false`. If `true`, this event is featured in the user's "Event DNA" on their profile. |
+| `check_in_latitude`      | `float`      | Optional. The latitude recorded at the moment of check-in.                                         |
+| `check_in_longitude`     | `float`      | Optional. The longitude recorded at the moment of check-in.                                        |
+| `reported_by_profile_id` | `uuid`       | Foreign key to `social_profiles.id` of who is reporting.                                           |
+| `created_at`             | `timestampz` |                                                                                                    |
 
 ---
 

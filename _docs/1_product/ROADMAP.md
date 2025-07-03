@@ -107,6 +107,7 @@ With the core loop in place, this phase is about making the experience richer, m
 - Onboarding questionnaire to capture user interests and preferences in greater detail.
 - Walkthrough of theoretical events to build a richer user profile.
 - Store this data for more nuanced matching.
+- **Task:** Develop the "Interest Constellation" feature to visualize a user's clustered interest personas on their profile.
 
 **[Epic #XXX] Internal User Ratings (V1):**
 
@@ -136,6 +137,7 @@ With the core loop in place, this phase is about making the experience richer, m
 - **Develop the "Contribution Score":** Create the internal `contribution_score` metric in the `user_internal_metrics` table.
 - **Backend Logic:** Build the system to calculate the score based on kudos received, attendance records, and other positive engagement signals. Track counts for each kudo type to calculate metrics like a kudos-per-event ratio.
 - **Algorithm Integration:** Factor the Contribution Score into the event curation algorithm to reward positive community members.
+- **Task:** Develop the "Kudos Showcase" feature to visualize a user's top kudos on their profile.
 - Implement push notifications for receiving peer-to-peer kudos.
 
 **[Epic #XXX] The Memory Book & Enhanced Connections:**
@@ -151,7 +153,9 @@ With the core loop in place, this phase is about making the experience richer, m
 - **Task:** Implement the `profile_photos` table and logic for the "Authentic" badge, including the 12-month expiry.
 - **Task:** Update the `connections` table schema to store immutable Face Card snapshots (`connected_profile_snapshot_face_card_url`, etc.).
 - **Task:** Develop the progressive "Face Card" system, from initial photo to stylized version.
+- **Task:** Design the interactive "back" of the Face Card to be the primary container for the Interest Constellation, Kudos Showcase.
 - **Task:** Build the system for unlockable customizations (frames, badges) for Face Cards based on user achievements.
+- **Task:** Develop the "Event DNA" feature, allowing users to select and showcase a gallery of their favorite past events on their profile.
 - **Spike:** Research and integrate a third-party AI image generation service (e.g., DALL-E 3 API, Stable Diffusion API) for the stylization feature.
 
 **[Epic #XXX] Social Connect in Memory Book:**
@@ -203,6 +207,7 @@ This phase focuses on leveraging AI, automation, and content to scale the platfo
 
 - Experiment with an AI-driven voice interview for interest-building.
 - Pre-event AI "hype-man" to build confidence and provide conversation starters.
+- **Task:** Develop the "Vibe Summary" feature, allowing users to generate and display an AI-powered narrative summary on their profile.
 
 **[Epic #XXX] Content & Marketing Integration:**
 
