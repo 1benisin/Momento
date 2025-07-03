@@ -3,7 +3,7 @@
 This document details the technical strategy for matching users with events, centered on the use of vector embeddings.
 
 - **[The Core Concept: Vector Embeddings](#1-the-core-concept-vector-embeddings)**: Explains the foundational technology used to convert text into mathematical representations for concept-based matching.
-- **[Implementation: The Phased Approach](#2-implementation-the-phased-approach)**: Outlines the MVP implementation using single positive and negative interest vectors for each user.
+- **[The Social Graph Matching Algorithm](#2-the-social-graph-matching-algorithm)**: Outlines the algorithm used to find groups with a high potential for social and romantic chemistry.
 - **[Evolving User Preferences](#3-evolving-user-preferences)**: Describes the mechanisms, like the Discovery Feed and post-event ratings, that allow a user's interest profile to change and adapt over time.
 - **[Future Concepts & Enhancements](#4-future-concepts--enhancements-phase-3--beyond)**: A look ahead at more advanced concepts like multi-vector profiles, a "Chemistry Multiplier," and AI conversational interviews.
 
@@ -25,50 +25,85 @@ Vector embeddings allow us to convert complex, unstructured data (like text) int
 
 ---
 
-## 2. Implementation: The Phased Approach
+## 2. The Social Graph Matching Algorithm
 
-We will implement this system in phases to manage complexity and build upon our learnings.
+To move beyond simple interest matching and create groups with a high potential for social and romantic chemistry, we model each potential group of attendees as a "social graph." In this graph, every person is a node. Our goal is to find the group that represents the most vibrant and interconnected graph, ensuring no one is left in a social "dead-end."
 
-### Phase 1: Single Positive & Negative Vectors (MVP)
+The algorithm operates using a **"Concentric Circles"** strategy. Instead of evaluating all possible users at once, it performs iterative passes, starting with the most ideal candidates and slowly expanding the criteria until a high-quality group is formed. This ensures we always prioritize the best possible social experience.
 
-For the initial launch, each user will have two primary vectors that define their interest profile.
+### Pillar 1: The Potential Connection Score (The Graph's Edges)
 
-1.  **The `positive_interest_vector`**:
+The foundation of the graph is the strength of its connections. We calculate a `PotentialConnectionScore(A, B)` for every possible one-way pairing. This score, from 0 to 1, represents the likelihood of User A being interested in User B.
 
-    - **Source:** Generated during the "Possibility Card" onboarding flow. It is the **average** of the vectors of all the event cards the user swiped right on ("I'm Interested").
-    - **Purpose:** Represents the core of what the user is looking for in an experience.
+1.  **Categorical Compatibility (The Prerequisite)**
 
-2.  **The `negative_interest_vector`**:
-    - **Source:** It is the **average** of the vectors of all event cards the user swiped left on ("Not for Me").
-    - **Purpose:** Represents a "repulsion force." It defines the concepts and vibes the user actively dislikes.
+    - Does User B's `gender` appear in User A's `interested_in` array?
+    - If `NO`, the `PotentialConnectionScore` is **0**. If `YES`, we proceed.
 
-#### Matching Logic (Phase 1)
+2.  **Profile Vector Similarity (The Nuance)**
+    - We calculate the cosine similarity between **User B's** `social_profile` vector and **User A's** `person_attraction_vector` (built from their "Discover Your Type" swipes). This score represents how closely User B aligns with User A's demonstrated "type."
 
-When a new event is created, we generate an `EventVector` for its description. To calculate a user's match score for that event, we use a formula that combines attraction and repulsion:
+### Pillar 2: The Group Curation Engine (Iterative Group Building)
 
-**`MatchScore = CosineSimilarity(EventVector, User.PositiveVector) - CosineSimilarity(EventVector, User.NegativeVector)`**
+This engine runs in passes, expanding its search radius until a valid, high-chemistry group is found.
 
-- `CosineSimilarity` is a standard metric that measures the similarity between two vectors. A score of `1` means they are identical, `-1` means they are opposite, and `0` means they are unrelated.
-- This formula rewards events similar to a user's likes and penalizes events similar to their dislikes.
+**Pass 1: The "Perfect" Pool**
+The process begins with the most restrictive constraints to find the absolute best matches.
 
-#### Hard Filters (Pre-computation)
+- **Step 1: Candidate Pool Generation (Strict)**
+  The algorithm first creates a candidate pool by applying a strict set of **Hard Filters**. A user is only considered if they:
 
-Before calculating the `MatchScore`, the system will first apply a set of hard filters to exclude any events that are definitively not a match. This is more efficient than calculating vector similarity for every event in the system.
+  - Have **not** been blocked by, or blocked, any other user in the potential pool.
+  - Do **not** have a "Don't connect again" preference with any other user in the pool.
+  - Strictly meet the event's age, distance, and price preferences without any buffer.
+  - Have an extremely high vector similarity score between their interests and the event's theme.
 
-An event will be **excluded** from a user's potential matches if:
+- **Step 2: Group Assembly & Scoring**
+  Within this elite pool, the system attempts to build a valid social graph.
+  - It pre-computes the `PotentialConnectionScore` matrix for all candidates in the pool.
+  - It assembles and **validates** potential groups, ensuring every person has at least one potential incoming and one outgoing connection. Any group failing this check is discarded.
+  - It calculates a `GroupChemistryScore` for each valid group by summing all internal connection scores.
 
-- `Event.location` is outside the user's `profile.distancePreference` radius. We can add soft buffer and a negative match score to anything that is in the buffer.
-- `Event.estimatedEventCost` is above the user's `profile.priceSensitivity` setting. We can add a buffer and a negative match score the farther out of the user's price sensitivity the event is.
+**If a valid group with a high enough score is found, the process stops and invitations are sent.** If not, the engine proceeds to the next pass.
 
-Only events that pass these hard filters will proceed to the vector-based scoring stage.
+**Pass 2+ (Expanded Pools)**
+The algorithm systematically expands the circles. It will:
 
-#### The "Holistic" User Profile
+- Slightly lower the required event-interest similarity score.
+- Add a small buffer to the distance and price preferences.
+- This creates a larger, but still high-quality, candidate pool. The Group Assembly & Scoring process (Step 2) is run again.
 
-The user's vectors are not static and aren't just from the onboarding flow. They will be a weighted average of multiple text sources to create a richer profile:
+This iterative process repeats, ensuring the system only "settles" for a good group if a perfect one cannot be formed.
 
-`PositiveVector = (60% * OnboardingSwipes) + (30% * StatedInterests) + (10% * ProfileBio)`
+### Pillar 3: Dynamic Reason Generation (The "Why")
 
-This ensures we capture a more complete picture of the user.
+Once the ideal group is selected, the system does a "reverse lookup" to explain the match to each user. It constructs a human-readable `match_reason` by analyzing the strongest signals that led to their inclusion. The hierarchy, from most compelling to most practical, is:
+
+1.  **Strong Social Signals (The "Inside Track"):** This is the highest tier, based on a user's direct feedback on people.
+
+    - **Trigger:** The group includes a user they've flagged with **"Connect Again,"** or the event is hosted by someone they've previously given a **5-star rating.**
+    - **Example:** _"Someone you wanted to connect with again will be at this event!"_
+
+2.  **High Chemistry Potential (The "People Connection"):** The core reason when the user is a key part of the social graph's chemistry.
+
+    - **Trigger:** The user's combined incoming and outgoing `PotentialConnectionScore`s are particularly high within the chosen group.
+    - **Example:** _"We think you'll really connect with the people at this event."_
+
+3.  **Event & Interest Match (The "Vibe Check"):** For when the event itself is an ideal match for their tastes.
+
+    - **Trigger:** High vector similarity between the event and the user's `positive_interest_vector` or explicit `interests`.
+    - **Example:** _"This seems right up your alley! It's similar to the '[Liked Event Card Title]' experience you were interested in."_
+
+4.  **Logistical Perfection (The "Perfect Fit"):** This is most powerful when an event perfectly matches a user's restrictive preferences.
+
+    - **Trigger:** The event aligns perfectly with the user's set **distance, price, and timing/availability** preferences.
+    - **Example:** _"An event that fits your schedule and budget, right in your neighborhood!"_
+
+5.  **Exploration & Variety (The "Wild Card"):** Directly responds to a user's request to try something new.
+    - **Trigger:** The user recently chose "I'm looking to try new things" when declining an event, and this event is intentionally outside their core interest cluster.
+    - **Example:** _"You mentioned you wanted to try new things—we thought this might be a fun surprise!"_
+
+This transforms a complex calculation into a transparent, personalized, and compelling invitation.
 
 ---
 
@@ -83,10 +118,10 @@ A user's interests are not static. To prevent an "invite rut" where a user is on
     - The primary tool for post-onboarding interest refinement. Users can browse a feed of real, highly-rated past events and indicate their interest.
     - An affirmative swipe on a past event is a strong, explicit signal that adds the event's vector to the user's `positive_interest_vector`.
 
-2.  **The "Discover your People" Feed:**
+2.  **The "Discover your Type" Feed:**
 
-    - This is the primary tool for understanding a user's "type." Users browse a feed of other user profiles and indicate potential connection.
-    - An affirmative swipe ("I'd like to create a memory with them") is a signal used to build a `person_attraction_vector` for the user. This helps the algorithm match them with more compatible people in future events.
+    - This is the primary tool for understanding a user's "type" and is the engine that builds their `person_attraction_vector`. Users browse a feed of profiles filtered by their `interested_in` preferences.
+    - An affirmative swipe ("I'd like to create a memory with them") is a powerful signal. It updates the user's `person_attraction_vector`, making our understanding of their type more and more accurate over time.
 
 3.  **Post-Event Ratings:**
 

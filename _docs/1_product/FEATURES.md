@@ -11,6 +11,7 @@ This document is organized into the following sections.
   - [Host Tools & Controls](#host-tools)
 - [4. Interest Building Flow: The Momento Preview](#4-interest-building-flow-the-momento-preview)
 - [5. The Invitation](#5-the-invitation)
+  - [Algorithm Transparency: The "Why"](#algorithm-transparency-the-why)
   - [Declining an Invitation](#declining-an-invitation-capturing-user-intent)
   - [Calendar Integration](#post-confirmation--calendar-integration)
 - [6. Event Preferences & Filtering](#6-event-preferences-filtering)
@@ -46,6 +47,10 @@ User profiles will contain three categories of information:
   - An "absentee rating" (for tracking no-shows or lateness).
   - An internal "attractiveness rating" to assist in matching users with others in a similar range.
   - A "contribution score" that gamifies positive social engagement. This score is influenced by receiving "kudos" from peers, good attendance, and participating in pre-event activities. The system will track the counts of each type of kudo received, allowing for metrics like a kudos-per-event ratio. A higher score can increase a user's likelihood of being invited to high-demand events.
+- **Identity & Preferences**: To facilitate our unique matching, users provide:
+  - **`gender`**: A single selection from a comprehensive list (e.g., Woman, Man, Non-binary, Transgender Woman, etc.).
+  - **`interested_in`**: A multiple-selection field indicating the genders they are interested in connecting with.
+  - **`pronouns`**: An optional field that, if filled out, is displayed on their public profile.
 
 > **Future Enhancement (Phase 3):** > **Feature:** In-App Camera Requirement.
 > **Rationale:** Requiring at least one profile picture to be taken through the in-app camera (instead of just incentivizing it) would more strongly guarantee that photos are recent and unedited, further increasing platform trust.
@@ -133,7 +138,20 @@ The invitation is a core part of the weekly user experience.
 - The app will curate invitees based on who is the best match for the event and other participants.
 - A balanced male-to-female ratio will be a goal.
 - Participants will not see who else is attending until after they arrive (or possibly after they accept).
+- The app curates invitees using a "Social Graph" algorithm. The goal is to create groups with the highest potential for social and romantic connections, ensuring that no attendee is a "dead-end" in the group's dynamic. Every invitee is chosen because they have at least one potential incoming _and_ outgoing connection within the group, based on a nuanced, person-to-person compatibility score.
+- Participants will not see who else is attending until after they arrive, preserving the magic of discovery.
 - Participants will be able to message the host before the event for logistical questions.
+
+#### Algorithm Transparency: The "Why"
+
+To build trust and make the experience feel more personalized, every invitation includes a short, friendly message explaining why the user was matched with that specific event. This transforms the invitation from a random notification into a thoughtful suggestion.
+
+- **Functionality:** A `MatchReasonBanner` is displayed at the top of the `InvitationDetailScreen`.
+- **Example Reasons:**
+  - _"We thought you'd like this because you're interested in **Hiking** and **Japanese Cuisine**."_
+  - _"This seems right up your alley! It's similar to the **'Secret Garden Soirée'** experience you were interested in."_
+  - _"An event just for you, right in your neighborhood! It's only **5 miles away**."_
+- **Impact:** This feature makes the matching process feel less like a black box and more like a personalized service, reinforcing that Momento understands the user's unique tastes.
 
 #### Declining an Invitation: Capturing User Intent
 
@@ -374,11 +392,11 @@ To solve the "invite rut" problem and allow users to continuously refine their t
 To help the matching algorithm understand a user's "type" in potential connections, the app features a second discovery mode focused on people. This moves beyond simple "liking" and frames the action as an intentional search for compatibility.
 
 - **Headline:** **"Help us Discover your Type"**
-- **Functionality**: Users are presented with a swipeable deck of profile cards, showing them only users of the opposite sex (for the initial implementation).
+- **Functionality**: Users are presented with a swipeable deck of profile cards. This feed is populated based on the user's `interested_in` preferences. It will not show users outside of these preferences.
 - **Interaction**: The language is designed to be intentional and aligned with Momento's values.
   - **Swipe Right:** The button or action is labeled **"I'd like to create a memory with them."** This signals a potential for genuine connection.
   - **Swipe Left:** The button or action is labeled **"Not the connection I'm looking for."**
-- **Backend Signal**: Each right swipe provides a signal that helps define a user's `person_attraction_vector`, which is used by the matching algorithm to suggest more compatible attendees for future events. This is not a direct "like" that is sent to the other user; it is a private signal for the system.
+- **Backend Signal**: Each right swipe is a crucial signal. It does not send a "like" to the other user. Instead, it helps the algorithm build the user's `person_attraction_vector`—a nuanced, mathematical representation of their "type." This vector is a key component in calculating person-to-person compatibility for the "Social Graph" algorithm, moving far beyond simple gender preferences to understand the _vibe_ of people a user connects with.
 
 ## 14. Notifications
 

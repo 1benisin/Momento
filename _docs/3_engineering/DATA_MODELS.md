@@ -112,20 +112,22 @@ This table stores the vector embeddings that represent a user's interests. This 
 
 The default public profile for every user who participates in events. The existence of this record, linked to a `users` record, designates a user as a `Participant`.
 
-| Column                       | Type         | Description                                                               |
-| ---------------------------- | ------------ | ------------------------------------------------------------------------- |
-| `id`                         | `uuid`       | Primary Key.                                                              |
-| `user_id`                    | `uuid`       | Foreign Key, linking to the `users` table. (One-to-One)                   |
-| `first_name`                 | `text`       | User's public first name.                                                 |
-| `preferred_name`             | `text`       | The name the user prefers to be called.                                   |
-| `current_photo_id`           | `uuid`       | Foreign key to `profile_photos.id`, pointing to their main profile photo. |
-| `current_face_card_photo_id` | `uuid`       | Foreign key to `profile_photos.id`, pointing to their stylized Face Card. |
-| `bio`                        | `text`       | A short public biography.                                                 |
-| `gender`                     | `text`       | User's self-identified gender.                                            |
-| `occupation`                 | `text`       | User's occupation.                                                        |
-| `location`                   | `text`       | General location (e.g., "Brooklyn, NY").                                  |
-| `liked_profiles`             | `uuid[]`     | An array of `social_profile` IDs that this user has liked.                |
-| `created_at`                 | `timestampz` |                                                                           |
+| Column                       | Type         | Description                                                                                                                                                                                                                 |
+| ---------------------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                         | `uuid`       | Primary Key.                                                                                                                                                                                                                |
+| `user_id`                    | `uuid`       | Foreign Key, linking to the `users` table. (One-to-One)                                                                                                                                                                     |
+| `first_name`                 | `text`       | User's public first name.                                                                                                                                                                                                   |
+| `preferred_name`             | `text`       | The name the user prefers to be called.                                                                                                                                                                                     |
+| `current_photo_id`           | `uuid`       | Foreign key to `profile_photos.id`, pointing to their main profile photo.                                                                                                                                                   |
+| `current_face_card_photo_id` | `uuid`       | Foreign key to `profile_photos.id`, pointing to their stylized Face Card.                                                                                                                                                   |
+| `bio`                        | `text`       | A short public biography.                                                                                                                                                                                                   |
+| `gender`                     | `text`       | **Required**. User's self-identified gender. A single selection from a predefined list: 'Woman', 'Man', 'Non-binary', 'Transgender Woman', 'Transgender Man', 'Genderqueer', 'Genderfluid', 'Agender'.                      |
+| `pronouns`                   | `text`       | **Optional**. User's pronouns (e.g., 'she/her', 'they/them'). If provided, this is displayed on their profile.                                                                                                              |
+| `interested_in`              | `text[]`     | **Required**. An array of genders the user is interested in connecting with. Multi-select from the same list as the `gender` field. Powers the "Discover Your Type" feed and is a core component of the matching algorithm. |
+| `occupation`                 | `text`       | User's occupation.                                                                                                                                                                                                          |
+| `location`                   | `text`       | General location (e.g., "Brooklyn, NY").                                                                                                                                                                                    |
+| `liked_profiles`             | `uuid[]`     | An array of `social_profile` IDs that this user has liked.                                                                                                                                                                  |
+| `created_at`                 | `timestampz` |                                                                                                                                                                                                                             |
 
 ### `profile_photos` Table
 
@@ -178,10 +180,11 @@ To facilitate user matching, we'll use a structured interest system.
 
 A global, unique list of all possible interests.
 
-| Column | Type     | Description                                                        |
-| ------ | -------- | ------------------------------------------------------------------ |
-| `id`   | `serial` | Primary Key.                                                       |
-| `name` | `text`   | The name of the interest (e.g., "Hiking", "Vintage Film"). Unique. |
+| Column   | Type     | Description                                                        |
+| -------- | -------- | ------------------------------------------------------------------ |
+| `id`     | `serial` | Primary Key.                                                       |
+| `name`   | `text`   | The name of the interest (e.g., "Hiking", "Vintage Film"). Unique. |
+| `vector` | `vector` | The vector embedding of the interest's name, used for matching.    |
 
 ### `profile_interests` Table
 
@@ -277,6 +280,7 @@ Tracks which users are invited to which events and their status.
 | `profile_id`     | `uuid`       | Foreign key to `social_profiles.id` (the invitee).                                                                             |
 | `status`         | `text`       | e.g., 'sent', 'confirmed', 'declined', 'expired', 'payment_failed', 'cancelled'. 'confirmed' means the user accepted and paid. |
 | `decline_reason` | `text`       | Optional. Stores the reason a user declined, e.g., 'busy', 'not_interested', 'wants_variety'.                                  |
+| `match_reason`   | `text`       | Optional. A system-generated, human-readable string explaining why the user was matched to this event.                         |
 | `created_at`     | `timestampz` |                                                                                                                                |
 | `updated_at`     | `timestampz` |                                                                                                                                |
 

@@ -58,20 +58,15 @@ _This is the view for `Host-Only` and `Hybrid` users who are in "Host Mode." It 
 - **`InboxTab`**: A dedicated inbox for messages from attendees of the host's events.
 - **`ProfileTab`**: Manage the public `Host Profile`, brand photos, payout settings, etc. Contains the **`ModeSwitcher`** for `Hybrid Users`.
 
----
+### 4. Invitation & Event Details
 
+- **`InvitationDetailScreen`**: Displays all details for a pending event invitation. It prominently features the `MatchReasonBanner` at the top to immediately personalize the experience.
 - **`EventDetailScreen`**: A multi-state screen for a confirmed event.
   - **Upcoming State**: Shows full itinerary, logistics, collaborator info, and a clear `CostBreakdown` component that separates the **Confirmation Fee** (paid to Momento) from the **Estimated Event Cost** (paid to the host/venue).
   - **Arrival State**: Reveals the "Deck of Cards" UI for check-in once at least two attendees have arrived.
   - **Post-Event State**: Hub for feedback, messaging, the shared photo gallery, and an event-specific message board (`EventPostFeed`).
-- **`FirstEventCheckInPhotoScreen`**: A one-time screen shown when a user checks into their first event, prompting them to take their initial "authentic" photo to create their first Face Card.
-- **`PostEventFeedbackFlow`**: A multi-step modal flow presented after an event concludes, replacing the simple `FeedbackModal`.
-  - Step 1: `RatingScreen` for rating the event and host.
-  - Step 2: `PeerKudosScreen` for giving private, anonymous kudos to fellow attendees.
-- **`SharedEventGalleryScreen`**: View for the shared photo album for a past event. Includes uploader, downloader, and a "report photo" feature.
-- **`AIHypeManModal` (Future)**: A modal that can be triggered before an event to build a user's confidence with personalized conversation starters and reminders of their positive qualities, as described in the marketing strategy.
 
-### 4. Connection & Profile Details
+### 5. Connection & Profile Details
 
 - **`ConnectionDetailScreen`**: Detailed view of a "Face Card" from the Memory Book. Includes:
   - Private notes section.
@@ -92,37 +87,56 @@ _This is the view for `Host-Only` and `Hybrid` users who are in "Host Mode." It 
 - **`InAppNotificationBanner`**: A banner/toast for displaying notifications while the user is inside the app.
 - **`ModeSwitcher`**: A UI control, likely a dropdown or segmented control in the `ProfileTab`, that allows a `Hybrid User` to toggle between "Social Mode" and "Host Mode."
 
-### 5. Settings & User Management
+### 6. Settings & User Management
 
-- **`SettingsScreen`**: Main menu for all settings.
-- **`EditProfileScreen`**: For updating the user's public profile.
-- **`NotificationSettingsScreen`**: For managing push and SMS notification preferences.
+The main `SettingsScreen` will feature a tabbed interface to organize all user-configurable options clearly. This keeps all settings in a single, predictable location while separating them by context.
+
+- **`SettingsScreen`**: The container screen with the three tabs described below.
+
+---
+
+#### Tab 1: Account (Global Settings)
+
+_Handles core, private settings tied to the `users` account._
+
+- **`PrivateInfoScreen`**: To manage private details like email and last name.
+- **`SecurityAndPrivacyScreen`**: Hub for safety features.
+  - **`BlockedUsersScreen`**: A sub-screen to view and manage blocked users.
+  - **`VerificationScreen`**: The UI flow for identity verification.
 - **`PaymentMethodsScreen`**: For adding/removing payment methods.
-- **`TransactionHistoryScreen`**: For viewing past payments.
-- **`MySocialLinksScreen`**: For managing the user's own social media links to be shared via "Social Connect." For hosts, this screen includes a toggle for each link to make it publicly visible on their Host Profile.
-- **`InvitationPreferencesScreen`**: Screen for configuring soft invite preferences; includes a `NoticePreferenceSlider` component for lead-time settings and day-of-week availability toggles.
-- **`EventPreferencesScreen`**: Screen for configuring hard event filters. Contains the `DistancePreferenceSlider` and `PriceSensitivitySelector`. This screen is typically reached via a deep link from a contextual nudge.
-- **`SecurityAndPrivacyScreen`**: Hub for safety features, including the blocked users list.
-- **`BlockedUsersScreen`**: A screen to view and manage blocked users.
-- **`VerificationScreen`**: The UI flow for identity verification.
-- **`ReportUserFlow`**: A guided flow for submitting a formal report against another user.
+- **`TransactionHistoryScreen`**: For viewing past payments made to Momento.
+- **`NotificationSettingsScreen`**: A single, consolidated screen for managing all push and SMS preferences. The UI on this screen will be grouped by context (e.g., "Social & Connections," "Host Notifications") as defined in `_docs/3_engineering/NOTIFICATIONS_PLAN.md`.
+- **`HelpCenterScreen`**: The entry point for contacting support.
+
+---
+
+#### Tab 2: Participant (Social Profile Settings)
+
+_Manages the user's public identity as an event attendee and their discovery preferences._
+
+- **`EditProfileScreen`**: For updating the user's public-facing social profile (`preferred_name`, `bio`, etc.).
+- **`CameraRollScreen`**: To manage personal photos and access shared event albums.
+- **`FaceCardStylingScreen`**: To customize the visual style of the `FaceCard`.
+- **`InvitationPreferencesScreen`**: For "soft" preferences like ideal event lead-time and weekly availability.
+- **`EventPreferencesScreen`**: For "hard" filters like max travel distance and price sensitivity. This screen is the destination for contextual nudges.
+- **`MySocialLinksScreen`**: For managing private social media links that can be shared one-to-one with connections.
+
+---
+
+#### Tab 3: Host (Hosting-Specific Settings)
+
+_A dynamic tab that is only visible to users with a `host_profiles` record._
+
+- **`EditHostProfileScreen`**: To manage the public host bio, name, and brand/marketing photos (`host_photos`).
+- **`ManagePublicSocialsScreen`**: A view (likely reusing `MySocialLinksScreen`) where hosts can toggle the `is_public_on_host_profile` flag for their social links.
+- A shortcut to the **`EventsTab`** in Host Mode to manage created events.
+- A section for **`Payouts` (Future)**, which will eventually link to a screen for managing bank details.
+
+---
+
+- **`ReportUserFlow`**: A guided flow for submitting a formal report against another user. This can be accessed from multiple places, including the `HelpCenterScreen`.
 - **`ReportPhotoModal`**: A modal for reporting an inappropriate photo from the `SharedEventGalleryScreen`.
 - **`CoachingModuleScreen`**: A guided, mandatory walkthrough on community standards for users who have received a serious report.
-
-### 6. Help & Support Flow
-
-- **`HelpCenterScreen`**: The main entry point for support, accessed from `Settings`. It presents a list of categories to guide the user.
-  - "Report a Technical Issue"
-  - "Suggest an Improvement"
-  - "Help with a Payment"
-  - "Hosting Question"
-  - "Account or Profile Issue"
-  - "Report Another User" (This initiates the `ReportUserFlow` from a new context).
-  - "General Inquiry"
-- **`SupportTicketFormScreen`**: A dynamic form screen whose content changes based on the category selected in the `HelpCenterScreen`. It includes pre-filled, selectable dropdowns where applicable.
-  - **For Payments**: Includes a dropdown of the user's recent transactions.
-  - **For Hosting**: Includes a dropdown of the host's created events.
-  - All dropdowns will include a "General Question" or "Other" option.
 
 ### 7. Hosting Flow
 
@@ -141,7 +155,7 @@ _This is the view for `Host-Only` and `Hybrid` users who are in "Host Mode." It 
 
 ### 9. Discovery & Content
 
-- \*\*`
+- **`ContentDetailScreen`**: For displaying long-form content like articles or videos, likely launched from the `HomeTab`.
 
 ---
 
@@ -153,6 +167,7 @@ This section catalogs the reusable UI elements that form the building blocks of 
 
 - **`DeclineFeedbackModal`**: A modal presented after a user declines an invitation, asking for a reason. Includes options for "Too short notice," "Too far away," and "Too expensive."
 - **`ContextualNudgeModal`**: A one-time, educational modal that appears after a user action (like declining an event for being "Too far away") to deep-link them to a relevant setting.
+- **`MatchReasonBanner`**: An elegant banner displayed prominently on the `InvitationDetailScreen`. It's designed to feel insightful and personal, not like a system debug message. It features a small icon (e.g., ✨) and a short, friendly text that explains why the user was invited to this specific event.
 
 ### Indicators & Badges
 
@@ -175,3 +190,5 @@ This section catalogs the reusable UI elements that form the building blocks of 
   - `$$$$` (e.g., $75+)
 - **`DayWeekendToggle`**: A simple toggle or segmented control for setting basic "Weekday" vs. "Weekend" availability preferences.
 - **`AvailabilityGrid`**: A 7x2 grid for setting detailed availability preferences for each day and night of the week. Activated via an "Advanced" dropdown in the `InvitationPreferencesScreen`.
+
+- **`AIHypeManModal` (Future)**: A modal that can be triggered before an event to build a user's confidence with personalized conversation starters and reminders of their positive qualities, as described in the marketing strategy.

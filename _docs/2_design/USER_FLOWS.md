@@ -71,7 +71,7 @@ This flow describes the journey of a brand new user from first launch to accepti
 
 6.  **Viewing the Invitation**:
 
-    - `->` **`InvitationDetailScreen`**: Displays all details for the event: itinerary, host info, description, etc. The UI will prominently display a `ShortNoticeBadge` if the event's lead-time is less than the user's preference.
+    - `->` **`InvitationDetailScreen`**: Displays all details for the event: itinerary, host info, description, etc. Upon opening the screen, the user first sees the `MatchReasonBanner` at the top, explaining why they were invited (e.g., "We thought you'd like this because you're interested in Live Music."). This immediately reassures the user that the invitation is personalized. The UI will also prominently display a `ShortNoticeBadge` if the event's lead-time is less than the user's preference.
     - **User Actions**:
       - Taps "Accept." (Proceeds to Step 7)
       - Taps "Decline."
@@ -227,7 +227,7 @@ This flow describes the journey for a business or service provider who wants to 
 
 1.  **Prerequisite**: A user must first add their social media links in their private profile settings.
 
-    - **User Action**: Navigates to `SettingsScreen` -> `MySocialLinksScreen`.
+    - **User Action**: Navigates to `SettingsScreen` -> `Participant Tab` -> `My Social Links`.
     - `->` **`MySocialLinksScreen`**: User adds their Instagram URL. If they are also a host, they see a toggle to "Make public on Host Profile," which they leave off for this private link.
 
 2.  **Accessing Connections**:
@@ -256,6 +256,7 @@ This flow describes the journey for a business or service provider who wants to 
     - **System Action**: A `social_connections` record is created. The share is silent; the other user receives no notification.
 
 6.  **Receiving Social Media Links (The Discovery Moment)**:
+
     - **Trigger**: Another user has shared a link with the current user.
     - The user will not be notified. Instead, the next time they view the sharer's `ConnectionDetailScreen`, the relevant social icon will be visible.
     - Tapping the icon opens the link. A "Share Back" button is also displayed to make reciprocation easy.
@@ -322,6 +323,7 @@ This flow describes the journey for an existing participant to create a host pro
 7.  **System Action**:
     - A `host_profiles` record is created and linked to the user's `users.id`. The user is now a `Hybrid User`.
     - The **`ModeSwitcher`** component now appears in their `ProfileTab`.
+    - The **`Host Tab`** now appears in the main `SettingsScreen`.
 8.  **Completion**: The user is returned to their `ProfileTab`. They can now switch to "Host Mode" to begin creating events.
 
 ---
@@ -458,7 +460,7 @@ This flow describes how a user sends a direct, categorized message to the Moment
 
 ### Flow Steps:
 
-1.  **Entry Point**: User navigates to `SettingsScreen` -> `Help & Support`.
+1.  **Entry Point**: User navigates to `SettingsScreen` -> `Account Tab` -> `Help & Support`.
 2.  `->` **`HelpCenterScreen`**: The user is presented with a list of categories.
 3.  **User Action**: Selects a category, for example, "Help with a Payment".
 4.  `->` **`SupportTicketFormScreen`**: The form is tailored to the selected category.
@@ -485,7 +487,7 @@ This flow is a critical alternative to the standard reporting flow, ensuring a u
 
 ### Flow Steps:
 
-1.  **Entry Point**: User navigates to `SettingsScreen` -> `Help & Support`.
+1.  **Entry Point**: User navigates to `SettingsScreen` -> `Account Tab` -> `Help & Support`.
 2.  `->` **`HelpCenterScreen`**: User sees the list of categories.
 3.  **User Action**: Selects "Report Another User".
 4.  `->` The app initiates the standard **`ReportUserFlow`**, now with more context-gathering steps.
@@ -518,7 +520,7 @@ This flow is a critical alternative to the standard reporting flow, ensuring a u
 
 ### Flow Steps:
 
-1.  **Entry Point**: User navigates to `SettingsScreen` → `InvitationPreferencesScreen`.
+1.  **Entry Point**: User navigates to `SettingsScreen` -> `Participant Tab` -> `Invitation Preferences`.
 2.  `->` **`InvitationPreferencesScreen`**: Displays:
     - **Lead-Time Slider** (`NoticePreferenceSlider`), default 3 days (range 0–14 days).
     - **Day/Week Availability**: Soft Day/Weekend toggle (`DayWeekendToggle`).
@@ -565,7 +567,7 @@ This flow is critical for progressive discovery, ensuring the user isn't overwhe
 5.  **Deep-linking to Settings**:
 
     - **User Action**: User taps "Set My Radius" or "Set My Budget".
-    - `->` **`SettingsScreen`**: The user is taken directly to the `EventPreferencesScreen`, with the relevant setting possibly highlighted.
+    - `->` **`SettingsScreen`**: The user is taken directly to the `Participant Tab` and shown the `EventPreferencesScreen`, with the relevant setting possibly highlighted.
     - The user can now configure their preference. The original invitation is dismissed.
 
 6.  **Dismissal**:

@@ -6,6 +6,7 @@ This document outlines the complete plan for user notifications, covering four k
 - **[Database Schema Additions](#2-database-schema-additions)**: Defines the new `push_notification_tokens` and `user_notification_settings` tables required to store device tokens and user preferences.
 - **[Notification Triggers & Content](#3-notification-triggers--content)**: A comprehensive list of every notification in the app, categorized by type (Event, Social, Account) with suggested message content.
 - **[Advanced Scenarios & Best Practices](#4-advanced-scenarios--best-practices)**: Discusses implementation details for more complex features like chat message bundling, deep linking, and in-app notifications.
+- **[User-Facing Settings UI](#5-user-facing-settings-ui)**: Details the organized, context-grouped layout for the notification toggles as we designed.
 
 ---
 
@@ -132,3 +133,37 @@ Here is a brainstormed list of potential notifications, their triggers, and sugg
 - **Deep Linking:** All notifications should use deep links. Tapping a notification for an event invitation should take the user directly to that invitation screen in the app, not just the home screen. Expo's Linking library combined with Expo Router handles this well.
 
 - **In-App Notifications:** For notifications while the user is actively using the app (e.g., a new message arrives), we should not use a push notification. Instead, we can use an in-app solution like a temporary banner or toast message at the top of the screen. This can be managed with a global state listener that subscribes to real-time events from Supabase.
+
+---
+
+## 5. User-Facing Settings UI
+
+To give users clear and granular control, the `NotificationSettingsScreen` (located under the `SettingsScreen` -> `Account Tab`) will present the toggles in logical groups. This keeps all notification settings in one predictable place while still separating them by context.
+
+For a user who is both a participant and a host, the screen would be organized as follows:
+
+#### **Push Notifications**
+
+- `[Toggle]` **Social & Connections**
+  - _New Kudos, Mutual Connections, new photos in event galleries, etc._
+- `[Toggle]` **Direct Messages**
+  - _Messages from other participants._
+- `[Toggle]` **Event Invitations & Reminders**
+  - _New invites, event updates, and reminders to provide feedback._
+
+#### **Host Notifications**
+
+_*This entire section is only visible to users with a Host profile.*_
+
+- `[Toggle]` **Attendee Messages & Event Posts**
+  - _Messages from your event attendees and posts in your event feeds._
+- `[Toggle]` **Event & Attendee Updates**
+  - _Event confirmed, event is full, check-in reports, etc._
+- `[Toggle]` **Content Moderation**
+  - _Reports on photos in your event galleries._
+
+#### **SMS Notifications**
+
+- `[Toggle]` **Event Invitations**
+- `[Toggle]` **Event Reminders & Critical Updates**
+  - _For event start times, cancellations, or major detail changes._
