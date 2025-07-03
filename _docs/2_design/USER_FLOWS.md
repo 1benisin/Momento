@@ -17,10 +17,11 @@ This document maps out the key user journeys within the Momento application.
 - **[Managing Photos in a Shared Event Gallery](#12-managing-photos-in-a-shared-event-gallery)**: The flow for attendees to share memories and hosts to maintain a safe environment in a shared event photo album.
 - **[Customizing a Face Card](#13-customizing-a-face-card)**: The flow for personalizing a user's public-facing `FaceCard` after their first event.
 - **[Cancelling Event Attendance](#14-cancelling-event-attendance)**: The flow for a confirmed attendee to formally cancel attendance and understand the consequences.
-- **[Contacting Support](#15-contacting-support)**: The flow for a user to send a direct message to the Momento support team.
-- **[User Safety: Reporting a User (via Help Center)](#16-user-safety-reporting-a-user-via-help-center)**: The flow for reporting a user through the help center, which is critical if the reporting user has already been blocked.
-- **[Invitation Preferences](#17-invitation-preferences)**: The flow for configuring soft invite lead-time and day/week availability preferences.
-- **[User Declines Invite (Contextual Onboarding)](#18-user-declines-invite-contextual-onboarding)**: The flow for when a user declines an event, and how the app uses that moment to contextually introduce preference settings.
+- **[Handling Host-Initiated Event Changes](#15-handling-host-initiated-event-changes)**: The automated flow for when a host modifies a key event detail after attendees have already paid.
+- **[Contacting Support](#16-contacting-support)**: The flow for a user to send a direct message to the Momento support team.
+- **[User Safety: Reporting a User (via Help Center)](#17-user-safety-reporting-a-user-via-help-center)**: The flow for reporting a user through the help center, which is critical if the reporting user has already been blocked.
+- **[Invitation Preferences](#18-invitation-preferences)**: The flow for configuring soft invite lead-time and day/week availability preferences.
+- **[User Declines Invite (Contextual Onboarding)](#19-user-declines-invite-contextual-onboarding)**: The flow for when a user declines an event, and how the app uses that moment to contextually introduce preference settings.
 
 ---
 
@@ -451,7 +452,53 @@ This flow outlines what happens when a confirmed attendee decides they can no lo
 
 ---
 
-## 15. Contacting Support
+## 15. Handling Host-Initiated Event Changes
+
+This flow outlines the automated process for managing material changes to an event made by the host after participants have already confirmed and paid. The goal is to protect the user and build trust by giving them a clear choice.
+
+- **Role:** `Participant` (Confirmed Attendee)
+- **Goal:** To be notified of a significant event change and choose whether to accept the new terms or receive an automatic refund.
+
+### Flow Steps:
+
+1.  **Trigger**: A host edits a key detail of a `published` event that already has confirmed attendees.
+
+    - **Material Changes Include**:
+      - A change in date or a significant change in `start_time` (e.g., > 30 minutes).
+      - A change to the `location_id` of any `event_itinerary_stops`.
+      - A significant change to the event's `title` or `description` that alters the core experience.
+
+2.  **System Action**: The system immediately flags this change.
+
+3.  **Notification**: All confirmed attendees receive a high-priority notification.
+
+    - **`Push Notification`**: "Update for '[Event Title]': The details have changed. Please review and confirm your spot."
+    - **`InAppNotificationBanner`**: A persistent banner appears if the user is in the app.
+
+4.  **User Action**: User taps the notification.
+
+    - `->` **`EventDetailScreen`**: The screen now displays the updated information, with visual cues highlighting what has changed.
+
+5.  **The Choice**: A modal overlay, the **`EventChangeConfirmationModal`**, appears automatically.
+
+    - **Modal Content**: "The host has updated this event. The start time is now **7:00 PM** (was 6:00 PM). Do you still want to attend?"
+    - **Actions**:
+      - **Primary Button**: "Keep My Spot"
+      - **Secondary Button**: "Cancel & Request Refund"
+
+6.  **User Confirmation**:
+    - **Scenario A: User taps "Keep My Spot".**
+      - The modal dismisses. The user has re-confirmed their attendance under the new terms.
+    - **Scenario B: User taps "Cancel & Request Refund".**
+      - **System Action**: An automatic, one-click refund is processed.
+      - The user's `invitations` record is updated to `cancelled_host_change`.
+      - The related `payments` record is reversed via Stripe.
+      - The user sees a confirmation message: "Your spot has been cancelled and your $5 fee has been refunded."
+      - The spot is now open and the system may try to fill it.
+
+---
+
+## 16. Contacting Support
 
 This flow describes how a user sends a direct, categorized message to the Momento support team.
 
@@ -462,14 +509,22 @@ This flow describes how a user sends a direct, categorized message to the Moment
 
 1.  **Entry Point**: User navigates to `SettingsScreen` -> `Account Tab` -> `Help & Support`.
 2.  `->` **`HelpCenterScreen`**: The user is presented with a list of categories.
-3.  **User Action**: Selects a category, for example, "Help with a Payment".
+3.  **User Action**: Selects a category, for example, "Request a Refund".
 4.  `->` **`SupportTicketFormScreen`**: The form is tailored to the selected category.
     - **Email Confirmation**: The form checks if the user has an email in their `users` record.
       - If yes, it displays a message: "We will respond to: `user@example.com`".
       - If no, it displays a required text input field for the user to enter their email address.
-    - A message reminds the user about the non-refundable fee policy.
-    - A dropdown is pre-populated with their recent transactions. The user can select one, or choose "General Payment Question."
-    - A text field allows them to describe the issue.
+    - A message reminds the user about the non-refundable fee policy, but notes exceptions may apply for event cancellations or host-initiated changes.
+    - A dropdown allows the user to select a reason for the refund request:
+      - _Host changed event details_
+      - _Host cancelled the event_
+      - _Host was a no-show_
+      - _The event was not as described_
+      - _I experienced a safety issue_
+      - _I was unable to attend due to a personal emergency_
+      - _A technical issue prevented me from checking in_
+    - A second dropdown is pre-populated with their recent events, allowing them to associate the ticket with a specific event.
+    - A text field allows them to describe the issue in more detail.
 5.  **User Action**: Fills out the form and taps "Submit".
 6.  **System Action**:
     - A new record is created in the `support_tickets` table, including the `reply_to_email`.
@@ -478,7 +533,7 @@ This flow describes how a user sends a direct, categorized message to the Moment
 
 ---
 
-## 16. User Safety: Reporting a User (via Help Center)
+## 17. User Safety: Reporting a User (via Help Center)
 
 This flow is a critical alternative to the standard reporting flow, ensuring a user can always report someone, even if they have been blocked by them.
 
@@ -513,7 +568,7 @@ This flow is a critical alternative to the standard reporting flow, ensuring a u
     - A record is created in the `reports` table with all context (reporter, reported entity, event, etc.).
     - A notification is sent to the reporter confirming receipt.
 
-## 17. Invitation Preferences
+## 18. Invitation Preferences
 
 - **Role:** Participant
 - **Goal:** Configure soft invite lead-time and day/week availability preferences.
@@ -528,7 +583,7 @@ This flow is a critical alternative to the standard reporting flow, ensuring a u
 3.  **User Action**: Adjusts preferences and taps "Save".
 4.  **System Action**: Preferences (`user.min_lead_time`, `user.availability`) saved; invites outside preferences show a "Short-Notice" badge for soft deprioritization.
 
-## 18. User Declines Invite (Contextual Onboarding)
+## 19. User Declines Invite (Contextual Onboarding)
 
 - **Role:** `Participant`
 - **Goal:** To decline an event invitation and be gently onboarded to a relevant preference setting.

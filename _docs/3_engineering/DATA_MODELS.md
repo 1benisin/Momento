@@ -145,15 +145,16 @@ A user's collection of profile photos, including ones taken in-app for authentic
 
 A separate profile that a user can have if they choose to become a host. The existence of this record, linked to a `users` record, designates a user as a `Host`.
 
-| Column           | Type         | Description                                                      |
-| ---------------- | ------------ | ---------------------------------------------------------------- |
-| `id`             | `uuid`       | Primary Key.                                                     |
-| `user_id`        | `uuid`       | Foreign Key, linking to the `users` table. (One-to-One)          |
-| `host_type`      | `text`       | The type of host, e.g., 'user' or 'community'.                   |
-| `host_name`      | `text`       | Public name of the host (can be different from their user name). |
-| `host_bio`       | `text`       | A biography specific to their hosting activities.                |
-| `average_rating` | `float`      | Calculated average from all event/host ratings.                  |
-| `created_at`     | `timestampz` |                                                                  |
+| Column           | Type         | Description                                                                                                                       |
+| ---------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| `id`             | `uuid`       | Primary Key.                                                                                                                      |
+| `user_id`        | `uuid`       | Foreign Key, linking to the `users` table. (One-to-One)                                                                           |
+| `host_type`      | `text`       | The type of host, e.g., 'user' or 'community'.                                                                                    |
+| `host_name`      | `text`       | Public name of the host (can be different from their user name).                                                                  |
+| `host_bio`       | `text`       | A biography specific to their hosting activities.                                                                                 |
+| `location_id`    | `uuid`       | **Nullable**. Foreign key to `locations.id`. The primary, physical location of a `community` host. This is null for `user` hosts. |
+| `average_rating` | `float`      | Calculated average from all event/host ratings.                                                                                   |
+| `created_at`     | `timestampz` |                                                                                                                                   |
 
 This profile will also feature an "Event History" section, displaying a list of their successfully completed past events along with the average rating each event received from attendees. This provides social proof of their hosting quality. Publicly visible social media links, managed in the `user_social_links` table, can also be displayed here.
 

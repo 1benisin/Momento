@@ -166,6 +166,7 @@ This section catalogs the reusable UI elements that form the building blocks of 
 ### Modals & Overlays
 
 - **`DeclineFeedbackModal`**: A modal presented after a user declines an invitation, asking for a reason. Includes options for "Too short notice," "Too far away," and "Too expensive."
+- **`EventChangeConfirmationModal`**: A modal that appears when a host has made a material change to an event (e.g., time or location) after an attendee has already confirmed. It clearly states the change and gives the user the choice to "Keep My Spot" or "Cancel & Request Refund".
 - **`ContextualNudgeModal`**: A one-time, educational modal that appears after a user action (like declining an event for being "Too far away") to deep-link them to a relevant setting.
 - **`MatchReasonBanner`**: An elegant banner displayed prominently on the `InvitationDetailScreen`. It's designed to feel insightful and personal, not like a system debug message. It features a small icon (e.g., ✨) and a short, friendly text that explains why the user was invited to this specific event.
 

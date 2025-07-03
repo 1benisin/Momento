@@ -328,7 +328,9 @@ To build a safe and trustworthy community, users will have access to a multi-tie
 
 To protect the quality of events and respect the commitment of hosts and fellow attendees, Momento has a clear, non-refundable cancellation policy. This framework is designed to create a reliable and committed community.
 
-- **Non-Refundable Fee:** The $5 event confirmation fee is **non-refundable** in all cancellation scenarios. This fee represents a commitment to attend.
+- **Non-Refundable Fee:** The $5 event confirmation fee is **non-refundable** in all cancellation scenarios initiated by the participant. This fee represents a commitment to attend.
+
+- **Exception for Host-Initiated Changes:** The non-refundable policy has one critical exception: if a host makes a material change to the event (e.g., time, location) after a user has confirmed and paid, the fee becomes fully refundable. The user will be notified and given the choice to accept the new details or receive an automatic, one-click refund. This ensures users are protected from last-minute changes outside their control.
 
 The system distinguishes between several scenarios, each with a different impact on a user's internal `absentee_rating`:
 
