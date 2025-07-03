@@ -131,6 +131,16 @@ With the core loop in place, this phase is about making the experience richer, m
 - **Develop the user "coaching" module:** A mandatory educational walkthrough for users who receive a serious report.
 - Implement push notifications for report status updates.
 
+**[Epic #XXX] Dynamic Duos:**
+
+- Introduce the ability for two users to form a temporary "Duo" to receive paired event invitations.
+- **Task:** Create `duos` and `duo_participants` tables in the database.
+- **Task:** Modify the `invitations` table to include a `duo_id`.
+- **Task:** Build the UI flow for forming a Duo by searching phone contacts. This includes the `DuoHomeScreen` and `FormDuoScreen`.
+- **Task:** Update the matching algorithm to handle Duos as a single "entity" with a composite profile.
+- **Task:** Implement the "shared fate" logic for paired invitations (if one declines, the invitation is cancelled for both).
+- **Task:** Design and implement the new `MatchReasonBanner` variant for Duos.
+
 **[Epic #XXX] Community Health & Contribution:**
 
 - **Implement the "Peer-to-Peer Kudos" system:** After an event, allow users to give anonymous, private, positive acknowledgements (e.g., "Great Listener") to other attendees.

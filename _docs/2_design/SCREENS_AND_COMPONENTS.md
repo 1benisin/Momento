@@ -179,6 +179,7 @@ This section catalogs the reusable UI elements that form the building blocks of 
 ### Indicators & Badges
 
 - **`ShortNoticeBadge`**: A small, non-intrusive badge displayed on invitation cards for events with a lead-time shorter than the user's preference.
+- **`DuoBadge`**: A visual indicator (e.g., a overlay element over a corner of the card like a passport stamp) displayed on a `FaceCard` within the `DeckOfCardsAttendee` UI. This badge signals to other attendees that the two users have joined the event as a pre-formed pair.
 
 ### Domain-Specific Components
 
@@ -189,6 +190,14 @@ This section catalogs the reusable UI elements that form the building blocks of 
 - **`CostBreakdown`**: A UI component used on the `EventDetailScreen` that clearly distinguishes between the two types of costs.
   - **Line Item 1**: "Confirmation Fee: $5" with a subtitle explaining this is paid to Momento to secure a spot and encourage commitment.
   - **Line Item 2**: "Estimated Event Cost: $$" with a subtitle explaining this is an estimate paid directly to the host or venue and is not processed by Momento.
+
+### 6. Dynamic Duos
+
+- **`DuoHomeScreen`**: A central hub for managing Duo pacts. It would feature tabbed navigation for:
+  - **Active Duo**: Shows the current Duo partner and the pact's expiration date.
+  - **Pending Invites**: Shows incoming Duo requests from other users to be accepted or declined.
+  - **Past Duos**: A history of previous Duo partnerships and the events attended together.
+- **`FormDuoScreen`**: A screen that, after getting user permission, accesses the phone's contacts to display a list of friends who are also on Momento, allowing the user to select one to send a Duo invitation to.
 
 ### Controls & Inputs
 

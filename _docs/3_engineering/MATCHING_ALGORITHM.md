@@ -43,25 +43,24 @@ The foundation of the graph is the strength of its connections. We calculate a `
 2.  **Profile Vector Similarity (The Nuance)**
     - We calculate the cosine similarity between **User B's** `social_profile` vector and **User A's** `person_attraction_vector` (built from their "Discover Your Type" swipes). This score represents how closely User B aligns with User A's demonstrated "type."
 
-### Pillar 2: The Group Curation Engine (Iterative Group Building)
+### Pillar 2: The Group Curation Engine (Duo-Aware)
 
-This engine runs in passes, expanding its search radius until a valid, high-chemistry group is found.
+The engine now thinks in terms of **"Entities,"** which can be either an **Individual** or an **Active Duo**.
 
 **Pass 1: The "Perfect" Pool**
 The process begins with the most restrictive constraints to find the absolute best matches.
 
-- **Step 1: Candidate Pool Generation (Strict)**
-  The algorithm first creates a candidate pool by applying a strict set of **Hard Filters**. A user is only considered if they:
+- **Step 1: Candidate Pool Generation (Modified)**
+  The algorithm first fetches all `active` Duos from the `duos` table and treats them as single entities. It then creates a pool of all other individual users. For each Duo, it creates a temporary, in-memory **"Composite Profile"**:
+  - **Composite Interest Vector:** The interest vectors of the two users are averaged to create a new vector representing their shared "vibe."
+  - **Composite Filters:** For hard filters like `distance_preference` and `price_sensitivity`, the algorithm uses the **more restrictive** value of the two users.
+  - **Composite Blocklist:** The Duo's effective blocklist is the union of both users' individual blocklists.
+- The algorithm then applies its strict **Hard Filters** to all entities (Individuals and Composite Duo profiles).
 
-  - Have **not** been blocked by, or blocked, any other user in the potential pool.
-  - Do **not** have a "Don't connect again" preference with any other user in the pool.
-  - Strictly meet the event's age, distance, and price preferences without any buffer.
-  - Have an extremely high vector similarity score between their interests and the event's theme.
-
-- **Step 2: Group Assembly & Scoring**
+- **Step 2: Group Assembly & Scoring (Modified)**
   Within this elite pool, the system attempts to build a valid social graph.
-  - It pre-computes the `PotentialConnectionScore` matrix for all candidates in the pool.
-  - It assembles and **validates** potential groups, ensuring every person has at least one potential incoming and one outgoing connection. Any group failing this check is discarded.
+  - A Duo counts as **two people** toward the event's `max_attendees` limit.
+  - **The Critical Rule for Duos:** To prevent a Duo from becoming a social island, the algorithm validates that **each member of a Duo has at least one strong potential connection (incoming or outgoing) with someone _outside_ of their Duo.**
   - It calculates a `GroupChemistryScore` for each valid group by summing all internal connection scores.
 
 **If a valid group with a high enough score is found, the process stops and invitations are sent.** If not, the engine proceeds to the next pass.
@@ -79,27 +78,32 @@ This iterative process repeats, ensuring the system only "settles" for a good gr
 
 Once the ideal group is selected, the system does a "reverse lookup" to explain the match to each user. It constructs a human-readable `match_reason` by analyzing the strongest signals that led to their inclusion. The hierarchy, from most compelling to most practical, is:
 
-1.  **Strong Social Signals (The "Inside Track"):** This is the highest tier, based on a user's direct feedback on people.
+1.  **Paired Invitation (The "Perfect Pair"):** The highest-tier reason, reserved for "Dynamic Duos".
+
+    - **Trigger:** The invitation is for a Duo.
+    - **Example:** _"We found an event that bridges your love for **Hiking** with David's interest in **Japanese Cuisine**."_
+
+2.  **Strong Social Signals (The "Inside Track"):** This is the next highest tier, based on a user's direct feedback on people.
 
     - **Trigger:** The group includes a user they've flagged with **"Connect Again,"** or the event is hosted by someone they've previously given a **5-star rating.**
     - **Example:** _"Someone you wanted to connect with again will be at this event!"_
 
-2.  **High Chemistry Potential (The "People Connection"):** The core reason when the user is a key part of the social graph's chemistry.
+3.  **High Chemistry Potential (The "People Connection"):** The core reason when the user is a key part of the social graph's chemistry.
 
     - **Trigger:** The user's combined incoming and outgoing `PotentialConnectionScore`s are particularly high within the chosen group.
     - **Example:** _"We think you'll really connect with the people at this event."_
 
-3.  **Event & Interest Match (The "Vibe Check"):** For when the event itself is an ideal match for their tastes.
+4.  **Event & Interest Match (The "Vibe Check"):** For when the event itself is an ideal match for their tastes.
 
     - **Trigger:** High vector similarity between the event and the user's `positive_interest_vector` or explicit `interests`.
     - **Example:** _"This seems right up your alley! It's similar to the '[Liked Event Card Title]' experience you were interested in."_
 
-4.  **Logistical Perfection (The "Perfect Fit"):** This is most powerful when an event perfectly matches a user's restrictive preferences.
+5.  **Logistical Perfection (The "Perfect Fit"):** This is most powerful when an event perfectly matches a user's restrictive preferences.
 
     - **Trigger:** The event aligns perfectly with the user's set **distance, price, and timing/availability** preferences.
     - **Example:** _"An event that fits your schedule and budget, right in your neighborhood!"_
 
-5.  **Exploration & Variety (The "Wild Card"):** Directly responds to a user's request to try something new.
+6.  **Exploration & Variety (The "Wild Card"):** Directly responds to a user's request to try something new.
     - **Trigger:** The user recently chose "I'm looking to try new things" when declining an event, and this event is intentionally outside their core interest cluster.
     - **Example:** _"You mentioned you wanted to try new things—we thought this might be a fun surprise!"_
 

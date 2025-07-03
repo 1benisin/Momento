@@ -299,6 +299,7 @@ Tracks which users are invited to which events and their status.
 | `status`         | `text`       | e.g., 'sent', 'confirmed', 'declined', 'expired', 'payment_failed', 'cancelled'. 'confirmed' means the user accepted and paid. |
 | `decline_reason` | `text`       | Optional. Stores the reason a user declined, e.g., 'busy', 'not_interested', 'wants_variety'.                                  |
 | `match_reason`   | `text`       | Optional. A system-generated, human-readable string explaining why the user was matched to this event.                         |
+| `duo_id`         | `uuid`       | **Nullable**. Foreign key to `duos.id`. If this invitation was sent to a Duo, this column links to the specific `duos` record. |
 | `created_at`     | `timestampz` |                                                                                                                                |
 | `updated_at`     | `timestampz` |                                                                                                                                |
 
@@ -457,51 +458,32 @@ This table stores photos uploaded by attendees to a shared event gallery.
 
 ---
 
-## 7. Monetization
+## 7. Dynamic Duos & Paired Invites
 
-To handle payments for event invitations, we'll need a table to track individual transactions. The `users` table already includes a `payment_customer_id` to link a user with their Stripe Customer object.
+To support the "Dynamic Duos" feature, where two users can choose to be invited to events as a pair, we introduce a model to manage the lifecycle of this partnership.
 
-### `payments` Table
+### `duos` Table
 
-This table will store a record for each payment attempt made by a user.
+This table manages the state of a Duo pact between two users.
 
-| Column             | Type         | Description                                                                           |
-| ------------------ | ------------ | ------------------------------------------------------------------------------------- |
-| `id`               | `uuid`       | Primary Key.                                                                          |
-| `user_id`          | `uuid`       | Foreign key to `users.id` (the payer).                                                |
-| `event_id`         | `uuid`       | Foreign key to `events.id` (the event being paid for).                                |
-| `amount_in_cents`  | `integer`    | The charge amount in the smallest currency unit (e.g., 500 for $5.00).                |
-| `currency`         | `text`       | The currency of the charge (e.g., "usd").                                             |
-| `status`           | `text`       | The status of the payment from the provider (e.g., 'succeeded', 'pending', 'failed'). |
-| `stripe_charge_id` | `text`       | The unique charge identifier from Stripe for reconciliation. Unique.                  |
-| `created_at`       | `timestampz` |                                                                                       |
+| Column       | Type         | Description                                                                                                       |
+| ------------ | ------------ | ----------------------------------------------------------------------------------------------------------------- |
+| `id`         | `uuid`       | Primary Key. A unique identifier for this specific partnership instance.                                          |
+| `status`     | `text`       | The current state of the Duo: `pending`, `active`, `completed` (after attending an event), `expired`, `declined`. |
+| `expires_at` | `timestampz` | The timestamp when this Duo pact will automatically expire if they haven't been matched to an event.              |
+| `created_at` | `timestampz` |                                                                                                                   |
 
-### `blocked_users` Table
+### `duo_participants` Table
 
-This table stores a record of which users have blocked others, creating a hard stop for all interactions.
+This join table links users to a specific Duo pact.
 
-| Column            | Type         | Description                                                |
-| ----------------- | ------------ | ---------------------------------------------------------- |
-| `blocker_user_id` | `uuid`       | Foreign key to `users.id` (the user initiating the block). |
-| `blocked_user_id` | `uuid`       | Foreign key to `users.id` (the user being blocked).        |
-| `created_at`      | `timestampz` |                                                            |
+| Column    | Type   | Description                                                              |
+| --------- | ------ | ------------------------------------------------------------------------ |
+| `duo_id`  | `uuid` | Foreign key to `duos.id`.                                                |
+| `user_id` | `uuid` | Foreign key to `users.id`.                                               |
+| `role`    | `text` | The user's role in forming the pact, e.g., 'initiator' or 'participant'. |
 
-_Note: The primary key for this table would be a composite of (`blocker_user_id`, `blocked_user_id`)._
-
-### `reports` Table
-
-This table logs formal reports submitted by users for review by the Momento team.
-
-| Column             | Type         | Description                                                           |
-| ------------------ | ------------ | --------------------------------------------------------------------- |
-| `id`               | `uuid`       | Primary Key.                                                          |
-| `reporter_user_id` | `uuid`       | Foreign key to `users.id` (who filed the report).                     |
-| `reported_user_id` | `uuid`       | Foreign key to `users.id` (who is being reported).                    |
-| `category`         | `text`       | The category of violation (e.g., 'harassment', 'spam').               |
-| `comments`         | `text`       | The detailed comments provided by the reporter.                       |
-| `status`           | `text`       | The internal status of the report (e.g., 'pending', 'resolved').      |
-| `event_id`         | `uuid`       | **Nullable**. Foreign key to `events.id` where the incident occurred. |
-| `created_at`       | `timestampz` |                                                                       |
+_Note: The primary key for this table would be a composite of (`duo_id`, `user_id`)._
 
 ---
 

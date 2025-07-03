@@ -14,23 +14,24 @@ This document is organized into the following sections.
   - [Algorithm Transparency: The "Why"](#algorithm-transparency-the-why)
   - [Declining an Invitation](#declining-an-invitation-capturing-user-intent)
   - [Calendar Integration](#post-confirmation--calendar-integration)
-- [6. Event Preferences & Filtering](#6-event-preferences-filtering)
-- [7. The Arrival Experience: The Signal](#7-the-arrival-experience-the-signal)
+- [6. Dynamic Duos: Attend with a Friend](#6-dynamic-duos-attend-with-a-friend)
+- [7. Event Preferences & Filtering](#7-event-preferences-filtering)
+- [8. The Arrival Experience: The Signal](#8-the-arrival-experience-the-signal)
   - [The Host Sets the Stage](#the-host-sets-the-stage)
   - [The Deck of Cards](#the-arrival-flow-the-deck-of-cards)
-- [8. Post-Event Interaction](#8-post-event-interaction)
+- [9. Post-Event Interaction](#9-post-event-interaction)
   - [Peer-to-Peer Kudos](#peer-to-peer-kudos)
-- [9. The Memory Book & The Face Card](#9-the-memory-book--the-face-card)
+- [10. The Memory Book & The Face Card](#10-the-memory-book--the-face-card)
   - [The Face Card Lifecycle](#the-face-card-lifecycle)
   - [Social Connect](#social-connect-effortless-social-sharing)
-- [10. Shared Event Galleries & Camera Roll](#10-shared-event-galleries--camera-roll)
-- [11. User Safety: Blocking & Reporting](#11-user-safety-blocking--reporting)
+- [11. Shared Event Galleries & Camera Roll](#11-shared-event-galleries--camera-roll)
+- [12. User Safety: Blocking & Reporting](#12-user-safety-blocking--reporting)
   - [A Three-Tiered System](#a-three-tiered-system)
   - [Community Reliability: Cancellations & No-Shows](#community-reliability-cancellations--no-shows)
   - [Reporting & Consequence Framework](#reporting--consequence-framework)
-- [12. Discovering Your Interests](#12-discovering-your-interests)
-- [13. Discovering Your Type](#13-discovering-your-type)
-- [14. Notifications](#14-notifications)
+- [13. Discovering Your Interests](#13-discovering-your-interests)
+- [14. Discovering Your Type](#14-discovering-your-type)
+- [15. Notifications](#15-notifications)
 
 ---
 
@@ -219,7 +220,27 @@ Once a user's attendance is confirmed (payment successful), they will be present
   - Start and End Times
   - A link back to the event page in the Momento app.
 
-## 6. Event Preferences & Filtering
+## 6. Dynamic Duos: Attend with a Friend
+
+To directly address the natural anxiety of attending a social event alone and to create a new vector for shared experiences, Momento introduces "Dynamic Duos." This feature allows two friends to signal their intent to attend their next event together, transforming the matching process into a curated experience for a pair.
+
+This is not a traditional "+1" feature. It is a pre-declared pact between two existing Momento users, ensuring that the integrity of the group curation is not just maintained, but enhanced.
+
+### The Philosophy: It's a Pact, Not a Plus One
+
+- **Pre-emptive, Not Reactive:** Duos are formed _before_ an invitation is sent. Users proactively declare, "For our next adventure, we want to go together."
+- **A Shared Journey:** The system's goal is no longer just to find an event for one person, but to find the perfect event that bridges the worlds of two people.
+- **Privacy-First:** Duos are formed by searching for friends via a user's phone contacts, ensuring users can find their real-world friends without turning Momento into a generic social network with searchable user lists. The `MemoryBook` remains a sacred space for connections made _at_ Momento events.
+
+### The Duo Lifecycle
+
+1.  **Forming the Duo:** A user can invite a friend (who is also a Momento user) to form a Duo. The friend is found by granting temporary access to the user's phone contacts.
+2.  **The Handshake:** The friend receives and accepts the Duo invitation.
+3.  **The Pact:** The Duo is now considered `active` for a set period (e.g., two weeks) or until they attend an event together. During this time, the matching algorithm treats them as a single, combined entity.
+4.  **The Paired Invitation:** When the algorithm finds an event that is a strong match for the Duo's composite interests, a special "Paired Invitation" is sent to both users simultaneously. The `MatchReasonBanner` will explicitly mention the partnership: _"We found an event that bridges your love for **Hiking** with David's interest in **Japanese Cuisine**."_
+5.  **Individual Acceptance:** Once the Paired Invitation is sent each user can now accept or decline the invitation individually. If one friend declines, the other can still accept and attend, preserving their own opportunity to connect. The curated group dynamic is slightly altered, but this prioritizes individual user freedom.
+
+## 7. Event Preferences & Filtering
 
 To give users more control over their invitations and reduce noise, Momento provides a set of powerful, optional preferences. These are introduced contextually when a user declines an event for a related reason, rather than overwhelming them during onboarding.
 
@@ -228,7 +249,7 @@ To give users more control over their invitations and reduce noise, Momento prov
 
 These features ensure that the invitations a user sees are not only a good match for their interests but also for their real-world logistics and budget.
 
-## 7. The Arrival Experience: The Signal
+## 8. The Arrival Experience: The Signal
 
 One of the most intimidating moments of any social event is the arrival—that brief, awkward period of finding your group. Momento transforms this moment of friction into a standardized, confidence-building ritual with a "secret society" feel. We call it **"The Signal."**
 
@@ -251,6 +272,7 @@ Instead of a "secret password," the arrival is centered around a "Deck of Cards"
 2.  **The Deck is Revealed:** Once at least two people have checked in (including any combination of attendees and the host), the **Deck of Cards** UI is revealed to all of them. This is designed to solve the "I'm here, but is that person also here for the event?" problem.
     - The UI is a simple, horizontally swipeable set of cards. Each card displays a large profile picture and the person's first name.
     - **The Host Card:** The first card in the deck is always the host. It is visually distinct and displays a clear status stamp, such as "ARRIVED" or "NOT YET ARRIVED." This gives attendees an immediate anchor point.
+    - **Dynamic Duo Cards:** If two attendees were invited as a Duo and **both have checked in**, their `FaceCard`s will feature a special, dynamic duo badge (e.g., a designed stamp element over a corner of the card. like a passport stamp). This provides context to the group, clarifying that these two individuals arrived together.
     - **Attendee Cards:** Subsequent cards show every other checked-in attendee in the order they arrived.
 
 This flow ensures that even if attendees arrive before the host, they can still identify and connect with each other, turning a moment of potential awkwardness into the first moment of connection. When the host finally does check in, their card's status updates, and a notification can be sent to all attendees: **"Your host, Sarah, has arrived!"**
@@ -266,7 +288,7 @@ To ensure accurate attendance data and help users who forget, the app will send 
 > **Future Enhancement (Phase 2):** > **Feature:** Geofenced Check-in Reminders.
 > **Rationale:** A geofenced reminder would provide a more magical, context-aware experience than the time-based one. By triggering the check-in prompt the moment a user arrives in the event's vicinity, we reduce friction and improve the accuracy of arrival data.
 
-## 8. Post-Event Interaction
+## 9. Post-Event Interaction
 
 - The day after the event, participants will be prompted to provide feedback on the event and the host.
 - They will also report if any participants were late or did not show up.
@@ -283,7 +305,7 @@ To ensure accurate attendance data and help users who forget, the app will send 
 
 The design will subtly encourage users to wait until after the event to exchange contact information, reinforcing that they can connect through the app after the event.
 
-## 9. The Memory Book & The Face Card
+## 10. The Memory Book & The Face Card
 
 To foster lasting connections beyond a single event, the app will feature a dedicated "Memory Book." This screen serves as a private, organized record of every person a user has met at Momento events. It is a gallery of collected memories, not just a list of contacts.
 
@@ -327,7 +349,7 @@ To bridge the gap between a memorable event and an ongoing connection, users can
 - **Reciprocal Flow:** When a user receives a shared social link, it appears on the sender's Face Card in their Memory Book. A prompt will ask if they'd like to "Share back," making reciprocation seamless.
 - **User Control:** A user can revoke a shared link at any time, removing it from the other person's view.
 
-## 10. Shared Event Galleries & Camera Roll
+## 11. Shared Event Galleries & Camera Roll
 
 To extend the life of an event and give attendees a way to share their collective memories, the app will feature a robust photo-sharing system.
 
@@ -349,7 +371,7 @@ To give users a central place for all their visual memories within the app, a "M
 
 _Note: The "My Camera Roll" feature is for participants. Community hosts (representing a venue or organization) manage their brand photos (e.g., logos, venue shots) through their dedicated Host Dashboard._
 
-## 11. User Safety: Blocking & Reporting
+## 12. User Safety: Blocking & Reporting
 
 To build a safe and trustworthy community, users will have access to a multi-tiered system for managing their interactions with others. The design prioritizes user comfort and provides clear, distinct tools for different situations.
 
@@ -431,7 +453,7 @@ To ensure accountability, reports will trigger specific, escalating actions.
     - **Trigger:** A violation that represents a serious threat to the community.
     - **Consequence:** A **Permanent Ban** from the platform.
 
-## 12. Discovering Your Interests
+## 13. Discovering Your Interests
 
 To solve the "invite rut" problem and allow users to continuously refine their tastes, the app will feature a dedicated discovery mode. This serves both as an interest-building tool and an internal marketing feature that showcases the quality of experiences on Momento without sacrificing the exclusivity of future events.
 
@@ -441,7 +463,7 @@ To solve the "invite rut" problem and allow users to continuously refine their t
 - **Interaction**: Users can swipe right or left. This action is primarily a signal for the matching algorithm and does not mean the user will be invited to that specific event if it runs again.
 - **Backend Signal**: Each right swipe provides a strong, positive signal to the user's `positive_interest_vector`, helping the algorithm understand their current tastes. This is a primary mechanism for evolving a user's preferences over time.
 
-## 13. Discovering Your Type
+## 14. Discovering Your Type
 
 To help the matching algorithm understand a user's "type" in potential connections, the app features a second discovery mode focused on people. This moves beyond simple "liking" and frames the action as an intentional search for compatibility.
 
@@ -452,7 +474,7 @@ To help the matching algorithm understand a user's "type" in potential connectio
   - **Swipe Left:** The button or action is labeled **"Not the connection I'm looking for."**
 - **Backend Signal**: Each right swipe is a crucial signal. It does not send a "like" to the other user. Instead, it helps the algorithm build the user's `person_attraction_vector`—a nuanced, mathematical representation of their "type." This vector is a key component in calculating person-to-person compatibility for the "Social Graph" algorithm, moving far beyond simple gender preferences to understand the _vibe_ of people a user connects with.
 
-## 14. Notifications
+## 15. Notifications
 
 A robust notification system is critical to the user experience, ensuring users are informed about timely events like invitations, reminders, and social interactions. The system will use a combination of Push Notifications (via Expo) and SMS (via Twilio), with all logic orchestrated by secure backend functions.
 

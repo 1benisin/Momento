@@ -24,6 +24,7 @@ This document maps out the key user journeys within the Momento application.
 - **[User Declines Invite (Contextual Onboarding)](#20-user-declines-invite-contextual-onboarding)**: The flow for when a user declines an event, and how the app uses that moment to contextually introduce preference settings.
 - **[Handling a Recycled Phone Number (New User)](#21-handling-a-recycled-phone-number-new-user)**: The flow for a new user who signs up with a phone number that was previously registered to another, now dormant, account.
 - **[Account Recovery (Existing User on New Device)](#22-account-recovery-existing-user-on-new-device)**: The flow for an existing user to securely access their account from a new device.
+- **[Forming a Dynamic Duo & Receiving a Paired Invitation](#12-forming-a-dynamic-duo--receiving-a-paired-invitation)**: The flow for two friends to receive event invitations together.
 
 ---
 
@@ -193,7 +194,7 @@ This flow describes the journey for a business or service provider who wants to 
 
     - **Trigger**: At least two people (attendees or host) have checked in.
     - The `EventDetailScreen` now displays the `DeckOfCardsAttendee` component.
-    - Users can swipe through the `FaceCard` of each checked-in attendee to identify each other. The `HostCard` variant is visually distinct.
+    - Users can swipe through the `FaceCard` of each checked-in attendee to identify each other. The `HostCard` variant is visually distinct. If any attendees are part of a `Dynamic Duo`, their `FaceCard`s will be marked with a special `DuoBadge` to provide social context to the group.
 
 5.  **Host Arrival Notification**:
 
@@ -387,7 +388,51 @@ This flow describes how a `Hybrid User` navigates between the two core app exper
 
 ---
 
-## 12. Managing Photos in a Shared Event Gallery
+## 12. Forming a Dynamic Duo & Receiving a Paired Invitation
+
+This flow describes how two friends partner up to receive event invitations together.
+
+- **Role:** `Participant`
+- **Goal:** To form a temporary pact with a friend to be invited to the same event.
+
+### Flow Steps:
+
+1.  **Entry Point**: A user (Alex) decides she wants to attend her next event with a friend.
+
+    - **User Action**: Navigates to a "Duos" tab or section within her profile.
+
+2.  **Initiating a Duo**:
+
+    - `->` **`DuoHomeScreen`**: This screen shows any active, pending, or past Duo pacts.
+    - **User Action**: Alex taps "Form a New Duo."
+
+3.  **Inviting a Friend**:
+
+    - `->` **`FormDuoScreen`**: The app requests one-time access to the user's phone contacts to find their friends on Momento.
+    - **User Action**: Alex grants permission. The app displays a list of her contacts who are also Momento users.
+    - **User Action**: She selects her friend, David, and sends the Duo invitation.
+
+4.  **The Handshake**:
+
+    - **Notification**: David receives a notification: "Alex wants to team up for your next Momento adventure."
+    - **User Action**: David accepts the invitation in his `DuoHomeScreen`.
+    - **System Action**: A new record is created in the `duos` table with a status of `active` and an `expires_at` timestamp (e.g., 2 weeks in the future). A badge may appear on their profiles, visible only to them, indicating the active pact.
+
+5.  **Receiving a Paired Invitation**:
+
+    - **Trigger**: The backend matching algorithm, now treating Alex and David as a single entity, finds a suitable event.
+    - **Notification**: Both Alex and David receive a push notification simultaneously.
+    - `->` **`InvitationDetailScreen`**: The invitation is clearly marked as a "Paired Invitation." The `MatchReasonBanner` explains the match based on their combined interests.
+
+6.  **Individual Confirmation**:
+    - The Paired Invitation has served its purpose in matching. Now, both users can accept or decline individually.
+    - **Scenario A (Both Accept)**: Alex and David both individually accept and pay. They are both confirmed for the event. The `duos` record status is updated to `completed`.
+    - **Scenario B (One Accepts, One Declines)**: Alex accepts and pays. David declines. Alex's spot is still confirmed, and she can attend the event. David's invitation is simply marked as `declined`. The group composition will be one person smaller than initially planned unless the system can fill the spot.
+    - The `duos` record is not updated to `completed` because the Duo is still active for the duration of the pact or until we find them an event together.
+
+---
+
+## 13. Managing Photos in a Shared Event Gallery
 
 This flow covers how attendees share memories and how hosts maintain a safe environment.
 
@@ -412,11 +457,11 @@ This flow covers how attendees share memories and how hosts maintain a safe envi
 
 ---
 
-## 13. Customizing a Face Card
+## 14. Customizing a Face Card
 
 - **Role:** `Participant`
 
-## 14. Cancelling Event Attendance
+## 15. Cancelling Event Attendance
 
 This flow outlines what happens when a confirmed attendee decides they can no longer make it to an event.
 
@@ -454,7 +499,7 @@ This flow outlines what happens when a confirmed attendee decides they can no lo
 
 ---
 
-## 15. Handling Host-Initiated Event Changes
+## 16. Handling Host-Initiated Event Changes
 
 This flow outlines the automated process for managing material changes to an event made by the host after participants have already confirmed and paid. The goal is to protect the user and build trust by giving them a clear choice.
 
@@ -500,7 +545,7 @@ This flow outlines the automated process for managing material changes to an eve
 
 ---
 
-## 16. Contacting Support
+## 17. Contacting Support
 
 This flow describes how a user sends a direct, categorized message to the Momento support team.
 
@@ -535,7 +580,7 @@ This flow describes how a user sends a direct, categorized message to the Moment
 
 ---
 
-## 17. User Safety: Reporting a User (via Help Center)
+## 18. User Safety: Reporting a User (via Help Center)
 
 This flow is a critical alternative to the standard reporting flow, ensuring a user can always report someone, even if they have been blocked by them.
 
@@ -570,7 +615,7 @@ This flow is a critical alternative to the standard reporting flow, ensuring a u
     - A record is created in the `reports` table with all context (reporter, reported entity, event, etc.).
     - A notification is sent to the reporter confirming receipt.
 
-## 18. Invitation Preferences
+## 19. Invitation Preferences
 
 - **Role:** Participant
 - **Goal:** Configure soft invite lead-time and day/week availability preferences.
@@ -585,7 +630,7 @@ This flow is a critical alternative to the standard reporting flow, ensuring a u
 3.  **User Action**: Adjusts preferences and taps "Save".
 4.  **System Action**: Preferences (`user.min_lead_time`, `user.availability`) saved; invites outside preferences show a "Short-Notice" badge for soft deprioritization.
 
-## 19. User Declines Invite (Contextual Onboarding)
+## 20. User Declines Invite (Contextual Onboarding)
 
 - **Role:** `Participant`
 - **Goal:** To decline an event invitation and be gently onboarded to a relevant preference setting.
@@ -633,7 +678,7 @@ This flow is critical for progressive discovery, ensuring the user isn't overwhe
 
 ---
 
-## 20. Handling a Recycled Phone Number (New User)
+## 21. Handling a Recycled Phone Number (New User)
 
 This flow describes the journey for a new user who signs up with a phone number that was previously registered to another, now dormant, account.
 
@@ -666,7 +711,7 @@ This flow describes the journey for a new user who signs up with a phone number 
 
 ---
 
-## 21. Account Recovery (Existing User on New Device)
+## 22. Account Recovery (Existing User on New Device)
 
 This flow describes how an existing user securely logs into their account from a new, untrusted device.
 
