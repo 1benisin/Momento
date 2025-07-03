@@ -50,7 +50,7 @@ This flow describes the journey of a brand new user from first launch to accepti
 3.  **Account Creation (US-Based User)**:
 
     - `->` **`SignUpFlow`**
-    - **`PhoneInputScreen`**: User enters a valid US phone number.
+    - **`PhoneInputScreen`**: User enters a valid US phone number. The screen will include a statement like, "By continuing, you agree to our Terms of Service and Privacy Policy," with links to both documents.
     - **User Action**: Taps "Continue".
     - `->` **`OTPScreen`**: User receives an SMS with a one-time password and enters it.
     - Upon successful verification, the flow continues to the profile creation steps:

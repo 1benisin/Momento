@@ -106,6 +106,9 @@ _Handles core, private settings tied to the `users` account._
 - **`PaymentMethodsScreen`**: For adding/removing payment methods.
 - **`TransactionHistoryScreen`**: For viewing past payments made to Momento.
 - **`NotificationSettingsScreen`**: A single, consolidated screen for managing all push and SMS preferences. The UI on this screen will be grouped by context (e.g., "Social & Connections," "Host Notifications") as defined in `_docs/3_engineering/NOTIFICATIONS_PLAN.md`.
+- **`LegalScreen`**: Contains links to legal and policy documents.
+  - **`PrivacyPolicyScreen`**: A screen displaying the company's privacy policy.
+  - **`TermsOfServiceScreen`**: A screen displaying the company's terms of service.
 - **`HelpCenterScreen`**: The entry point for contacting support.
 
 ---
