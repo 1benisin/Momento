@@ -28,51 +28,29 @@ We will use a combination of services to handle different types of notifications
   - **Why:** We use a two-pronged approach for email. **Postmark** is a best-in-class service for developer-driven transactional emails (e.g., security alerts), ensuring maximum deliverability. For payment receipts, we will leverage **Stripe's** automated, compliant, and trusted email receipt system to save development time.
   - **Implementation:** Custom app-related emails will be sent via the Postmark API from a Supabase Edge Function. Payment receipts will be configured in the Stripe dashboard and sent automatically by Stripe.
 
-### Backend Architecture: Supabase
+### Backend Architecture: Convex
 
-The core logic for sending notifications will reside in **Supabase Edge Functions**. This is ideal for several reasons:
+The core logic for sending notifications will reside in **Convex Functions**. This is ideal for several reasons:
 
 1.  **Security:** API keys for Expo, Twilio, and Postmark are kept off the client app.
 2.  **Triggers:** Functions can be invoked in various ways:
-    - **Database Webhooks:** A change in a table (e.g., a new row in `invitations`) can automatically trigger a function to send a notification.
-    - **Cron Jobs:** We can schedule functions to run at specific intervals for reminders (e.g., "Your event starts in 1 hour").
+    - **Database Triggers:** A change in a table (e.g., a new row in `invitations`) can automatically trigger a function to send a notification.
+    - **Cron Jobs (Scheduled Functions):** We can schedule functions to run at specific intervals for reminders (e.g., "Your event starts in 1 hour").
     - **Directly from the Client:** The app can call an Edge Function for complex, on-demand notifications (like calculating travel time).
 
 ---
 
 ## 2. Database Schema Additions
 
-To support notifications and user preferences, we need two new tables. These should be added to our primary data model.
+To support notifications and user preferences, our Convex data model has been updated.
 
 ### `push_notification_tokens` Table
 
-Stores the unique push tokens for each user's device(s).
+This collection is defined in `_docs/CONVEX_DATA_MODELS.md`. It stores the unique push tokens for each user's device(s).
 
-| Column        | Type         | Description                                                      |
-| ------------- | ------------ | ---------------------------------------------------------------- |
-| `id`          | `uuid`       | Primary Key.                                                     |
-| `user_id`     | `uuid`       | Foreign key to `users.id`.                                       |
-| `token`       | `text`       | The push token from Expo. Must be unique.                        |
-| `device_info` | `text`       | Optional, human-readable info about the device (e.g., "iPhone"). |
-| `created_at`  | `timestampz` |                                                                  |
+### Notification Settings (Embedded in `users` document)
 
-### `user_notification_settings` Table
-
-Stores each user's preferences for receiving different types of notifications. Our backend logic **must** query this table before sending any notification to respect user choice.
-
-| Column                     | Type         | Description                                                                   |
-| -------------------------- | ------------ | ----------------------------------------------------------------------------- |
-| `user_id`                  | `uuid`       | Primary Key. Foreign key to `users.id`.                                       |
-| `sms_invitations`          | `boolean`    | Defaults to `true`. User agrees to receive new invitations via SMS.           |
-| `sms_reminders`            | `boolean`    | Defaults to `true`. User agrees to receive event start reminders via SMS.     |
-| `push_event_invitations`   | `boolean`    | Defaults to `true`. Push notifications for new & expiring invitations.        |
-| `push_event_updates`       | `boolean`    | Defaults to `true`. Push notifications for event changes and confirmations.   |
-| `push_event_reminders`     | `boolean`    | Defaults to `true`. Push notifications for upcoming events.                   |
-| `push_direct_messages`     | `boolean`    | Defaults to `true`. Push notifications for new DMs.                           |
-| `push_social`              | `boolean`    | Defaults to `true`. Push notifications for kudos, matches, etc.               |
-| `push_account_and_safety`  | `boolean`    | Defaults to `true`. Push notifications for payments, reports, etc.            |
-| `email_account_and_safety` | `boolean`    | Defaults to `true`. For critical account alerts (e.g., phone number changes). |
-| `updated_at`               | `timestampz` |                                                                               |
+The `user_notification_settings` table has been eliminated in the new Convex schema. This data is now stored as an **embedded object** directly within each `users` document. Our backend logic **must** query this object before sending any notification to respect user choice. This approach is more efficient as it reduces the number of database reads required to get a user's full profile and preferences.
 
 ---
 

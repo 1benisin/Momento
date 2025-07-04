@@ -26,7 +26,7 @@ Focuses on the **user experience and interface**. This includes our design princ
 Describes the **how** of our technical implementation. It covers architecture, data models, algorithms, and development processes.
 
 - **[ARCHITECTURE.md](./ARCHITECTURE.md)**: An overview of the system's technical architecture, including frontend, backend, and data storage.
-- **[DATA_MODELS.md](./DATA_MODELS.md)**: Defines the structure and relationships of our application's data.
+- **[CONVEX_DATA_MODELS.md](./CONVEX_DATA_MODELS.md)**: Defines the structure and relationships of our application's data using the Convex schema.
 - **[MATCHING_ALGORITHM.md](./MATCHING_ALGORITHM.md)**: Details the logic behind our user matching feature.
 - **[NOTIFICATIONS_PLAN.md](./NOTIFICATIONS_PLAN.md)**: The plan for implementing and managing user notifications.
 - **[TESTING_STRATEGY.md](./TESTING_STRATEGY.md)**: The strategy for automated testing and Continuous Integration/Continuous Delivery (CI/CD).
