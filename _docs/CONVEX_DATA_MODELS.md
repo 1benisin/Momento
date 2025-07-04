@@ -40,31 +40,31 @@ In a document model, we combine private user data, public profiles, metrics, and
 
 Serves as the aggregate root for a user, combining private data (phone, email), public profiles (`socialProfile`, `hostProfile`), system settings, and internal metrics into a single document. This model optimizes for fetching all user-related information in a single read and determines a user's role (`Participant`, `Host`, or `Hybrid`) based on the presence of embedded profile objects.
 
-| Field Name                 | Type                                     | Description                                                                                         |
-| -------------------------- | ---------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `_id`                      | `Id<"users">`                            | Convex system field. Primary Key.                                                                   |
-| `phone_number`             | `v.string()`                             | User's private phone number. Indexed for authentication lookups.                                    |
-| `email`                    | `v.optional(v.string())`                 | Optional private email for recovery or receipts.                                                    |
-| `last_name`                | `v.optional(v.string())`                 | User's private last name.                                                                           |
-| `birth_date`               | `v.number()`                             | User's date of birth (as a timestamp) for age calculation.                                          |
-| `is_verified`              | `v.boolean()`                            | Defaults to `false`. True if user completed ID verification.                                        |
-| `status`                   | `v.string()`                             | e.g., 'active', 'suspended', 'verification_pending', 'banned', 'archived_for_recycling'.            |
-| `active_role`              | `v.string()`                             | For Hybrid Users, stores the last active role ('participant' or 'host'). Defaults to 'participant'. |
-| `last_active_at`           | `v.number()`                             | Timestamp of the last user activity.                                                                |
-| `user_number`              | `v.number()`                             | A unique, sequential number for early adopters. Managed via a counter or mutation logic.            |
-| `payment_customer_id`      | `v.optional(v.string())`                 | Stripe customer ID.                                                                                 |
-| `min_lead_time_days`       | `v.optional(v.number())`                 | User's preferred minimum notice for event invites.                                                  |
-| `availability_preferences` | `v.optional(v.any())`                    | Stores day/week availability. `v.any()` for `jsonb` equivalent.                                     |
-| `distance_preference`      | `v.optional(v.number())`                 | User's max travel distance in miles.                                                                |
-| `price_sensitivity`        | `v.optional(v.number())`                 | User's max price comfort level (1-4).                                                               |
-| `person_attraction_vector` | `v.optional(v.array(v.float64()))`       | Vector representing the user's "type" in others, built from "Discover Your Type" swipes.            |
-| `socialProfile`            | `v.optional(v.object({ ... }))`          | Embedded object containing the user's public-facing participant profile. See details below.         |
-| `hostProfile`              | `v.optional(v.object({ ... }))`          | Embedded object containing the user's public-facing host profile. See details below.                |
-| `internalMetrics`          | `v.optional(v.object({ ... }))`          | Embedded object for system-generated scores and metrics. See details below.                         |
-| `interestVectors`          | `v.optional(v.array(v.object({ ... })))` | Embedded array of interest vector objects. See details below.                                       |
-| `socialLinks`              | `v.optional(v.array(v.object({ ... })))` | Embedded array of the user's social media links. See details below.                                 |
-| `notificationSettings`     | `v.object({ ... })`                      | Embedded object for managing notification preferences. See details below.                           |
-| `deviceHistory`            | `v.optional(v.array(v.object({ ... })))` | Embedded array of device login history. See details below.                                          |
+| Field Name                 | Type                                     | Description                                                                                 |
+| -------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `_id`                      | `Id<"users">`                            | Convex system field. Primary Key.                                                           |
+| `phone_number`             | `v.string()`                             | User's private phone number. Indexed for authentication lookups.                            |
+| `email`                    | `v.optional(v.string())`                 | Optional private email for recovery or receipts.                                            |
+| `last_name`                | `v.optional(v.string())`                 | User's private last name.                                                                   |
+| `birth_date`               | `v.number()`                             | User's date of birth (as a timestamp) for age calculation.                                  |
+| `is_verified`              | `v.boolean()`                            | Defaults to `false`. True if user completed ID verification.                                |
+| `status`                   | `v.string()`                             | e.g., 'active', 'suspended', 'verification_pending', 'banned', 'archived_for_recycling'.    |
+| `active_role`              | `v.string()`                             | For Hybrid Users, stores the last active role ('social' or 'host'). Defaults to 'social'.   |
+| `last_active_at`           | `v.number()`                             | Timestamp of the last user activity.                                                        |
+| `user_number`              | `v.number()`                             | A unique, sequential number for early adopters. Managed via a counter or mutation logic.    |
+| `payment_customer_id`      | `v.optional(v.string())`                 | Stripe customer ID.                                                                         |
+| `min_lead_time_days`       | `v.optional(v.number())`                 | User's preferred minimum notice for event invites.                                          |
+| `availability_preferences` | `v.optional(v.any())`                    | Stores day/week availability. `v.any()` for `jsonb` equivalent.                             |
+| `distance_preference`      | `v.optional(v.number())`                 | User's max travel distance in miles.                                                        |
+| `price_sensitivity`        | `v.optional(v.number())`                 | User's max price comfort level (1-4).                                                       |
+| `person_attraction_vector` | `v.optional(v.array(v.float64()))`       | Vector representing the user's "type" in others, built from "Discover Your Type" swipes.    |
+| `socialProfile`            | `v.optional(v.object({ ... }))`          | Embedded object containing the user's public-facing participant profile. See details below. |
+| `hostProfile`              | `v.optional(v.object({ ... }))`          | Embedded object containing the user's public-facing host profile. See details below.        |
+| `internalMetrics`          | `v.optional(v.object({ ... }))`          | Embedded object for system-generated scores and metrics. See details below.                 |
+| `interestVectors`          | `v.optional(v.array(v.object({ ... })))` | Embedded array of interest vector objects. See details below.                               |
+| `socialLinks`              | `v.optional(v.array(v.object({ ... })))` | Embedded array of the user's social media links. See details below.                         |
+| `notificationSettings`     | `v.object({ ... })`                      | Embedded object for managing notification preferences. See details below.                   |
+| `deviceHistory`            | `v.optional(v.array(v.object({ ... })))` | Embedded array of device login history. See details below.                                  |
 
 #### Embedded `socialProfile` Object
 
