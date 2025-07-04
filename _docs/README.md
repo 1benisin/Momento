@@ -29,6 +29,7 @@ Describes the **how** of our technical implementation. It covers architecture, d
 - **[DATA_MODELS.md](./DATA_MODELS.md)**: Defines the structure and relationships of our application's data.
 - **[MATCHING_ALGORITHM.md](./MATCHING_ALGORITHM.md)**: Details the logic behind our user matching feature.
 - **[NOTIFICATIONS_PLAN.md](./NOTIFICATIONS_PLAN.md)**: The plan for implementing and managing user notifications.
+- **[TESTING_STRATEGY.md](./TESTING_STRATEGY.md)**: The strategy for automated testing and Continuous Integration/Continuous Delivery (CI/CD).
 - **[DEVELOPMENT_PROCESS.md](./DEVELOPMENT_PROCESS.md)**: The workflow and processes for our software development lifecycle.
 - **[DOCUMENTATION_STANDARDS.md](./DOCUMENTATION_STANDARDS.md)**: Design docs template and standards.
 
