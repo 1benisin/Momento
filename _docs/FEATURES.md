@@ -504,12 +504,12 @@ To help the matching algorithm understand a user's "type" in potential connectio
 
 ## 15. Notifications
 
-A robust notification system is critical to the user experience, ensuring users are informed about timely events like invitations, reminders, and social interactions. The system will use a combination of Push Notifications (via Expo) and SMS (via Twilio), with all logic orchestrated by secure backend functions.
+A robust notification system is critical to the user experience, ensuring users are informed about timely events like invitations, reminders, and social interactions. The system will use a combination of Push Notifications (via Expo), SMS (via Twilio), and targeted Email (via Postmark), with all logic orchestrated by secure backend functions.
 
-- **Granular User Control:** Users will have a dedicated "Notification Settings" screen to opt in or out of different categories of notifications (e.g., `sms_invitations`, `push_direct_messages`). The backend will always respect these preferences.
+- **Granular User Control:** Users will have a dedicated "Notification Settings" screen to opt in or out of different categories of notifications (e.g., `sms_invitations`, `push_direct_messages`, `email_account_and_safety`). The backend will always respect these preferences.
 - **Event-Driven:** Notifications will be triggered by key events in the app lifecycle:
   - **Invitations:** New and expiring invitations.
   - **Event Logistics:** Confirmations, reminders (24-hour, 1-hour), updates, and cancellations.
   - **Social:** New direct messages, kudos received, and mutual connection matches.
-  - **Account & Safety:** Payment confirmations and report status updates.
+  - **Account & Safety:** Payment receipts (via Stripe), report status updates, and critical security alerts.
 - **Intelligent Delivery:** The system will employ strategies like message bundling for chat to avoid overwhelming users and deep linking to take users directly to the relevant content in the app.

@@ -20,14 +20,19 @@ We will use a combination of services to handle different types of notifications
   - **Implementation:** We will use `expo-notifications` on the client-side to request permissions and receive notifications. Push tokens for each device will be stored in our database.
 
 - **SMS Notifications:** **Twilio**
+
   - **Why:** Twilio is a reliable, industry-standard service for programmable SMS. Your `ROADMAP.md` already identified this as a potential service.
   - **Implementation:** We will use the Twilio SDK within a Supabase Edge Function to send SMS messages. This keeps our API keys and logic secure on the server side.
+
+- **Transactional Email:** **Postmark** & **Stripe**
+  - **Why:** We use a two-pronged approach for email. **Postmark** is a best-in-class service for developer-driven transactional emails (e.g., security alerts), ensuring maximum deliverability. For payment receipts, we will leverage **Stripe's** automated, compliant, and trusted email receipt system to save development time.
+  - **Implementation:** Custom app-related emails will be sent via the Postmark API from a Supabase Edge Function. Payment receipts will be configured in the Stripe dashboard and sent automatically by Stripe.
 
 ### Backend Architecture: Supabase
 
 The core logic for sending notifications will reside in **Supabase Edge Functions**. This is ideal for several reasons:
 
-1.  **Security:** API keys for Expo and Twilio are kept off the client app.
+1.  **Security:** API keys for Expo, Twilio, and Postmark are kept off the client app.
 2.  **Triggers:** Functions can be invoked in various ways:
     - **Database Webhooks:** A change in a table (e.g., a new row in `invitations`) can automatically trigger a function to send a notification.
     - **Cron Jobs:** We can schedule functions to run at specific intervals for reminders (e.g., "Your event starts in 1 hour").
@@ -55,18 +60,19 @@ Stores the unique push tokens for each user's device(s).
 
 Stores each user's preferences for receiving different types of notifications. Our backend logic **must** query this table before sending any notification to respect user choice.
 
-| Column                    | Type         | Description                                                                 |
-| ------------------------- | ------------ | --------------------------------------------------------------------------- |
-| `user_id`                 | `uuid`       | Primary Key. Foreign key to `users.id`.                                     |
-| `sms_invitations`         | `boolean`    | Defaults to `true`. User agrees to receive new invitations via SMS.         |
-| `sms_reminders`           | `boolean`    | Defaults to `true`. User agrees to receive event start reminders via SMS.   |
-| `push_event_invitations`  | `boolean`    | Defaults to `true`. Push notifications for new & expiring invitations.      |
-| `push_event_updates`      | `boolean`    | Defaults to `true`. Push notifications for event changes and confirmations. |
-| `push_event_reminders`    | `boolean`    | Defaults to `true`. Push notifications for upcoming events.                 |
-| `push_direct_messages`    | `boolean`    | Defaults to `true`. Push notifications for new DMs.                         |
-| `push_social`             | `boolean`    | Defaults to `true`. Push notifications for kudos, matches, etc.             |
-| `push_account_and_safety` | `boolean`    | Defaults to `true`. Push notifications for payments, reports, etc.          |
-| `updated_at`              | `timestampz` |                                                                             |
+| Column                     | Type         | Description                                                                   |
+| -------------------------- | ------------ | ----------------------------------------------------------------------------- |
+| `user_id`                  | `uuid`       | Primary Key. Foreign key to `users.id`.                                       |
+| `sms_invitations`          | `boolean`    | Defaults to `true`. User agrees to receive new invitations via SMS.           |
+| `sms_reminders`            | `boolean`    | Defaults to `true`. User agrees to receive event start reminders via SMS.     |
+| `push_event_invitations`   | `boolean`    | Defaults to `true`. Push notifications for new & expiring invitations.        |
+| `push_event_updates`       | `boolean`    | Defaults to `true`. Push notifications for event changes and confirmations.   |
+| `push_event_reminders`     | `boolean`    | Defaults to `true`. Push notifications for upcoming events.                   |
+| `push_direct_messages`     | `boolean`    | Defaults to `true`. Push notifications for new DMs.                           |
+| `push_social`              | `boolean`    | Defaults to `true`. Push notifications for kudos, matches, etc.               |
+| `push_account_and_safety`  | `boolean`    | Defaults to `true`. Push notifications for payments, reports, etc.            |
+| `email_account_and_safety` | `boolean`    | Defaults to `true`. For critical account alerts (e.g., phone number changes). |
+| `updated_at`               | `timestampz` |                                                                               |
 
 ---
 
@@ -115,12 +121,15 @@ Here is a brainstormed list of potential notifications, their triggers, and sugg
 
 ### Account & Safety Notifications
 
-| Event Trigger                          | Type | Audience | Message Content                                                                                   |
-| -------------------------------------- | ---- | -------- | ------------------------------------------------------------------------------------------------- |
-| **Payment Succeeded**                  | Push | User     | "Your payment for '[Event Title]' was successful. You're all set!"                                |
-| **Payment Failed**                     | Push | User     | "Your payment for '[Event Title]' failed. Please update your payment method to secure your spot." |
-| **Report Status Update**               | Push | Reporter | "Update on your report: We have reviewed your report and taken appropriate action."               |
-| **"Authentic" Photo Badge Expiration** | Push | User     | "Your 'Authentic' photo badge is expiring soon. Take a new photo to keep your profile trusted."   |
+| Event Trigger                          | Type  | Audience | Message Content                                                                                                            |
+| -------------------------------------- | ----- | -------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **Payment Succeeded**                  | Email | User     | _This email is sent automatically by **Stripe**._                                                                          |
+| **Payment Succeeded**                  | Push  | User     | "Your payment for '[Event Title]' was successful. You're all set!"                                                         |
+| **Payment Failed**                     | Push  | User     | "Your payment for '[Event Title]' failed. Please update your payment method to secure your spot."                          |
+| **Report Status Update**               | Email | Reporter | "Update on your report: We have reviewed the details and have taken appropriate action based on our community guidelines." |
+| **Report Status Update**               | Push  | Reporter | "Update on your report: We have reviewed your report and taken appropriate action."                                        |
+| **Account Security Alert**             | Email | User     | "A sign-in attempt was made on a new device. If this was not you, please secure your account immediately."                 |
+| **"Authentic" Photo Badge Expiration** | Push  | User     | "Your 'Authentic' photo badge is expiring soon. Take a new photo to keep your profile trusted."                            |
 
 ---
 
@@ -167,3 +176,10 @@ _*This entire section is only visible to users with a Host profile.*_
 - `[Toggle]` **Event Invitations**
 - `[Toggle]` **Event Reminders & Critical Updates**
   - _For event start times, cancellations, or major detail changes._
+
+#### **Email Notifications**
+
+- `[Toggle]` **Account & Safety**
+  - _Critical alerts about your account security._
+- `[Info]` **Payment Receipts**
+  - _A note explaining that payment receipts are sent automatically by our payment processor, Stripe, and cannot be disabled._
