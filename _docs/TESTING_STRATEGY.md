@@ -71,7 +71,7 @@ This layer ensures that different units work together correctly.
 This is the highest level of testing, simulating a complete user journey through the live application.
 
 - **What it is:** An automated script that launches the actual Momento app on a real device or simulator and interacts with it as a user would.
-- **How it works:** The script performs critical user flows from start to finish (e.g., sign-up and onboarding, accepting an event invitation). These tests will interact with the real Supabase backend in a staging environment.
+- **How it works:** The script performs critical user flows from start to finish (e.g., sign-up and onboarding, accepting an event invitation). These tests will interact with the real Convex backend in a staging environment.
 - **Recommended Tools:**
   - **Maestro:** A modern, simple-to-use E2E testing framework. Its declarative YAML syntax makes tests easy to write and maintain, making it the preferred choice for Momento.
   - **Detox:** A more powerful, but more complex, JavaScript-based alternative.

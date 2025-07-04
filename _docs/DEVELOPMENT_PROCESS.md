@@ -23,35 +23,106 @@ We will leverage the power of Git and repository hosting services (like GitHub o
 
 ## Recommended Directory Structure
 
+A well-defined directory structure is the bedrock of a scalable and maintainable application. This structure is designed to be logical, embrace conventions from our tech stack (Expo, Convex, NativeWind), and make it immediately clear where any given file should go.
+
+### Top-Level Directory Guide
+
+This table provides a high-level map of the project. Use it to quickly understand the purpose of each top-level directory and where to place new files.
+
+| Directory     | Purpose                                                                                                                                     | Example Files & Use Cases                                |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| `_docs/`      | **Project Documentation.** Contains all long-lived planning and design documents that define the product, design, and engineering strategy. | `PROJECT_OVERVIEW.md`, `FEATURES.md`, `ARCHITECTURE.md`  |
+| `_epics/`     | **Feature-Specific Planning.** Holds the detailed planning artifacts (PRDs, task lists) for a specific, large-scale feature or "epic."      | `/001-user-profile-v1/prd.md`, `/002-auth-flow/tasks.md` |
+| `app/`        | **Application Screens & Routing.** The heart of the user-facing app, powered by Expo Router's file-system-based navigation.                 | `/home.tsx`, `/(auth)/login.tsx`, `/(tabs)/_layout.tsx`  |
+| `assets/`     | **Static Assets.** All static files like images, icons, and custom fonts that are used in the application.                                  | `/images/logo.png`, `/fonts/SpaceMono-Regular.ttf`       |
+| `components/` | **Reusable UI Components.** The "Lego bricks" of our UI, organized by their scope and purpose.                                              | `/core/Button.tsx`, `/domain/EventCard.tsx`              |
+| `constants/`  | **App-Wide Constants.** Stores unchanging values used across the app, like color palettes or layout dimensions.                             | `Colors.ts`, `Layout.ts`                                 |
+| `convex/`     | **Backend Logic & Schema.** Contains all server-side code, including database schema, queries, mutations, and HTTP actions.                 | `schema.ts`, `users.ts`, `events.ts`, `http.ts`          |
+| `hooks/`      | **Custom React Hooks.** Reusable, non-UI logic encapsulated into custom hooks.                                                              | `useAuth.ts`, `useNotifications.ts`                      |
+| `lib/`        | **Shared Libraries & Helpers.** Utility functions, typed API wrappers, and other shared logic that isn't a React hook.                      | `utils.ts`, `api.ts` (for Convex client)                 |
+| `navigation/` | **Navigation Types.** Centralized TypeScript definitions for navigators and route parameters.                                               | `types.ts`                                               |
+| `styles/`     | **Global Styles.** Configuration for our styling system (NativeWind/Tailwind).                                                              | `global.css` (if needed)                                 |
+
+### Full Directory Tree
+
+This is a more detailed view of the recommended structure for our source code.
+
 ```
 /
-├── .github/              # For GitHub-specific configs like PR templates
-├── _docs/                # Detailed, long-lived planning docs
-│   ├── PROJECT_OVERVIEW.md
-│   ├── FEATURES.md
-│   ├── USER_PERSONAS.md
-│   └── ...
-├── _epics/               # <-- Your new "feature planning" home
-│   ├── 001-user-profile-v1/
-│   │   ├── prd.md        # The LLM-generated Product Requirements Doc
-│   │   └── tasks.md      # The LLM-generated task list
-│   ├── 002-event-invitation-flow/
-│   │   ├── prd.md
-│   │   └── tasks.md
-│   └── ...
-├── app/                  # Your application source code (with Expo)
-├── README.md
-└── ...
+├── .github/              # GitHub-specific configs (PR templates, etc.)
+├── _docs/                # Long-lived planning docs
+├── _epics/               # Feature-specific planning docs
+│
+├── app/                  # --- EXPO ROUTER APP DIRECTORY ---
+│   ├── (tabs)/           # Layout route for the main tab navigation
+│   │   ├── _layout.tsx   # Defines the tab navigator itself
+│   │   ├── home.tsx      # Screen for the first tab
+│   │   └── ...           # Other tab screens
+│   ├── (auth)/           # Layout route for the authentication flow
+│   ├── modal.tsx         # Example of a modal route defined by Expo Router
+│   └── _layout.tsx       # Root layout for the entire app (fonts, providers)
+│
+├── assets/               # Static assets like images and fonts
+│
+├── components/           # --- SHARED UI COMPONENTS ---
+│   ├── core/             # Atomic, reusable primitives (Button, Input, Card)
+│   ├── layout/           # Layout helpers (Container, Grid, Spacer)
+│   └── domain/           # App-specific components (EventCard, ProfileAvatar)
+│
+├── constants/            # App-wide constants (Colors, Layout, API keys)
+│
+├── convex/               # --- CONVEX BACKEND ---
+│   ├── schema.ts         # Database schema definition
+│   ├── users.ts          # Queries & mutations related to users
+│   ├── events.ts         # Queries & mutations related to events
+│   ├── http.ts           # HTTP actions for webhooks (e.g., Stripe)
+│   └── _generated/       # Auto-generated Convex client files (do not edit)
+│
+├── hooks/                # Custom React hooks (e.g., useNotifications, useAuth)
+│
+├── lib/                  # Shared libraries, helpers, and business logic
+│   ├── api.ts            # Typed wrappers for Convex functions
+│   ├── utils.ts          # General utility functions (date formatting, etc.)
+│   └── stripe.ts         # Client-side Stripe helper functions
+│
+├── navigation/           # Navigation-specific logic and types
+│   └── types.ts          # TypeScript types for navigators and route params
+│
+├── styles/               # Global styles or theme configuration for NativeWind
+│
+├── babel.config.js       # Babel configuration
+├── metro.config.js       # Metro bundler configuration
+├── package.json
+├── tailwind.config.js    # Tailwind CSS / NativeWind configuration
+└── tsconfig.json
 ```
 
-### Key Changes & Rationale:
+### Architectural Rationale
 
-- **A New `/_epics` Directory**: This is the home for all your feature-specific planning documents. An "Epic" is a large body of work, like "Build User Profiles."
+This structure is designed for clarity, scalability, and maintainability.
 
-- **Numbered Feature Folders**: Each epic gets its own numbered folder (e.g., `001-user-profile-v1`).
-  - The number provides a unique, short ID that you can use to reference the feature everywhere (branches, commits, conversations).
-  - It keeps related documents (`prd.md`, `tasks.md`) permanently grouped together.
-  - The location never changes. You don't move the folder. This results in a clean, a stable Git history.
+1.  **Clear Separation of Concerns**: The top-level directories create a very clear distinction between different parts of the application:
+
+    - `app/`: UI and routing (what the user sees).
+    - `convex/`: All backend logic and database schema. This is the standard and required convention for Convex.
+    - `components/`: Reusable, presentation-only UI elements.
+    - `hooks/` & `lib/`: Reusable frontend logic.
+    - `_docs/` & `_epics/`: Project planning and documentation.
+
+2.  **Convention-Driven (Expo & Convex)**: This structure fully embraces the conventions of our key technologies.
+
+    - **Expo Router**: The `app/` directory is the heart of Expo's file-system-based routing. Grouping routes with `(parentheses)` is the standard way to create layout routes without adding segments to the URL, which is perfect for organizing flows like `(tabs)` and `(auth)`.
+    - **Convex**: The `convex/` directory is where Convex expects to find all backend functions and the schema. This clear boundary makes it easy to reason about what code runs on the server vs. the client.
+
+3.  **Scalable Component Architecture**: Splitting `components/` into `core`, `layout`, and `domain` prevents it from becoming a messy, flat folder as the project grows.
+
+    - `core` components are completely generic and could be used in any project.
+    - `layout` components help maintain a consistent structure across screens.
+    - `domain` components are specific to Momento's features. This makes them easy to find and reuse.
+
+4.  **Enhanced Type Safety**: The `navigation/types.ts` file becomes a single source of truth for all navigation-related TypeScript definitions. This is crucial for ensuring that when you navigate from one screen to another, you are passing the correct parameters.
+
+5.  **Centralized Logic**: Placing reusable, non-UI logic in `hooks/` and `lib/` prevents code duplication and keeps our screen files in `app/` lean and focused on presentation. Creating typed wrappers in `lib/api.ts` for your Convex functions will also make them much easier and safer to use throughout the client application.
 
 ## The 3-Step Workflow, Redesigned
 

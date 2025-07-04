@@ -1,4 +1,13 @@
-# Data Models & Schemas
+# [DEPRECATED] Data Models & Schemas
+
+> **⚠️ Deprecation Notice**
+> This document describes the original, relational data model designed for a PostgreSQL backend. This model is now obsolete. The project has migrated to a Convex backend, and the current, authoritative data model is defined in:
+>
+> **[CONVEX_DATA_MODELS.md](./CONVEX_DATA_MODELS.md)**
+>
+> Please refer to the new document for all schema-related information.
+
+---
 
 This document outlines the core data models for the Momento application. These schemas will serve as the foundation for our database structure, likely implemented in Supabase.
 

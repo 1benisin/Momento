@@ -20,7 +20,7 @@ Momento's primary revenue stream is a flat **$5 Confirmation Fee** charged to a 
 - **Framework:** React Native with Expo
 - **Navigation:** Expo Router
 - **Styling:** NativeWind
-- **Backend:** Supabase
+- **Backend:** Convex
 - **Payments:** Stripe (using `@stripe/stripe-react-native` on the client and `stripe-node` on the server)
 - **Verification:** Stripe Identity
 - **Transactional Email:** Postmark

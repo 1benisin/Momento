@@ -52,11 +52,11 @@ graph TD
         mobile_app["React Native / Expo App"]
     end
 
-    subgraph "Momento Backend (Supabase)"
-        auth["Supabase Auth"]
-        db["Database (Postgres)"]
-        storage["Storage"]
-        functions["Edge Functions"]
+    subgraph "Momento Backend (Convex)"
+        auth["Convex Auth"]
+        db["Convex Database"]
+        storage["Convex File Storage"]
+        functions["Convex Functions<br/>(Mutations & Queries)"]
     end
 
     subgraph "External Services"
@@ -69,12 +69,11 @@ graph TD
     end
 
     mobile_app -- "Signs In" --> auth
-    mobile_app -- "Reads/Writes Data" --> db
+    mobile_app -- "Reads/Writes Data via<br/>Mutations & Queries" --> functions
     mobile_app -- "Uploads/Downloads Images" --> storage
-    mobile_app -- "Initiates Secure Actions" --> functions
     mobile_app -- "Renders Maps" --> google_maps
 
-    db -- "Triggers (Webhooks, Cron)" --> functions
+    db -- "Triggers Scheduled Functions" --> functions
 
     functions -- "Processes Payments &<br/>Sends Receipts" --> stripe
     functions -- "Sends SMS" --> twilio
@@ -110,29 +109,55 @@ This approach ensures that single-role users have a simple, dedicated experience
 
 A core feature of Momento's matching algorithm is filtering events based on a user's `distance_preference`. As the number of users and events grows, performing a naive distance calculation for every event for every user will become a significant performance bottleneck.
 
-To solve this, we will leverage geospatial indexing in our PostgreSQL database (via Supabase).
+To solve this, we will leverage a purpose-built geospatial library within the Convex ecosystem.
 
-1.  **Enable PostGIS Extension**: The first step is to enable the `postgis` extension in our Supabase instance, which provides powerful geospatial functions and data types.
+1.  **Use a Geospatial Library**: We will integrate a community library like `@convex-dev/geospatial` into our project. This provides the necessary tools for indexing and querying location data directly within Convex.
 
-2.  **Use Geographic Data Types**: In the `locations` table, we will store coordinates not as simple `float` columns, but as a single `geography` or `geometry` point. The `geography` type is often preferred as it accounts for the Earth's curvature, providing more accurate distance calculations over larger areas.
+2.  **Store Location Data**: In the `locations` table, we will store coordinates as simple `latitude` and `longitude` number fields, as defined in `_docs/CONVEX_DATA_MODELS.md`.
 
-3.  **Create a GIST Index**: We will create a **GiST (Generalized Search Tree) index** on the new geospatial column. This type of index is specifically designed to accelerate spatial queries.
+3.  **Index Locations**: The geospatial library will manage the indexing of these locations. We will create a query that's exposed by the library, which takes our `locations` table data and organizes it into an efficient data structure (like an R-tree or Geohash-based index) for fast spatial lookups.
 
-4.  **Efficient Queries**: With the index in place, we can use PostGIS functions like `ST_DWithin` to perform highly efficient searches. The query will look something like this:
+4.  **Efficient Queries**: With the index in place, we can use the library's functions to perform highly efficient searches. A query to find nearby events would be handled by a Convex query function that might look something like this:
 
-    ```sql
-    -- Find all events within 25 miles (approx. 40233.6 meters) of a user's location
-    SELECT event.*
-    FROM events
-    JOIN event_itinerary_stops AS stops ON events.id = stops.event_id
-    JOIN locations ON stops.location_id = locations.id
-    WHERE ST_DWithin(
-      locations.point,
-      -- User's home location, cast to geography
-      ST_MakePoint(user_longitude, user_latitude)::geography,
-      -- Distance in meters
-      40233.6
-    );
+    ```typescript
+    // convex/events.ts (Illustrative Example)
+    import { query } from "./_generated/server";
+    import { बनाएंGeospatialQuery } from "@convex-dev/geospatial";
+
+    export const getNearbyEvents = query({
+      args: {
+        latitude: v.number(),
+        longitude: v.number(),
+        searchRadiusMiles: v.number(),
+      },
+      handler: async (ctx, args) => {
+        // 1. Initialize the geospatial query helper with our locations
+        const locations = await ctx.db.query("locations").collect();
+        const geoQuery = बनाएंGeospatialQuery(
+          locations,
+          "latitude",
+          "longitude"
+        );
+
+        // 2. Find locations within the user's radius
+        const nearbyLocationIds = geoQuery
+          .query({
+            center: { latitude: args.latitude, longitude: args.longitude },
+            radiusInMiles: args.searchRadiusMiles,
+          })
+          .map((loc) => loc._id);
+
+        // 3. Find all events that have an itinerary stop at one of those locations
+        const allEvents = await ctx.db.query("events").collect();
+        const nearbyEvents = allEvents.filter((event) =>
+          event.itinerary.some((stop) =>
+            nearbyLocationIds.includes(stop.location_id)
+          )
+        );
+
+        return nearbyEvents;
+      },
+    });
     ```
 
-This architectural decision is critical for ensuring the matching process remains fast and scalable as the platform grows. It allows the database to quickly eliminate the vast majority of events that are outside a user's radius, rather than calculating the distance for each one.
+This architectural decision is critical for ensuring the matching process remains fast and scalable as the platform grows. It allows the backend to quickly eliminate the vast majority of events that are outside a user's radius, rather than calculating the distance for each one.
