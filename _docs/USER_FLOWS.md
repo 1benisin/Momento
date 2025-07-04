@@ -12,8 +12,8 @@ This document maps out the key user journeys within the Momento application.
 - **[User Safety: Reporting Another User](#8-user-safety-reporting-another-user)**: The flow for formally reporting another user for a community standards violation.
 - **[A Social User Becomes a Host](#9-a-social-user-becomes-a-host)**: The journey for an existing participant to create a host profile and gain access to "Host Mode."
 - **[Switching Between Social & Host Modes](#10-switching-between-social--host-modes)**: How a `Hybrid User` navigates between the participant and host experiences.
-- **[Discovering Your Interests](#11-discovering-your-interests)**: The flow for continuously evolving a user's interest profile after onboarding.
-- **[Discovering Your Type](#12-discovering-your-type)**: The flow for helping the algorithm understand what types of people a user connects with.
+- **[Discovering Your Interests](#11-discovering-your-interests)**: The flow for discovering their unique "Interest Personas" through a guided, two-phase process.
+- **[Discovering Your Type](#12-discovering-your-type)**: The flow for helping the algorithm understand what types of people a user connects with, progressing through a structured, two-phase process.
 - **[Managing Photos in a Shared Event Gallery](#13-managing-photos-in-a-shared-event-gallery)**: The flow for attendees to share memories and hosts to maintain a safe environment in a shared event photo album.
 - **[Customizing a Face Card](#14-customizing-a-face-card)**: The flow for personalizing a user's public-facing `FaceCard` after their first event.
 - **[Cancelling Event Attendance](#15-cancelling-event-attendance)**: The flow for a confirmed attendee to formally cancel attendance and understand the consequences.
@@ -359,32 +359,51 @@ This flow describes how a `Hybrid User` navigates between the two core app exper
 ## 10. Discovering Your Interests
 
 - **Role:** `Participant`
-- **Goal:** Continuously evolve their interest profile after onboarding.
+- **Goal:** To discover their unique "Interest Personas" through a guided, two-phase process.
 
 ### Flow Steps:
 
 1.  **Entry Point**: User navigates to the `DiscoveryTab` and selects the "Interests" mode.
-2.  `->` **`InterestDiscoveryScreen`**: The user sees the headline **"Help us Discover your Interests"**.
-3.  **Interaction**: The user is presented with a full-screen, swipeable deck of `PastEventCard` components. Each card represents a real, highly-rated past event.
-4.  **User Action**: The user swipes right or left on each card.
-5.  **System Action**: Each swipe provides a new signal to the matching algorithm. This allows the user's taste profile to adapt and change over time.
+2.  `->` **`InterestDiscoveryScreen` (Calibration State)**: The user sees the headline **"Help us Discover your Interests"**.
+    - Because this is their first time, the screen displays the `CalibrationProgressBar` with a message like, _"Help us chart your map of interests."_
+3.  **Phase 1: Calibration**:
+    - **Interaction**: The user is presented with a full-screen, swipeable deck of diverse `PastEventCard` components.
+    - **User Action**: The user swipes right or left on the initial set of events.
+    - **System Action**: The backend gathers these signals to form a broad picture of the user's interests.
+4.  **The "Persona Reveal" Moment**:
+    - **Trigger**: The user has completed the initial set of calibration swipes.
+    - `->` The `CalibrationProgressBar` is replaced by the `PersonaRevealSummary` component.
+    - **Message**: A message appears, celebrating the discovery: _"Fascinating! It looks like you have a few different sides to you. We're seeing a pattern around things like **'Thrill Seeker'** and **'Cozy Creative'**."_ This provides a moment of genuine insight for the user.
+5.  **Phase 2: Refinement**:
+    - **Interaction**: After the user dismisses the summary, the `InterestDiscoveryScreen` transitions to its **Refinement State**. The deck of events is now sorted to help the user solidify and refine their newly discovered personas.
+    - **User Action**: The user can continue to swipe if they choose.
+    - **System Action**: Each additional swipe continues to refine the user's persona vectors. The user can leave and come back to this screen at any time.
 
 ---
 
 ## 11. Discovering Your Type
 
 - **Role:** `Participant`
-- **Goal:** To provide signals to the matching algorithm about the types of people they would like to connect with.
+- **Goal:** To provide signals to the matching algorithm about the types of people they would like to connect with, progressing through a structured, two-phase process.
 
 ### Flow Steps:
 
 1.  **Entry Point**: User navigates to the `DiscoveryTab` and selects the "People" mode.
-2.  `->` **`ProfileDiscoveryScreen`**: The user sees the headline **"Help us Discover your Type"**.
-3.  **Interaction**: The user is presented with a swipeable deck of profile cards, showing only users of the opposite sex.
-4.  **User Action**: The user swipes using the intention-driven labels:
-    - **Right**: "I'd like to create a memory with them."
-    - **Left**: "Not the connection I'm looking for."
-5.  **System Action**: Each right swipe provides a private signal to the matching algorithm, influencing the user's `person_attraction_vector`. The other user is not notified.
+2.  `->` **`ProfileDiscoveryScreen` (Calibration State)**: The user sees the headline **"Help us Discover your Type"**.
+    - Because this is their first time, the screen displays the `CalibrationProgressBar`.
+3.  **Phase 1: Calibration**:
+    - **Interaction**: The user is presented with a full-screen, swipeable deck of diverse profile cards.
+    - **User Action**: The user swipes through the first ~30 profiles using the intention-driven labels:
+      - **Right**: "I'd like to create a memory with them."
+      - **Left**: "Not the connection I'm looking for."
+    - **System Action**: Each right swipe provides a private signal that helps build the user's baseline `person_attraction_vector`. The other user is not notified.
+4.  **Transition to Refinement**:
+    - **Trigger**: The user has completed the initial set of calibration swipes.
+    - `->` The `CalibrationProgressBar` is replaced by the `CalibratedStateIndicator`. A message appears: _"Thanks, your compass is calibrated! We're now sorting people we think you'll connect with to the top."_
+5.  **Phase 2: Refinement**:
+    - **Interaction**: The `ProfileDiscoveryScreen` is now in its **Refinement State**. The deck of profiles is now sorted based on the user's calibrated preferences.
+    - **User Action**: The user can continue to swipe if they choose.
+    - **System Action**: Each additional swipe continues to refine the user's `person_attraction_vector`. The user can leave and come back to this screen at any time to further refine their type.
 
 ---
 

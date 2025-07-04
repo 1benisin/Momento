@@ -119,19 +119,37 @@ A user's interests are not static. To prevent an "invite rut" where a user is on
 
 1.  **The "Discover your Interests" Feed:**
 
-    - The primary tool for post-onboarding interest refinement. Users can browse a feed of real, highly-rated past events and indicate their interest.
-    - An affirmative swipe on a past event is a strong, explicit signal that adds the event's vector to the user's `positive_interest_vector`.
+    - The primary tool for the **initial discovery** of a user's "Interest Personas." The experience is divided into two phases to efficiently build a user's profile.
+    - **Phase 1: Broad Exploration (Calibration):** The user swipes on a diverse, curated set of past event cards. This builds a broad picture of their potential interests.
+    - **Phase 2: Persona Discovery & Refinement:** After the calibration phase, the backend runs a clustering algorithm on the user's liked event vectors. It identifies 1-3 distinct clusters and creates a separate `positive_persona_vector` for each. The feed then shifts to showing events similar to these new personas, helping to refine them.
+    - While this is the main tool for persona discovery, it is the starting point. The system gives significantly more weight to the implicit signals below for long-term persona evolution.
 
 2.  **The "Discover your Type" Feed:**
 
     - This is the primary tool for understanding a user's "type" and is the engine that builds their `person_attraction_vector`. Users browse a feed of profiles filtered by their `interested_in` preferences.
     - An affirmative swipe ("I'd like to create a memory with them") is a powerful signal. It updates the user's `person_attraction_vector`, making our understanding of their type more and more accurate over time.
+    - To gather this data efficiently, the algorithm operates in two distinct phases:
 
-3.  **Post-Event Ratings:**
+    - **Phase 1: Broad Exploration (First ~30 Swipes)**
 
-    - When a user rates an event highly (e.g., 4-5 stars), the system can slightly "nudge" their `positive_interest_vector` closer to that event's vector. This reinforces preferences with real-world, positive experiences.
+      - **Goal:** To quickly establish a baseline `person_attraction_vector` by exposing the user to a wide range of profiles.
+      - **Algorithm:** The system presents a deliberately diverse set of profiles that match the user's `interested_in` criteria. This is not random; the system ensures diversity across several axes (e.g., Interest Personas, age, vectorized bio) to cover the possibility space. At this stage, `internal_attractiveness_rating` is not used, as the goal is to learn from the user's raw preferences.
 
-4.  **Explicit Decline Reasons:**
+    - **Phase 2: Guided Refinement (After Calibration)**
+      - **Goal:** To refine the `person_attraction_vector` with high-quality signals.
+      - **Algorithm:** With each right swipe, the user's `person_attraction_vector` is updated. The subsequent profiles presented are a strategic blend:
+        - **80% Exploitation:** The algorithm prioritizes showing profiles that have a high vector similarity to the user's now-established `person_attraction_vector`. The `internal_attractiveness_rating` can be used here as a secondary sorting key to surface profiles in a similar range, increasing the probability of a future mutual connection.
+        - **20% Exploration:** To prevent an echo chamber, the algorithm introduces "serendipity" by showing profiles that are slightly outside the user's core calculated type but are popular with other users who share similar tastes.
+
+3.  **Post-Event Ratings & Attendance (Strongest Signal):**
+
+    - When a user attends an event and rates it highly (e.g., 4-5 stars), the system strongly "nudges" the most relevant `positive_persona_vector` closer to that event's vector. This is a powerful, verifying signal because it reflects real-world behavior, not just a casual swipe.
+
+4.  **"Event DNA" Selections (Strong Signal):**
+
+    - When a user chooses to showcase a past event on their public profile, it's a powerful endorsement. The system gives the vector of this event a higher weight when calculating and refining the user's Interest Personas.
+
+5.  **Explicit Decline Reasons:**
     - When a user declines an invitation, their stated reason provides a crucial signal.
     - **"This event isn't for me"**: Strongly updates the `negative_interest_vector`.
     - **"I'm looking to try new things"**: Temporarily increases an "exploration" parameter for the user's next few invites, encouraging the algorithm to suggest events outside their core cluster.

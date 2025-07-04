@@ -79,8 +79,12 @@ _This is the view for `Host-Only` and `Hybrid` users who are in "Host Mode." It 
 - **`UserProfileScreen`**: The public profile view of another user, featuring their photos, bio, their `InterestConstellation`, a `KudosShowcase`, their `EventDNAGallery`, and an optional `VibeSummary`.
 - **`FaceCardStylingScreen`**: Where a user can apply AI-driven styles, borders, and other customizations to their Face Card photo after an event.
 - **`ShareSocialsModal`**: A modal launched from the `ConnectionDetailScreen` that allows a user to select which of their saved social media links they want to share with a specific connection.
-- **`InterestDiscoveryScreen`**: The swipeable deck of `PastEventCard` components used to discover a user's interests.
-- **`ProfileDiscoveryScreen`**: The swipeable deck of user profile cards used to discover a user's type.
+- **`InterestDiscoveryScreen`**: The swipeable deck of `PastEventCard` components used to discover a user's interests. This screen has two distinct states:
+  - **Calibration State**: The initial state for a new user. It displays the `CalibrationProgressBar` and is focused on gathering signals from a diverse set of events.
+  - **Refinement State**: After calibration and the "persona reveal," this state shows events targeted at refining the user's discovered personas.
+- **`ProfileDiscoveryScreen`**: The swipeable deck of user profile cards used to discover a user's type. This screen has two distinct states:
+  - **Calibration State**: The initial state for a new user. It displays the `CalibrationProgressBar` and is focused on gathering the first ~30 swipes to build a baseline profile.
+  - **Refinement State**: After the initial calibration is complete, the screen shows the `CalibratedStateIndicator` and a message explaining that the feed is now sorted to help them refine their type.
 - **`ContentDetailScreen`**: For displaying long-form content like articles or videos, likely launched from the `HomeTab`.
 - **`CameraRollScreen`**: A personal gallery for a user to manage their photos, organized into three sections:
   - **My Profile Photos**: Photos used for their public `social_profile`.
@@ -190,6 +194,9 @@ This section catalogs the reusable UI elements that form the building blocks of 
 - **`CostBreakdown`**: A UI component used on the `EventDetailScreen` that clearly distinguishes between the two types of costs.
   - **Line Item 1**: "Confirmation Fee: $5" with a subtitle explaining this is paid to Momento to secure a spot and encourage commitment.
   - **Line Item 2**: "Estimated Event Cost: $$" with a subtitle explaining this is an estimate paid directly to the host or venue and is not processed by Momento.
+- **`CalibrationProgressBar`**: A UI component displayed on the `ProfileDiscoveryScreen` during the initial "Calibration State." It provides a visual indication of progress as the user works through their first ~30 profile swipes, accompanied by text like _"Help us calibrate your compass."_
+- **`CalibratedStateIndicator`**: A UI component that replaces the `CalibrationProgressBar` on the `ProfileDiscoveryScreen` once the initial calibration is complete. It could be a simple checkmark icon with text like _"Thanks, your compass is calibrated! We're now sorting people we think you'll connect with to the top."_
+- **`PersonaRevealSummary`**: A UI component used on the `InterestDiscoveryScreen` after a user completes the "Calibration State." It presents the names of the 1-3 "Interest Personas" the algorithm has identified (e.g., "Thrill Seeker," "Cozy Creative") and serves as the transition into the "Refinement State." It's a moment of insight designed to make the user feel understood.
 
 ### 6. Dynamic Duos
 

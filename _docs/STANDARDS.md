@@ -15,7 +15,6 @@
   - [Decision Log](#decision-log)
   - [Risk Assessment](#risk-assessment)
   - [Open Question](#open-question)
-- [Index Files (`index.md`)](#index-files-indexmd)
 
 ---
 
@@ -96,13 +95,3 @@ Use this to flag an area where a decision has _not_ yet been made and further di
 > **🤔 Open Question: [Topic]**
 > A clear question that needs to be answered.
 ```
-
-## Index Files (`index.md`)
-
-Every subdirectory inside `_docs` (e.g., `1_product`, `2_design`) must contain an `index.md` file.
-
-The purpose of this file is to:
-
-1.  Explain the category of documents contained within the directory.
-2.  List each document with a short description of its contents.
-3.  Provide clear guidance on when a document in this directory should be updated.

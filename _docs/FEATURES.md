@@ -57,7 +57,7 @@ User profiles will contain three categories of information:
 
 To showcase a user's personality beyond a simple list of hobbies, profiles will feature an "Interest Constellation." This data visualization moves beyond superficial tags to show the multifaceted nature of a user's character.
 
-- **How it Works:** The backend will analyze a user's activity—such as liked event cards, attended events, and positive ratings—and use clustering algorithms to group related interests into 2-3 distinct "personas" (e.g., "Thrill Seeker," "Cozy Creative," "Intellectual Explorer").
+- **How it Works:** The backend will analyze a user's full spectrum of activity to identify 2-3 distinct "personas" (e.g., "Thrill Seeker," "Cozy Creative," "Intellectual Explorer"). While this process begins with explicit signals from the "Discover Your Interests" feature, it is continuously refined by real-world behavior. The system gives more weight to implicit, high-commitment actions—like attending an event and rating it highly.
 - **Profile Visualization:** On the user's profile, these personas will be displayed as a minimalist, interactive constellation graphic. Each major "star" represents a persona. Tapping on a star could reveal the key concepts or types of experiences that define it (e.g., tapping "Thrill Seeker" might show keywords like `Rock Climbing`, `Live Music`, `Spontaneous Travel`).
 - **Impact:** This feature provides a rich, at-a-glance understanding of a user's character, showing _how_ their interests connect rather than just _what_ they are. It emphasizes depth and multifaceted personality, aligning with Momento's core value of fostering genuine connection.
 
@@ -71,11 +71,11 @@ To offer a form of social proof that is more meaningful than a simple rating, pr
 
 ### Event DNA
 
-To give users a way to express their character through their actions, not just their words, profiles will feature an "Event DNA" section. This is a curated gallery of a user's favorite past experiences on Momento.
+To give users a way to express their character through their actions, not just their words, profiles will feature an "Event DNA" section. This is a curated gallery of a user's favorite past experiences on Momento, acting as a powerful form of profile authentication.
 
-- **How it Works:** From their event history, a user can select 3-5 past events that they attended and rated highly to showcase on their public profile.
+- **How it Works:** From their event history, a user can **select** 3-5 past events that they attended and rated highly to showcase on their public profile.
 - **Profile Visualization:** This will be displayed as a visually rich gallery of the selected event cards. Seeing that a user chose to highlight their attendance at a "Backcountry Camping Trip," a "Japanese Pottery Workshop," and a "Silent Book Club" tells a much more compelling and authentic story than a simple list of interests.
-- **Impact:** This feature transforms a user's profile from a static page into a living testament to their adventures and passions. It provides concrete, verifiable examples of their interests, offering a deep and immediate insight into their personality.
+- **Impact:** This feature transforms a user's profile from a static page into a living testament to their adventures and passions. It provides concrete, verifiable examples of their interests, offering a deep and immediate insight into their personality. It serves as a real meeting feature, turning past attendance into social proof.
 
 ### The Vibe Summary (AI-Generated)
 
@@ -455,20 +455,48 @@ To ensure accountability, reports will trigger specific, escalating actions.
 
 ## 13. Discovering Your Interests
 
-To solve the "invite rut" problem and allow users to continuously refine their tastes, the app will feature a dedicated discovery mode. This serves both as an interest-building tool and an internal marketing feature that showcases the quality of experiences on Momento without sacrificing the exclusivity of future events.
+To solve the "invite rut" problem and allow users to continuously refine their tastes, the app will feature a dedicated discovery mode. This serves both as an interest-building tool and an internal marketing feature that showcases the quality of experiences on Momento without sacrificing the exclusivity of future events. This experience is a focused utility designed to efficiently discover a user's unique "Interest Personas."
 
 - **Headline:** **"Help us Discover your Interests"**
-- **Functionality**: Users are presented with a swipeable, full-screen deck of cards representing real, highly-rated **past events**.
+- **Functionality**: The experience is divided into two distinct phases to manage user expectations and deliver a moment of insight.
+
+### Phase 1: The Calibration Phase
+
+- **Goal:** To quickly understand the breadth of a user's interests by exposing them to a wide variety of event types.
+- **User Experience:** For the first ~30 swipes, the user sees a progress indicator with a message like, _"Help us chart your map of interests. The more you swipe, the better our recommendations."_
+- **The Deck:** Users are presented with a swipeable, full-screen deck of cards representing real, highly-rated **past events**. The initial deck is curated for maximum diversity, ensuring a user sees a balanced mix from all of Momento's core event categories.
+
+### Phase 2: The Persona Discovery & Refinement Phase
+
+- **Goal:** To identify the user's distinct "Interest Personas" and allow them to refine them over time.
+- **The "Persona Reveal" Moment:** After the calibration phase, the user is shown a summary of what the app has learned. For example: _"Fascinating! It looks like you have a few different sides to you. We're seeing a pattern around things like **'Thrill Seeker'** and **'Cozy Creative'**."_ This moment transforms the feature from a simple quiz into a moment of insightful self-discovery.
+- **The Deck:** The deck now shifts to showing the user more events that are highly similar to their newly discovered personas, helping to solidify and refine them. It will still sprinkle in "wild card" events to allow for continued exploration.
+- **Continued Swiping:** The user is informed that they can return at any time to further refine their personas, but the core discovery task is complete, discouraging endless swiping.
+
 - **Content**: Each card will feature the event's title, its evocative description, and the public, host-provided **cover image**. All information about the host and attendees is kept anonymous.
 - **Interaction**: Users can swipe right or left. This action is primarily a signal for the matching algorithm and does not mean the user will be invited to that specific event if it runs again.
 - **Backend Signal**: Each right swipe provides a strong, positive signal to the user's `positive_interest_vector`, helping the algorithm understand their current tastes. This is a primary mechanism for evolving a user's preferences over time.
 
 ## 14. Discovering Your Type
 
-To help the matching algorithm understand a user's "type" in potential connections, the app features a second discovery mode focused on people. This moves beyond simple "liking" and frames the action as an intentional search for compatibility.
+To help the matching algorithm understand a user's "type" in potential connections, the app features a second discovery mode focused on people. This moves beyond simple "liking" and frames the action as an intentional search for compatibility. This feature is not an endless swipe feed; it is a focused utility designed to efficiently build a user's `person_attraction_vector`.
 
 - **Headline:** **"Help us Discover your Type"**
-- **Functionality**: Users are presented with a swipeable deck of profile cards. This feed is populated based on the user's `interested_in` preferences. It will not show users outside of these preferences.
+- **Functionality**: Users are presented with a swipeable deck of profile cards. This feed is populated based on the user's `interested_in` preferences. It will not show users outside of these preferences. The experience is divided into two distinct phases to manage user expectations and gather data efficiently.
+
+### Phase 1: The Calibration Phase
+
+- **Goal:** To quickly understand the breadth of a user's preferences without making any assumptions.
+- **User Experience:** For the first ~30 swipes, the user sees a progress indicator with a message like, _"Help us calibrate your compass. The more you swipe, the better we can navigate to your type."_
+- **The Deck:** The initial profiles are deliberately diverse, showing a balanced mix of ages, styles, and "Interest Constellations" to establish a broad baseline.
+
+### Phase 2: The Refinement Phase
+
+- **Goal:** To hone in on the user's "type" and build a robust `person_attraction_vector`.
+- **User Experience:** After the initial calibration, the progress indicator is replaced by a message indicating completion: _"Thanks, your compass is calibrated! We now have a good sense of your type."_ To encourage transparency, another message appears: _"We're now sorting people we think you'll connect with to the top."_
+- **The Deck:** The profile deck is now a strategic blend. The majority of profiles shown are those the algorithm believes the user will be interested in, based on their previous swipes. To avoid an echo chamber, the deck will also include "serendipity" profiles that are a bit different.
+- **Continued Swiping:** The user is informed that they can return at any time to further refine their preferences, but the core task is complete. This framing discourages endless swiping.
+
 - **Interaction**: The language is designed to be intentional and aligned with Momento's values.
   - **Swipe Right:** The button or action is labeled **"I'd like to create a memory with them."** This signals a potential for genuine connection.
   - **Swipe Left:** The button or action is labeled **"Not the connection I'm looking for."**
