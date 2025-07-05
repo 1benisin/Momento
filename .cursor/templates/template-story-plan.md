@@ -23,7 +23,7 @@ _To implement this story correctly, you MUST reference the following specific se
 - file: /_docs/DEVELOPMENT_PROCESS.md
   section: "Full Directory Tree"
   why: "To correctly place the new component files."
-- file: /_docs/CONVEX_DATA_MODELS.md
+- file: /_docs/DATA_MODELS.md
   section: "User"
   why: "The new component will fetch and display user data."
 - file: /_docs/ARCHITECTURE.md

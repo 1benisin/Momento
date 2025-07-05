@@ -3,7 +3,7 @@
 > **⚠️ Deprecation Notice**
 > This document describes the original, relational data model designed for a PostgreSQL backend. This model is now obsolete. The project has migrated to a Convex backend, and the current, authoritative data model is defined in:
 >
-> **[CONVEX_DATA_MODELS.md](./CONVEX_DATA_MODELS.md)**
+> **[DATA_MODELS.md](./DATA_MODELS.md)**
 >
 > Please refer to the new document for all schema-related information.
 

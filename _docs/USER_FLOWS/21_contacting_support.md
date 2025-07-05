@@ -4,7 +4,7 @@ This document outlines the user flow for when a user needs to contact the Moment
 
 - **See Also:**
   - **UI:** `_docs/SCREENS_AND_COMPONENTS.md` (Screens: `SettingsScreen`, `HelpCenterScreen`)
-  - **Data Model:** `_docs/CONVEX_DATA_MODELS.md` (Collections: `support_tickets`)
+  - **Data Model:** `_docs/DATA_MODELS.md` (Collections: `support_tickets`)
 
 ---
 

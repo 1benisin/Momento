@@ -17,7 +17,7 @@ Your primary goal is **quality and clarity**. A well-defined plan prevents bugs 
 1.  **Analyze the Story**: Understand the goal of the user story within the context of its parent epic.
 2.  **Consult Key Documents**:
     - Thoroughly review the `Tactical Documentation & References` section in the `.cursor/templates/template-story-plan.md` template. This is your guide for which project documents to consult.
-    - Examine files in `_docs/` (like `ARCHITECTURE.md`, `CONVEX_DATA_MODELS.md`, and `DEVELOPMENT_PROCESS.md`) to understand the specific architectural patterns, data schemas, and file structures you MUST adhere to.
+    - Examine files in `_docs/` (like `ARCHITECTURE.md`, `DATA_MODELS.md`, and `DEVELOPMENT_PROCESS.md`) to understand the specific architectural patterns, data schemas, and file structures you MUST adhere to.
     - Look for existing code that implements similar features to ensure consistency.
 3.  **Generate the Story Plan**:
     - Use the `.cursor/templates/template-story-plan.md` as the blueprint for your output.

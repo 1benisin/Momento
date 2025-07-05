@@ -5,7 +5,7 @@ This document outlines the user flow that occurs when a participant declines an 
 - **See Also:**
   - **Features:** `_docs/FEATURES.md` (Section: [5. Declining an Invitation](#declining-an-invitation-capturing-user-intent))
   - **UI:** `_docs/SCREENS_AND_COMPONENTS.md` (Modals: `DeclineFeedbackModal`, `ContextualNudgeModal`)
-  - **Data Model:** `_docs/CONVEX_DATA_MODELS.md` (Collections: `invitations`, `users`)
+  - **Data Model:** `_docs/DATA_MODELS.md` (Collections: `invitations`, `users`)
   - **Algorithm:** `_docs/MATCHING_ALGORITHM.md`
 
 ---

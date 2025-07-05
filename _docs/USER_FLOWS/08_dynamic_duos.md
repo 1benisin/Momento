@@ -5,7 +5,7 @@ This document provides a complete, end-to-end overview of the "Dynamic Duos" fea
 - **See Also:**
   - **Features:** `_docs/FEATURES.md` (Section: [6. Dynamic Duos](#6-dynamic-duos-attend-with-a-friend))
   - **UI:** `_docs/SCREENS_AND_COMPONENTS.md` (Screens: `FormDuoScreen`, `InvitationDetailScreen`; Components: `DuoBadge`)
-  - **Data Model:** `_docs/CONVEX_DATA_MODELS.md` (Collections: `duos`, `invitations`)
+  - **Data Model:** `_docs/DATA_MODELS.md` (Collections: `duos`, `invitations`)
   - **Algorithm:** `_docs/MATCHING_ALGORITHM.md`
 
 ---

@@ -113,7 +113,7 @@ To solve this, we will leverage a purpose-built geospatial library within the Co
 
 1.  **Use a Geospatial Library**: We will integrate a community library like `@convex-dev/geospatial` into our project. This provides the necessary tools for indexing and querying location data directly within Convex.
 
-2.  **Store Location Data**: In the `locations` table, we will store coordinates as simple `latitude` and `longitude` number fields, as defined in `_docs/CONVEX_DATA_MODELS.md`.
+2.  **Store Location Data**: In the `locations` table, we will store coordinates as simple `latitude` and `longitude` number fields, as defined in `_docs/DATA_MODELS.md`.
 
 3.  **Index Locations**: The geospatial library will manage the indexing of these locations. We will create a query that's exposed by the library, which takes our `locations` table data and organizes it into an efficient data structure (like an R-tree or Geohash-based index) for fast spatial lookups.
 
@@ -161,3 +161,5 @@ To solve this, we will leverage a purpose-built geospatial library within the Co
     ```
 
 This architectural decision is critical for ensuring the matching process remains fast and scalable as the platform grows. It allows the backend to quickly eliminate the vast majority of events that are outside a user's radius, rather than calculating the distance for each one.
+
+All vector embeddings will be stored as `float64` arrays, and timestamps will be stored as simple `v.number()` fields, as defined in `_docs/DATA_MODELS.md`.

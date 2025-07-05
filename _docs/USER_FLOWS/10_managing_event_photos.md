@@ -5,7 +5,7 @@ This document outlines the user flow for interacting with the shared photo galle
 - **See Also:**
   - **Features:** `_docs/FEATURES.md` (Sections: [11. Shared Event Galleries & Camera Roll](#11-shared-event-galleries--camera-roll), [12. User Safety: Blocking & Reporting](#12-user-safety-blocking--reporting))
   - **UI:** `_docs/SCREENS_AND_COMPONENTS.md` (Screens: `EventDetailScreen` (Post-Event State), `SharedEventGalleryScreen`, `ReportPhotoModal`; Components: `CameraRollScreen`)
-  - **Data Model:** `_docs/CONVEX_DATA_MODELS.md` (Collections: `event_photos`, `reports`)
+  - **Data Model:** `_docs/DATA_MODELS.md` (Collections: `event_photos`, `reports`)
 
 ---
 

@@ -68,7 +68,7 @@ Example:
 - **Development Process & Structure:** `/_docs/DEVELOPMENT_PROCESS.md`
 - **User Flow(s):** (e.g., `/_docs/USER_FLOWS/01_new_user_onboarding.md`)
 - **Feature Brief:** `/_docs/FEATURES.md` (e.g., Section: "User Profiles")
-- **Data Models:** `/_docs/CONVEX_DATA_MODELS.md`
+- **Data Models:** `/_docs/DATA_MODELS.md`
 
 ## Technology Stack
 

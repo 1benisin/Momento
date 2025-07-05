@@ -5,7 +5,7 @@ This document outlines the user flow for when a participant, who has already con
 - **See Also:**
   - **Features:** `_docs/FEATURES.md` (Section: [12. Community Reliability: Cancellations & No-Shows](#community-reliability-cancellations--no-shows))
   - **UI:** `_docs/SCREENS_AND_COMPONENTS.md` (Screen: `EventDetailScreen`)
-  - **Data Model:** `_docs/CONVEX_DATA_MODELS.md` (Collections: `attendance`, `users` (specifically `internalMetrics.absentee_rating`))
+  - **Data Model:** `_docs/DATA_MODELS.md` (Collections: `attendance`, `users` (specifically `internalMetrics.absentee_rating`))
 
 ---
 

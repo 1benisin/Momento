@@ -5,7 +5,7 @@ This document outlines the critical user flow for managing material changes made
 - **See Also:**
   - **Features:** `_docs/FEATURES.md` (Section: [12. Community Reliability: Cancellations & No-Shows](#community-reliability-cancellations--no-shows))
   - **UI:** `_docs/SCREENS_AND_COMPONENTS.md` (Modals: `EventChangeConfirmationModal`)
-  - **Data Model:** `_docs/CONVEX_DATA_MODELS.md` (Collections: `invitations`, `payments`)
+  - **Data Model:** `_docs/DATA_MODELS.md` (Collections: `invitations`, `payments`)
   - **Notifications:** `_docs/NOTIFICATIONS_PLAN.md`
 
 ---

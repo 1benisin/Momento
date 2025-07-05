@@ -5,7 +5,7 @@ This document describes the user flow for applying AI-driven styles and other cu
 - **See Also:**
   - **Features:** `_docs/FEATURES.md` (Section: [10. The Memory Book & The Face Card](#10-the-memory-book--the-face-card))
   - **UI:** `_docs/SCREENS_AND_COMPONENTS.md` (Screens: `FaceCardStylingScreen`, `ProfileTab`, `SettingsScreen`)
-  - **Data Model:** `_docs/CONVEX_DATA_MODELS.md` (Collections: `users` (specifically the `socialProfile.current_face_card_photo_url` and `socialProfile.photos` fields))
+  - **Data Model:** `_docs/DATA_MODELS.md` (Collections: `users` (specifically the `socialProfile.current_face_card_photo_url` and `socialProfile.photos` fields))
 
 ---
 

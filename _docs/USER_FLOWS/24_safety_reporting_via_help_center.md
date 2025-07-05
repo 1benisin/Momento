@@ -4,7 +4,7 @@ This document outlines the user flow for reporting a safety or trust concern thr
 
 - **See Also:**
   - **UI:** `_docs/SCREENS_AND_COMPONENTS.md` (Screens: `HelpCenterScreen`)
-  - **Data Model:** `_docs/CONVEX_DATA_MODELS.md` (Collections: `support_tickets`)
+  - **Data Model:** `_docs/DATA_MODELS.md` (Collections: `support_tickets`)
   - **Related Flow:** `_docs/USER_FLOWS/20_contacting_support.md`
 
 ---

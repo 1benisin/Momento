@@ -46,7 +46,7 @@ To support notifications and user preferences, our Convex data model has been up
 
 ### `push_notification_tokens` Table
 
-This collection is defined in `_docs/CONVEX_DATA_MODELS.md`. It stores the unique push tokens for each user's device(s).
+This collection is defined in `_docs/DATA_MODELS.md`. It stores the unique push tokens for each user's device(s).
 
 ### Notification Settings (Embedded in `users` document)
 

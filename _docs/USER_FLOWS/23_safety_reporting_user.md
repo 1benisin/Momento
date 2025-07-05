@@ -5,7 +5,7 @@ This document outlines the user flow for the "Report" feature. This is a formal 
 - **See Also:**
   - **Features:** `_docs/FEATURES.md` (Sections: [12. A Three-Tiered System](#a-three-tiered-system), [Reporting & Consequence Framework](#reporting--consequence-framework))
   - **UI:** `_docs/SCREENS_AND_COMPONENTS.md` (Flows: `ReportUserFlow`; Modals: `ReportAndBlockModal`)
-  - **Data Model:** `_docs/CONVEX_DATA_MODELS.md` (Collections: `reports`, `blocked_users`)
+  - **Data Model:** `_docs/DATA_MODELS.md` (Collections: `reports`, `blocked_users`)
 
 ---
 

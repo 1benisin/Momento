@@ -5,7 +5,7 @@ This document outlines the user flow for the "Block" feature, a critical safety 
 - **See Also:**
   - **Features:** `_docs/FEATURES.md` (Section: [12. User Safety: A Three-Tiered System](#a-three-tiered-system))
   - **UI:** `_docs/SCREENS_AND_COMPONENTS.md` (Screens: `ConnectionDetailScreen`, `UserProfileScreen`, `BlockedUsersScreen`; Modals: `ReportAndBlockModal`)
-  - **Data Model:** `_docs/CONVEX_DATA_MODELS.md` (Collections: `blocked_users`, `connections`, `conversations`)
+  - **Data Model:** `_docs/DATA_MODELS.md` (Collections: `blocked_users`, `connections`, `conversations`)
 
 ---
 

@@ -5,7 +5,7 @@ This document outlines the user flow for setting both "soft" and "hard" preferen
 - **See Also:**
   - **Features:** `_docs/FEATURES.md` (Section: [7. Event Preferences & Filtering](#7-event-preferences-filtering))
   - **UI:** `_docs/SCREENS_AND_COMPONENTS.md` (Screens: `InvitationPreferencesScreen`, `EventPreferencesScreen`; Components: `NoticePreferenceSlider`, `DistancePreferenceSlider`, etc.)
-  - **Data Model:** `_docs/CONVEX_DATA_MODELS.md` (Collection: `users`)
+  - **Data Model:** `_docs/DATA_MODELS.md` (Collection: `users`)
   - **Algorithm:** `_docs/MATCHING_ALGORITHM.md` (Section: Lead-Time & Availability Scoring)
 
 ---
