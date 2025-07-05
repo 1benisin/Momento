@@ -80,10 +80,10 @@ sequenceDiagram
 
 ### Part 1: Forming the Pact
 
-1.  **Initiation**: User A navigates to the "Dynamic Duos" section of the app and decides to form a new pact.
+1.  **Initiation**: User A navigates to the "Dynamic Duos" section of the app (the `DuoHomeScreen`) and decides to form a new pact.
 2.  **Friend Discovery**: The app requests one-time access to the phone's contacts, sending the contact list to the backend to find which friends are also on Momento.
 3.  **Sending the Invite**: The app displays a list of User A's friends who are on Momento. User A selects User B and sends a Duo invitation. The backend creates a `duos` record with `status: 'pending'`.
-4.  **Acceptance**: User B receives a notification, opens the app, and accepts the Duo invitation.
+4.  **Acceptance**: User B receives a notification, opens the app, and accepts the Duo invitation from their `DuoHomeScreen`.
 5.  **Pact Activation**: The backend updates the `duos` record's `status` to `'active'` and sets an expiration date (e.g., two weeks). The pact is now active, and the matching algorithm will consider them a single entity.
 
 ### Part 2: The Paired Invitation

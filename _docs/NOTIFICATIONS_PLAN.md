@@ -88,26 +88,34 @@ Here is a brainstormed list of potential notifications, their triggers, and sugg
 
 ### Social & Messaging Notifications
 
-| Event Trigger                    | Type | Audience           | Message Content                                                                             |
-| -------------------------------- | ---- | ------------------ | ------------------------------------------------------------------------------------------- |
-| **New Direct Message**           | Push | Message Recipient  | "[Sender Name]: [Message Preview...]" (See best practices note below)                       |
-| **New Kudo Received**            | Push | Kudo Recipient     | "You received a new kudo! ✨ Someone at your last event said you have a 'Welcoming Vibe'."  |
-| **Mutual "Connect Again" Match** | Push | Both Users         | "You have a new mutual connection! You and [Other User's Name] both want to connect again." |
-| **New Photos Added**             | Push | Attendees (Opt-in) | "New photos were added to '[Event Title]'! Tap to see what you missed." (Bundled)           |
-| **Photo Reported**               | Push | Event Host         | "A photo in your event '[Event Title]' was reported. Please review it."                     |
-| **Photo Removed by Host**        | Push | Photo Uploader     | "Your photo from '[Event Title]' was removed by the host."                                  |
+| Event Trigger                    | Type | Audience           | Message Content                                                                                 |
+| -------------------------------- | ---- | ------------------ | ----------------------------------------------------------------------------------------------- |
+| **New Direct Message**           | Push | Message Recipient  | "[Sender Name]: [Message Preview...]" (See best practices note below)                           |
+| **New Kudo Received**            | Push | Kudo Recipient     | "You received a new kudo! ✨ Someone at your last event said you have a 'Welcoming Vibe'."      |
+| **Mutual "Connect Again" Match** | Push | Both Users         | "You have a new mutual connection! You and [Other User's Name] both want to connect again."     |
+| **Duo Invitation Received**      | Push | Invited User       | "[User Name] wants to form a Dynamic Duo for your next event!"                                  |
+| **Duo Pact Accepted**            | Push | Initiating User    | "[User Name] accepted your Duo invitation! We'll look for a great event for you both."          |
+| **Duo Pact Expired**             | Push | Both Users         | "Your Dynamic Duo pact with [User Name] has expired. Form a new one to find an event together!" |
+| **New Photos Added**             | Push | Attendees (Opt-in) | "New photos were added to '[Event Title]'! Tap to see what you missed." (Bundled)               |
+| **Photo Reported**               | Push | Event Host         | "A photo in your event '[Event Title]' was reported. Please review it."                         |
+| **Photo Removed by Host**        | Push | Photo Uploader     | "Your photo from '[Event Title]' was removed by the host."                                      |
 
 ### Account & Safety Notifications
 
-| Event Trigger                          | Type  | Audience | Message Content                                                                                                            |
-| -------------------------------------- | ----- | -------- | -------------------------------------------------------------------------------------------------------------------------- |
-| **Payment Succeeded**                  | Email | User     | _This email is sent automatically by **Stripe**._                                                                          |
-| **Payment Succeeded**                  | Push  | User     | "Your payment for '[Event Title]' was successful. You're all set!"                                                         |
-| **Payment Failed**                     | Push  | User     | "Your payment for '[Event Title]' failed. Please update your payment method to secure your spot."                          |
-| **Report Status Update**               | Email | Reporter | "Update on your report: We have reviewed the details and have taken appropriate action based on our community guidelines." |
-| **Report Status Update**               | Push  | Reporter | "Update on your report: We have reviewed your report and taken appropriate action."                                        |
-| **Account Security Alert**             | Email | User     | "A sign-in attempt was made on a new device. If this was not you, please secure your account immediately."                 |
-| **"Authentic" Photo Badge Expiration** | Push  | User     | "Your 'Authentic' photo badge is expiring soon. Take a new photo to keep your profile trusted."                            |
+| Event Trigger                          | Type  | Audience       | Message Content                                                                                                                                                                                                                                            |
+| -------------------------------------- | ----- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Support Ticket Created**             | Email | User           | "We've received your request (#[Ticket Number]). Our team will review it and get back to you at the email address you provided. You can reply to this email with any additional details."                                                                  |
+| **Payment Succeeded**                  | Email | User           | _This email is sent automatically by **Stripe**._                                                                                                                                                                                                          |
+| **Payment Succeeded**                  | Push  | User           | "Your payment for '[Event Title]' was successful. You're all set!"                                                                                                                                                                                         |
+| **Payment Failed**                     | Push  | User           | "Your payment for '[Event Title]' failed. Please update your payment method to secure your spot."                                                                                                                                                          |
+| **Report Status Update**               | Email | Reporter       | "Update on your report: We have reviewed the details and have taken appropriate action based on our community guidelines."                                                                                                                                 |
+| **Report Status Update**               | Push  | Reporter       | "Update on your report: We have reviewed your report and taken appropriate action."                                                                                                                                                                        |
+| **Account Security Alert**             | Email | User           | "A sign-in attempt was made on a new device. If this was not you, please secure your account immediately."                                                                                                                                                 |
+| **"Authentic" Photo Badge Expiration** | Push  | User           | "Your 'Authentic' photo badge is expiring soon. Take a new photo to keep your profile trusted."                                                                                                                                                            |
+| **Account Recycling Initiated**        | Email | Original Owner | "A sign-in attempt was made on your Momento account with a new device, and the user claims to be new. If this was not you, your account's phone number will be unlinked in 24 hours for security. Please contact support if you believe this is an error." |
+| **Account Recycling Complete**         | SMS   | New User       | "Welcome to Momento! You can now complete your sign-up."                                                                                                                                                                                                   |
+| **Device Verification Requested**      | Email | User           | "A sign-in attempt was made from a new device. Click this link to verify and continue: [link]"                                                                                                                                                             |
+| **Resend OTP**                         | SMS   | User           | "Your new Momento verification code is [Code]. This code will expire in 10 minutes."                                                                                                                                                                       |
 
 ---
 

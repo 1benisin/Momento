@@ -79,7 +79,7 @@ sequenceDiagram
       1.  Creates a new document in the `blocked_users` collection: `{ blockerId: 'ID_of_A', blockedId: 'ID_of_B' }`.
       2.  Finds and deletes any `connections` documents where the `ownerId` and `connectedUserId` are A and B, effectively removing them from each other's Memory Books.
       3.  Finds any `conversations` between A and B and disables them (e.g., archives the conversation or removes the participants).
-      4.  The matching algorithm is designed to **always** query the `blocked_users` table and exclude any potential matches between a user and someone they have blocked OR someone who has blocked them.
+      4.  The matching algorithm and any queries for user-generated content (profiles, photos, etc.) must be designed to **always** query the `blocked_users` table and exclude results where a block exists in **either direction**. For example, a query for User A's feed should exclude content from User B if a record exists where `(blockerId: A, blockedId: B)` OR `(blockerId: B, blockedId: A)`.
 
 4.  **UI Feedback**:
     - The UI confirms the block was successful with a toast message.
@@ -103,5 +103,16 @@ sequenceDiagram
 - **Success (Unblock)**:
   - The `blocked_users` record is deleted.
   - The two users are no longer actively prevented from interacting or being matched.
+
+## 7. Edge Cases & Special Scenarios
+
+### 7.1. Blocking in the Context of an Upcoming Event
+
+- **Scenario**: User A tries to block User B, but they are both confirmed attendees for the same upcoming event.
+- **System Rule**: To prevent logistical complexity and potential real-world awkwardness, this action is not allowed.
+- **User Experience**:
+  - The `blockUser` mutation fails with a specific error code (e.g., `upcoming_event_conflict`).
+  - The UI catches this error and displays the `BlockActionErrorModal`.
+  - The modal informs the user why the block cannot be performed at this time and presents them with two choices: "Cancel Attendance" or "OK". This gives the user agency while protecting the integrity of the event.
 
 </rewritten_file>

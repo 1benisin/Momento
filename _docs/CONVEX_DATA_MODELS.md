@@ -40,62 +40,70 @@ In a document model, we combine private user data, public profiles, metrics, and
 
 Serves as the aggregate root for a user, combining private data (phone, email), public profiles (`socialProfile`, `hostProfile`), system settings, and internal metrics into a single document. This model optimizes for fetching all user-related information in a single read and determines a user's role (`Participant`, `Host`, or `Hybrid`) based on the presence of embedded profile objects.
 
-| Field Name                 | Type                                     | Description                                                                                 |
-| -------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `_id`                      | `Id<"users">`                            | Convex system field. Primary Key.                                                           |
-| `phone_number`             | `v.string()`                             | User's private phone number. Indexed for authentication lookups.                            |
-| `email`                    | `v.optional(v.string())`                 | Optional private email for recovery or receipts.                                            |
-| `last_name`                | `v.optional(v.string())`                 | User's private last name.                                                                   |
-| `birth_date`               | `v.number()`                             | User's date of birth (as a timestamp) for age calculation.                                  |
-| `is_verified`              | `v.boolean()`                            | Defaults to `false`. True if user completed ID verification.                                |
-| `status`                   | `v.string()`                             | e.g., 'active', 'suspended', 'verification_pending', 'banned', 'archived_for_recycling'.    |
-| `active_role`              | `v.string()`                             | For Hybrid Users, stores the last active role ('social' or 'host'). Defaults to 'social'.   |
-| `last_active_at`           | `v.number()`                             | Timestamp of the last user activity.                                                        |
-| `user_number`              | `v.number()`                             | A unique, sequential number for early adopters. Managed via a counter or mutation logic.    |
-| `payment_customer_id`      | `v.optional(v.string())`                 | Stripe customer ID.                                                                         |
-| `min_lead_time_days`       | `v.optional(v.number())`                 | User's preferred minimum notice for event invites.                                          |
-| `availability_preferences` | `v.optional(v.any())`                    | Stores day/week availability. `v.any()` for `jsonb` equivalent.                             |
-| `distance_preference`      | `v.optional(v.number())`                 | User's max travel distance in miles.                                                        |
-| `price_sensitivity`        | `v.optional(v.number())`                 | User's max price comfort level (1-4).                                                       |
-| `person_attraction_vector` | `v.optional(v.array(v.float64()))`       | Vector representing the user's "type" in others, built from "Discover Your Type" swipes.    |
-| `socialProfile`            | `v.optional(v.object({ ... }))`          | Embedded object containing the user's public-facing participant profile. See details below. |
-| `hostProfile`              | `v.optional(v.object({ ... }))`          | Embedded object containing the user's public-facing host profile. See details below.        |
-| `internalMetrics`          | `v.optional(v.object({ ... }))`          | Embedded object for system-generated scores and metrics. See details below.                 |
-| `interestVectors`          | `v.optional(v.array(v.object({ ... })))` | Embedded array of interest vector objects. See details below.                               |
-| `socialLinks`              | `v.optional(v.array(v.object({ ... })))` | Embedded array of the user's social media links. See details below.                         |
-| `notificationSettings`     | `v.object({ ... })`                      | Embedded object for managing notification preferences. See details below.                   |
-| `deviceHistory`            | `v.optional(v.array(v.object({ ... })))` | Embedded array of device login history. See details below.                                  |
+| Field Name                 | Type                                                                                                                                              | Description                                                                                                    |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `_id`                      | `Id<"users">`                                                                                                                                     | Convex system field. Primary Key.                                                                              |
+| `phone_number`             | `v.optional(v.string())`                                                                                                                          | User's private phone number. Indexed. Can be null for archived accounts.                                       |
+| `email`                    | `v.optional(v.string())`                                                                                                                          | Optional private email for recovery or receipts.                                                               |
+| `last_name`                | `v.optional(v.string())`                                                                                                                          | User's private last name.                                                                                      |
+| `birth_date`               | `v.number()`                                                                                                                                      | User's date of birth (as a timestamp) for age calculation.                                                     |
+| `is_verified`              | `v.boolean()`                                                                                                                                     | Defaults to `false`. True if user completed ID verification.                                                   |
+| `status`                   | `v.string()`                                                                                                                                      | e.g., 'active', 'suspended', 'verification_pending', 'banned', 'archived_for_recycling', 'pending_onboarding'. |
+| `active_role`              | `v.string()`                                                                                                                                      | For Hybrid Users, stores the last active role ('social' or 'host'). Defaults to 'social'.                      |
+| `last_active_at`           | `v.number()`                                                                                                                                      | Timestamp of the last user activity.                                                                           |
+| `user_number`              | `v.number()`                                                                                                                                      | A unique, sequential number for early adopters. Managed via a counter or mutation logic.                       |
+| `payment_customer_id`      | `v.optional(v.string())`                                                                                                                          | Stripe customer ID.                                                                                            |
+| `otp_attempts`             | `v.optional(v.number())`                                                                                                                          | Tracks failed OTP attempts to prevent abuse. Reset on success.                                                 |
+| `otp_last_attempt_at`      | `v.optional(v.number())`                                                                                                                          | Timestamp of the last failed OTP attempt.                                                                      |
+| `min_lead_time_days`       | `v.optional(v.number())`                                                                                                                          | User's preferred minimum notice for event invites.                                                             |
+| `availability_preferences` | `v.optional(v.object({ mon: v.string(), tue: v.string(), wed: v.string(), thu: v.string(), fri: v.string(), sat: v.string(), sun: v.string() }))` | Stores day/week availability. Each day can be 'any', 'evening', 'daytime', or 'unavailable'.                   |
+| `distance_preference`      | `v.optional(v.number())`                                                                                                                          | User's max travel distance in miles.                                                                           |
+| `price_sensitivity`        | `v.optional(v.number())`                                                                                                                          | User's max price comfort level (1-4).                                                                          |
+| `person_attraction_vector` | `v.optional(v.array(v.float64()))`                                                                                                                | Vector representing the user's "type" in others, built from "Discover Your Type" swipes.                       |
+| `socialProfile`            | `v.optional(v.object({ ... }))`                                                                                                                   | Embedded object containing the user's public-facing participant profile. See details below.                    |
+| `hostProfile`              | `v.optional(v.object({ ... }))`                                                                                                                   | Embedded object containing the user's public-facing host profile. See details below.                           |
+| `internalMetrics`          | `v.optional(v.object({ ... }))`                                                                                                                   | Embedded object for system-generated scores and metrics. See details below.                                    |
+| `interestVectors`          | `v.optional(v.array(v.object({ ... })))`                                                                                                          | Embedded array of interest vector objects. See details below.                                                  |
+| `socialLinks`              | `v.optional(v.array(v.object({ ... })))`                                                                                                          | Embedded array of the user's social media links. See details below.                                            |
+| `notificationSettings`     | `v.object({ ... })`                                                                                                                               | Embedded object for managing notification preferences. See details below.                                      |
+| `deviceHistory`            | `v.optional(v.array(v.object({ ... })))`                                                                                                          | Embedded array of device login history. See details below.                                                     |
+| `contextualNudges`         | `v.optional(v.object({ shown_distance_preference_nudge: v.boolean(), shown_price_sensitivity_nudge: v.boolean() }))`                              | Tracks whether a user has been shown specific contextual nudges to avoid repetition.                           |
 
 #### Embedded `socialProfile` Object
 
-| Field Name                    | Type                                     | Description                                                                          |
-| ----------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------ |
-| `first_name`                  | `v.string()`                             | User's public first name.                                                            |
-| `preferred_name`              | `v.optional(v.string())`                 | The name the user prefers to be called.                                              |
-| `bio`                         | `v.optional(v.string())`                 | A short public biography.                                                            |
-| `vibe_summary`                | `v.optional(v.string())`                 | AI-generated narrative summary of the user's profile.                                |
-| `gender`                      | `v.string()`                             | User's self-identified gender.                                                       |
-| `pronouns`                    | `v.optional(v.string())`                 | User's pronouns.                                                                     |
-| `interested_in`               | `v.array(v.string())`                    | Genders the user is interested in connecting with.                                   |
-| `occupation`                  | `v.optional(v.string())`                 | User's occupation.                                                                   |
-| `location`                    | `v.optional(v.string())`                 | General location (e.g., "Brooklyn, NY").                                             |
-| `social_profile_vector`       | `v.optional(v.array(v.float64()))`       | Vector embedding of this user's social profile, representing their "vibe" to others. |
-| `interests`                   | `v.optional(v.array(v.id("interests")))` | An array of interest IDs, replacing the `profile_interests` join table.              |
-| `liked_profiles`              | `v.optional(v.array(v.id("users")))`     | An array of user IDs that this user has liked.                                       |
-| `photos`                      | `v.array(v.object({ ... }))`             | An embedded array of profile photo objects.                                          |
-| `current_photo_url`           | `v.string()`                             | Denormalized URL of the main profile photo for quick access.                         |
-| `current_face_card_photo_url` | `v.string()`                             | Denormalized URL of the stylized Face Card.                                          |
+| Field Name                          | Type                                                                       | Description                                                                                                                                           |
+| ----------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `first_name`                        | `v.string()`                                                               | User's public first name.                                                                                                                             |
+| `preferred_name`                    | `v.optional(v.string())`                                                   | The name the user prefers to be called.                                                                                                               |
+| `bio`                               | `v.optional(v.string())`                                                   | A short public biography.                                                                                                                             |
+| `vibe_summary`                      | `v.optional(v.string())`                                                   | AI-generated narrative summary of the user's profile.                                                                                                 |
+| `gender`                            | `v.string()`                                                               | User's self-identified gender.                                                                                                                        |
+| `pronouns`                          | `v.optional(v.string())`                                                   | User's pronouns.                                                                                                                                      |
+| `interested_in`                     | `v.array(v.string())`                                                      | Genders the user is interested in connecting with.                                                                                                    |
+| `occupation`                        | `v.optional(v.string())`                                                   | User's occupation.                                                                                                                                    |
+| `location`                          | `v.optional(v.string())`                                                   | General location (e.g., "Brooklyn, NY").                                                                                                              |
+| `social_profile_vector`             | `v.optional(v.array(v.float64()))`                                         | Vector embedding of this user's social profile, representing their "vibe" to others.                                                                  |
+| `interests`                         | `v.optional(v.array(v.id("interests")))`                                   | An array of interest IDs, replacing the `profile_interests` join table.                                                                               |
+| `liked_profiles`                    | `v.optional(v.array(v.id("users")))`                                       | An array of user IDs that this user has liked.                                                                                                        |
+| `photos`                            | `v.array(v.object({ ... }))`                                               | An embedded array of profile photo objects.                                                                                                           |
+| `current_photo_url`                 | `v.string()`                                                               | Denormalized URL of the main profile photo for quick access.                                                                                          |
+| `current_face_card_photo_url`       | `v.string()`                                                               | Denormalized URL of the stylized Face Card.                                                                                                           |
+| `face_card_source_photo_url`        | `v.optional(v.string())`                                                   | The URL of the photo from the `photos` array that is currently being used as the base for the Face Card. Defaults to the first authentic photo taken. |
+| `unlocked_face_card_customizations` | `v.optional(v.array(v.object({ id: v.string(), notified: v.boolean() })))` | An array of objects tracking unlocked customizations and their notification status (e.g., `{id: "style:vintage", notified: false}`).                  |
 
 #### Embedded `hostProfile` Object
 
-| Field Name       | Type                                     | Description                                           |
-| ---------------- | ---------------------------------------- | ----------------------------------------------------- |
-| `host_type`      | `v.string()`                             | 'user' or 'community'.                                |
-| `host_name`      | `v.string()`                             | Public name of the host.                              |
-| `host_bio`       | `v.string()`                             | Biography specific to hosting activities.             |
-| `location_id`    | `v.optional(v.id("locations"))`          | The primary, physical location of a `community` host. |
-| `average_rating` | `v.optional(v.number())`                 | Calculated average from all event/host ratings.       |
-| `photos`         | `v.optional(v.array(v.object({ ... })))` | An embedded array of host brand/venue photos.         |
+| Field Name       | Type                                                                                                                           | Description                                                                                              |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
+| `host_type`      | `v.string()`                                                                                                                   | 'user' or 'community'.                                                                                   |
+| `host_name`      | `v.string()`                                                                                                                   | Public name of the host.                                                                                 |
+| `host_bio`       | `v.string()`                                                                                                                   | Biography specific to hosting activities.                                                                |
+| `location_id`    | `v.optional(v.id("locations"))`                                                                                                | The primary, physical location of a `community` host.                                                    |
+| `address`        | `v.optional(v.string())`                                                                                                       | The physical street address for a `community` host. Required for verification.                           |
+| `website_url`    | `v.optional(v.string())`                                                                                                       | The official website for a `community` host, used for verification.                                      |
+| `average_rating` | `v.optional(v.number())`                                                                                                       | Calculated average from all event/host ratings.                                                          |
+| `photos`         | `v.optional(v.array(v.object({ ... })))`                                                                                       | An embedded array of host brand/venue photos.                                                            |
+| `reliabilityLog` | `v.optional(v.array(v.object({ eventId: v.id("events"), actionType: v.string(), timestamp: v.number(), metadata: v.any() })))` | An array of log entries that tracks host reliability signals for internal review and automated flagging. |
 
 #### Embedded `internalMetrics` Object
 
@@ -161,11 +169,12 @@ A direct mapping of the `user_notification_settings` table fields, with defaults
 
 Captures phone numbers of individuals who are outside the initial launch area (non-US numbers) and have requested to be notified when Momento becomes available in their region. This collection is intentionally simple and separate from the main `users` collection as it stores data for unauthenticated potential users.
 
-| Column          | Type                   | Description                           |
-| --------------- | ---------------------- | ------------------------------------- |
-| `_id`           | `Id<"waitlist_users">` | Primary Key.                          |
-| `phone_number`  | `v.string()`           | The user's full phone number. Unique. |
-| `_creationTime` | `v.number()`           | Timestamp of when the user joined.    |
+| Column          | Type                   | Description                                     |
+| --------------- | ---------------------- | ----------------------------------------------- |
+| `_id`           | `Id<"waitlist_users">` | Primary Key.                                    |
+| `phone_number`  | `v.string()`           | The user's full phone number. Should be unique. |
+| `region_code`   | `v.string()`           | The country code prefix, e.g., "+44".           |
+| `_creationTime` | `v.number()`           | Timestamp of when the user joined.              |
 
 ---
 
@@ -208,23 +217,24 @@ Stores structured data for all physical locations used in event itineraries. It 
 
 The central entity representing a single gathering organized by a host. It serves as the aggregate root for an event's core details, its multi-stop `itinerary`, and any `collaborators`. The embedded `event_vector` is crucial for matching the event's 'vibe' with user interests.
 
-| Field Name             | Type                                     | Description                                               |
-| ---------------------- | ---------------------------------------- | --------------------------------------------------------- |
-| `_id`                  | `Id<"events">`                           | Primary Key.                                              |
-| `hostId`               | `v.id("users")`                          | Reference to the host user.                               |
-| `title`                | `v.string()`                             | Title of the event.                                       |
-| `description`          | `v.string()`                             | Detailed description of the event.                        |
-| `event_vector`         | `v.array(v.float64())`                   | Vector embedding for matching.                            |
-| `status`               | `v.string()`                             | 'draft', 'published', 'completed', 'cancelled'.           |
-| `min_attendees`        | `v.number()`                             |                                                           |
-| `max_attendees`        | `v.number()`                             |                                                           |
-| `age_min`              | `v.optional(v.number())`                 |                                                           |
-| `age_max`              | `v.optional(v.number())`                 |                                                           |
-| `arrival_signpost`     | `v.optional(v.string())`                 | Real-world cue for finding the group.                     |
-| `confirmation_fee`     | `v.number()`                             | Fee in cents to confirm attendance.                       |
-| `estimated_event_cost` | `v.any()`                                | JSON object for expected cost.                            |
-| `itinerary`            | `v.array(v.object({ ... }))`             | Embedded array of itinerary stops. See details below.     |
-| `collaborators`        | `v.optional(v.array(v.object({ ... })))` | Embedded array of event collaborators. See details below. |
+| Field Name             | Type                                                                                                                                                            | Description                                                                                                       |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `_id`                  | `Id<"events">`                                                                                                                                                  | Primary Key.                                                                                                      |
+| `hostId`               | `v.id("users")`                                                                                                                                                 | Reference to the host user.                                                                                       |
+| `title`                | `v.string()`                                                                                                                                                    | Title of the event.                                                                                               |
+| `description`          | `v.string()`                                                                                                                                                    | Detailed description of the event.                                                                                |
+| `event_vector`         | `v.array(v.float64())`                                                                                                                                          | Vector embedding for matching.                                                                                    |
+| `status`               | `v.string()`                                                                                                                                                    | 'draft', 'published', 'completed', 'cancelled', 'cancelled_by_host'.                                              |
+| `min_attendees`        | `v.number()`                                                                                                                                                    |                                                                                                                   |
+| `max_attendees`        | `v.number()`                                                                                                                                                    |                                                                                                                   |
+| `age_min`              | `v.optional(v.number())`                                                                                                                                        |                                                                                                                   |
+| `age_max`              | `v.optional(v.number())`                                                                                                                                        |                                                                                                                   |
+| `arrival_signpost`     | `v.optional(v.string())`                                                                                                                                        | Real-world cue for finding the group.                                                                             |
+| `confirmation_fee`     | `v.number()`                                                                                                                                                    | Fee in cents to confirm attendance.                                                                               |
+| `estimated_event_cost` | `v.any()`                                                                                                                                                       | JSON object for expected cost.                                                                                    |
+| `itinerary`            | `v.array(v.object({ ... }))`                                                                                                                                    | Embedded array of itinerary stops. See details below.                                                             |
+| `collaborators`        | `v.optional(v.array(v.object({ ... })))`                                                                                                                        | Embedded array of event collaborators. See details below.                                                         |
+| `event_summary`        | `v.optional(v.object({ final_headcount: v.number(), host_rating_avg: v.number(), event_rating_avg: v.number(), feedback_summary_ai: v.optional(v.string()) }))` | An embedded object populated after an event is completed, containing aggregated metrics for the host's dashboard. |
 
 #### Embedded `itinerary` Array of Objects
 
@@ -257,30 +267,30 @@ The central entity representing a single gathering organized by a host. It serve
 
 Represents the many-to-many relationship between users and events, tracking the lifecycle of an invitation from `sent` to `confirmed` or `declined`. It stores the system-generated `match_reason` to provide transparency to the user on why they were invited.
 
-| Field Name       | Type                       | Description                                 |
-| ---------------- | -------------------------- | ------------------------------------------- |
-| `_id`            | `Id<"invitations">`        | Primary Key.                                |
-| `eventId`        | `v.id("events")`           | Reference to the event.                     |
-| `userId`         | `v.id("users")`            | Reference to the invited user.              |
-| `status`         | `v.string()`               | 'sent', 'confirmed', 'declined', etc.       |
-| `decline_reason` | `v.optional(v.string())`   |                                             |
-| `match_reason`   | `v.optional(v.string())`   | System-generated explanation for the match. |
-| `duoId`          | `v.optional(v.id("duos"))` | Reference if part of a Duo invitation.      |
+| Field Name       | Type                       | Description                                                                                          |
+| ---------------- | -------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `_id`            | `Id<"invitations">`        | Primary Key.                                                                                         |
+| `eventId`        | `v.id("events")`           | Reference to the event.                                                                              |
+| `userId`         | `v.id("users")`            | Reference to the invited user.                                                                       |
+| `status`         | `v.string()`               | 'sent', 'confirmed', 'declined', 'cancelled_early', 'cancelled_late', 'pending_reconfirmation', etc. |
+| `decline_reason` | `v.optional(v.string())`   |                                                                                                      |
+| `match_reason`   | `v.optional(v.string())`   | System-generated explanation for the match.                                                          |
+| `duoId`          | `v.optional(v.id("duos"))` | Reference if part of a Duo invitation.                                                               |
 
 ### `attendance` Collection
 
-A record of a user's participation in an event. This collection is critical for community health, as it logs attendance statuses like `attended`, `no_show`, or `cancelled_late`, which directly inform a user's internal `absentee_rating`.
+A record of a user's participation in an event. This collection is critical for community health, as it logs attendance statuses like `attended`, `no_show`, or `cancelled_late`, which directly inform a user's internal `absentee_rating`. An early cancellation by a participant or a cancellation by the host should result in the deletion of the corresponding attendance record to free up the spot.
 
-| Field Name            | Type                     | Description                                   |
-| --------------------- | ------------------------ | --------------------------------------------- |
-| `_id`                 | `Id<"attendance">`       | Primary Key.                                  |
-| `eventId`             | `v.id("events")`         | Reference to the event.                       |
-| `userId`              | `v.id("users")`          | Reference to the attendee.                    |
-| `status`              | `v.string()`             | 'attended', 'cancelled_late', 'no_show', etc. |
-| `is_showcased`        | `v.boolean()`            | If true, featured in user's "Event DNA".      |
-| `check_in_latitude`   | `v.optional(v.number())` |                                               |
-| `check_in_longitude`  | `v.optional(v.number())` |                                               |
-| `reported_by_user_id` | `v.id("users")`          | Who reported the attendance status.           |
+| Field Name            | Type                     | Description                                                |
+| --------------------- | ------------------------ | ---------------------------------------------------------- |
+| `_id`                 | `Id<"attendance">`       | Primary Key.                                               |
+| `eventId`             | `v.id("events")`         | Reference to the event.                                    |
+| `userId`              | `v.id("users")`          | Reference to the attendee.                                 |
+| `status`              | `v.string()`             | 'confirmed', 'attended', 'cancelled_late', 'no_show', etc. |
+| `is_showcased`        | `v.boolean()`            | If true, featured in user's "Event DNA".                   |
+| `check_in_latitude`   | `v.optional(v.number())` |                                                            |
+| `check_in_longitude`  | `v.optional(v.number())` |                                                            |
+| `reported_by_user_id` | `v.id("users")`          | Who reported the attendance status.                        |
 
 ---
 
@@ -389,6 +399,7 @@ Acts as a permissions layer for the 'Social Connect' feature. A record in this c
 | `sharerId`   | `v.id("users")`            | The user initiating the share.                       |
 | `receiverId` | `v.id("users")`            | The user receiving the share.                        |
 | `platform`   | `v.string()`               | The platform of the link shared (e.g., 'instagram'). |
+| `shared_url` | `v.string()`               | A snapshot of the URL at the time of sharing.        |
 
 ### `event_photos` Collection
 
@@ -462,15 +473,16 @@ A simple but critical collection that stores a record of one user blocking anoth
 
 Logs formal reports submitted by one user against another for violations of community standards. These reports are reviewed by the moderation team and can lead to consequences like account suspension or banning.
 
-| Field Name   | Type                         | Description                                           |
-| ------------ | ---------------------------- | ----------------------------------------------------- |
-| `_id`        | `Id<"reports">`              | Primary Key.                                          |
-| `reporterId` | `v.id("users")`              | The user filing the report.                           |
-| `reportedId` | `v.id("users")`              | The user being reported.                              |
-| `eventId`    | `v.optional(v.id("events"))` | The event where the incident occurred, if applicable. |
-| `reason`     | `v.string()`                 | The category of the report (e.g., 'Harassment').      |
-| `comments`   | `v.string()`                 | A detailed description of the incident.               |
-| `status`     | `v.string()`                 | 'new', 'under_review', 'resolved'.                    |
+| Field Name            | Type                               | Description                                           |
+| --------------------- | ---------------------------------- | ----------------------------------------------------- |
+| `_id`                 | `Id<"reports">`                    | Primary Key.                                          |
+| `reporterId`          | `v.id("users")`                    | The user filing the report.                           |
+| `reportedId`          | `v.id("users")`                    | The user being reported.                              |
+| `eventId`             | `v.optional(v.id("events"))`       | The event where the incident occurred, if applicable. |
+| `associated_photo_id` | `v.optional(v.id("event_photos"))` | The photo being reported, if applicable.              |
+| `reason`              | `v.string()`                       | The category of the report (e.g., 'Harassment').      |
+| `comments`            | `v.string()`                       | A detailed description of the incident.               |
+| `status`              | `v.string()`                       | 'new', 'under_review', 'resolved'.                    |
 
 ---
 
@@ -478,33 +490,4 @@ Logs formal reports submitted by one user against another for violations of comm
 
 This collection tracks the `$5 Confirmation Fee` for events, which is the core of the monetization model.
 
-### `payments` Collection
-
-Tracks the transaction for the `$5 Confirmation Fee` that a user pays to secure their spot at an event. This is the core of the monetization model and provides a record of all payments made through the platform, linking the user, the event, and the Stripe transaction ID.
-
-| Field Name              | Type             | Description                                     |
-| ----------------------- | ---------------- | ----------------------------------------------- |
-| `_id`                   | `Id<"payments">` | Primary Key.                                    |
-| `userId`                | `v.id("users")`  | The user who made the payment.                  |
-| `eventId`               | `v.id("events")` | The event for which the payment was made.       |
-| `amount`                | `v.number()`     | The payment amount in cents (e.g., 500).        |
-| `status`                | `v.string()`     | 'succeeded', 'failed', 'refunded'.              |
-| `provider`              | `v.string()`     | The payment provider, e.g., 'stripe'.           |
-| `providerTransactionId` | `v.string()`     | The unique charge ID from the payment provider. |
-
----
-
-## 10. Notifications
-
-### `push_notification_tokens` Collection
-
-Stores the push notification tokens for each of a user's devices. Since a user can be logged in on multiple devices, this one-to-many relationship is modeled separately to ensure notifications can be delivered to all active devices.
-
-| Field Name    | Type                             | Description                       |
-| ------------- | -------------------------------- | --------------------------------- |
-| `_id`         | `Id<"push_notification_tokens">` | Primary Key.                      |
-| `userId`      | `v.id("users")`                  |                                   |
-| `token`       | `v.string()`                     | The push token from Expo. Unique. |
-| `device_info` | `v.optional(v.string())`         | e.g., "iPhone".                   |
-
-The `user_notification_settings` table is now embedded directly in the `users` document.
+### `

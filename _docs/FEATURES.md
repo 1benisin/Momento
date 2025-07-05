@@ -7,8 +7,12 @@ This document is organized into the following sections.
   - [The Authentic Photo](#the-authentic-photo)
   - [User Verification](#user-verification)
 - [2. Monetization & Payments](#2-monetization--payments)
-- [3. Hosting](#3-hosting)
+- [3. Hosting & Event Creation](#3-hosting--event-creation)
+  - [Host Types & Onboarding](#host-types--onboarding)
+  - [Switching Between Social & Host Modes](#switching-between-social--host-modes)
+  - [Publishing Events: The Verification Gate](#publishing-events-the-verification-gate)
   - [Host Tools & Controls](#host-tools)
+  - [The Event Lifecycle (Host's View)](#the-event-lifecycle-host's-view)
 - [4. Interest Building Flow: The Momento Preview](#4-interest-building-flow-the-momento-preview)
 - [5. The Invitation](#5-the-invitation)
   - [Algorithm Transparency: The "Why"](#algorithm-transparency-the-why)
@@ -27,8 +31,8 @@ This document is organized into the following sections.
 - [11. Shared Event Galleries & Camera Roll](#11-shared-event-galleries--camera-roll)
 - [12. User Safety: Blocking & Reporting](#12-user-safety-blocking--reporting)
   - [A Three-Tiered System](#a-three-tiered-system)
+  - [Contacting Support](#contacting-support)
   - [Community Reliability: Cancellations & No-Shows](#community-reliability-cancellations--no-shows)
-  - [Reporting & Consequence Framework](#reporting--consequence-framework)
 - [13. Discovering Your Interests](#13-discovering-your-interests)
 - [14. Discovering Your Type](#14-discovering-your-type)
 - [15. Notifications](#15-notifications)
@@ -58,7 +62,7 @@ User profiles will contain three categories of information:
 To showcase a user's personality beyond a simple list of hobbies, profiles will feature an "Interest Constellation." This data visualization moves beyond superficial tags to show the multifaceted nature of a user's character.
 
 - **How it Works:** The backend will analyze a user's full spectrum of activity to identify 2-3 distinct "personas" (e.g., "Thrill Seeker," "Cozy Creative," "Intellectual Explorer"). While this process begins with explicit signals from the "Discover Your Interests" feature, it is continuously refined by real-world behavior. The system gives more weight to implicit, high-commitment actions—like attending an event and rating it highly.
-- **Profile Visualization:** On the user's profile, these personas will be displayed as a minimalist, interactive constellation graphic. Each major "star" represents a persona. Tapping on a star could reveal the key concepts or types of experiences that define it (e.g., tapping "Thrill Seeker" might show keywords like `Rock Climbing`, `Live Music`, `Spontaneous Travel`).
+- **Profile Visualization:** On the user's profile, these personas will be displayed as a minimalist, interactive constellation graphic. Each major "star" represents a "persona" (a neighborhood in the underlying data) that the user has an affiliation with. The larger the similarity or closeness to, or affinity for, that particular cluster of data points that has been given a name (a persona), the larger or brighter the star appears in their constellation. Tapping on a star could reveal the key concepts or types of experiences that define it (e.g., tapping "Thrill Seeker" might show keywords like `Rock Climbing`, `Live Music`, `Spontaneous Travel`). Figuring out how to visually display this underlying set of data as a constellation will be a future thing to figure out.
 - **Impact:** This feature provides a rich, at-a-glance understanding of a user's character, showing _how_ their interests connect rather than just _what_ they are. It emphasizes depth and multifaceted personality, aligning with Momento's core value of fostering genuine connection.
 
 ### Kudos Showcase
@@ -130,21 +134,71 @@ To build a foundation of trust and authenticity, Momento will include a feature 
   - Secure endpoints to handle payment intent creation and confirmation.
   - Webhooks to listen for payment status updates from Stripe (e.g., `charge.succeeded`).
 
-## 3. Hosting
+## 3. Hosting & Event Creation
 
-- Individuals and organizations can both create and host events.
-- Hosts will have a dedicated Host Profile with ratings from past events.
-- **Host Tools**:
-  - Access to information and best practices for creating highly-rated events.
-  - Insights from feedback on previous successful events.
-  - A notification 15 minutes after their event starts, informing them if any attendees have not yet checked in.
-- **Host Controls**:
-  - Hosts must be present at their events; they can be both host and participant. They can also be a business host.
-  - **Minimum Age:** Hosts can set a minimum age requirement for their event (e.g., 21+). Our matching algorithm will not match users who do not meet this requirement.
-  - **Host as Attendee:** A checkbox on the event creation screen for the host to indicate they will be participating in the event, not just organizing it. If selected, the host will occupy one spot, counting towards the `max_participants` limit. They are automatically considered "confirmed" for the event and are exempt from the $5 event fee. This option is only available for hosts who also have a participant social profile.
-  - **Public Social Links for Hosts**: `User Hosts` have the option to make specific social media profiles public on their Host Profile. This allows potential attendees to vet the host and get a better sense of their style and offerings, building trust and transparency. `Community Hosts` (venues, organizations) can also publicly display links like their official website or Instagram page.
-  - **Event Itinerary:** Hosts can build dynamic events with one or more stops. For each stop, they must define both a **start time** and an **end time**, and can add a location by either searching for a venue or business (e.g., a restaurant via Google Maps) or dropping a precise pin on the map for locations without a formal address (e.g., a specific spot in a park). This ensures a clear schedule for attendees and for calendar integrations.
-  - **Collaborators:** Hosts can add other people involved in the event, such as a co-host, instructor, or guide. If the collaborator is a Momento user, the host can link directly to their profile. If they are not, the host can simply enter their name and role. This provides clarity and recognizes everyone contributing to the experience.
+This section details the features and flows for users who create and manage events on the Momento platform.
+
+### Host Types & Onboarding
+
+Momento supports two types of hosts, each with a distinct onboarding path. The `host_type` ('user' or 'community') is set during this initial process and determines the required profile information.
+
+- **User Hosts:** This is an existing Momento participant who wants to start hosting events.
+  - **The Entry Point:** The journey begins with a "Become a Host" Call to Action (CTA) prominently displayed on their main `ProfileTab`.
+  - **The Onboarding Flow:** This CTA launches a simple flow that first explains the benefits of hosting (e.g., "Share your passions," "Meet like-minded people") and then guides them through creating a `hostProfile`.
+  - **Smart Profile Creation:** To create a seamless experience, the user's `hostProfile` is pre-populated with their existing `socialProfile.first_name` as the default `host_name`, which they can then edit.
+  - **Unlocking Host Mode:** The moment a user successfully creates their `hostProfile`, they are officially considered a `Hybrid User`. The `ModeSwitcher` component immediately becomes visible on their `ProfileTab`, granting them access to their new hosting tools.
+- **Community Hosts:** This is a business, venue, or organization signing up for the first time. They use a separate sign-up flow requiring an email and password and must provide details like a business address and website for their `hostProfile`. They can also begin drafting events immediately after setup.
+
+### Switching Between Social & Host Modes
+
+For users who are both participants and hosts (`Hybrid Users`), the application provides a `ModeSwitcher` to ensure the interface remains clean and contextually relevant. This control prevents UI clutter by presenting only the tools needed for the user's current goal.
+
+- **The Control:** A `ModeSwitcher` component is displayed on the `ProfileTab` for any user who has both a `socialProfile` and a `hostProfile`.
+- **The Mechanism:** When a user toggles between "Social Mode" and "Host Mode," the app updates the `users.active_role` field in the database to either `'social'` or `'host'`. This choice is persisted across sessions.
+- **The Impact:** The value of `active_role` acts as a global state that dictates the entire navigation structure. It determines which version of the main tab bar is rendered, ensuring that a user in "Host Mode" sees their hosting dashboard, event management tools, and host inbox, while a user in "Social Mode" sees their invitations, Memory Book, and social discovery feeds. This separation creates a focused and intuitive experience for users who wear multiple hats in the Momento ecosystem.
+
+### Publishing Events: The Verification Gate
+
+To ensure the safety and trust of the community, all hosts must be verified before they can make an event public.
+
+- **The Rule:** A host cannot change an event's status from `'draft'` to `'published'` unless their `users.is_verified` status is `true`.
+- **The Process:** The verification is handled via **Stripe Identity**. Both `User Hosts` and `Community Hosts` will be prompted by a persistent `VerificationPromptBanner` in their hosting dashboard to complete this step.
+- **The Implementation:** This rule is enforced on the backend through a validation check in the "publish event" mutation. The UI will also reflect this by disabling the "Publish" button on the `ManageEventScreen` for unverified hosts, with a tooltip explaining the requirement.
+
+### The Event Lifecycle (Host's View)
+
+This section describes the end-to-end journey for a host managing a single event.
+
+1.  **Drafting:** The initial creation stage where the host defines all event details, itinerary, and collaborators. The event is only visible to the host.
+2.  **Published & Matching:** After the host publishes the event, its status changes, and it becomes eligible for the matching algorithm. The backend now actively finds and sends invitations to well-matched users.
+3.  **Confirmed & Upcoming:** Once the event reaches its `min_attendees` threshold, it is officially confirmed. The host can now see a live headcount of confirmed attendees on the `ManageEventScreen` and has the ability to message them for any pre-event coordination.
+4.  **Event Day & Check-in:** On the day of the event, the host uses their version of the "Deck of Cards" UI to see who has arrived and to check them in, ensuring an accurate record of attendance.
+5.  **The "Wrap-Up" (Post-Event):**
+    - **Attendance Confirmation:** In a 24-hour window after the event's end time, the host is prompted to confirm the final attendance list via the `AttendanceConfirmationList` component. They must mark any confirmed attendees who were "No-Shows". This action is the final source of truth for applying `absentee_rating` penalties.
+    - **Viewing Feedback:** After submitting the final attendance, the host unlocks the `PastEventSummaryScreen`. Here they can view the aggregated feedback for the event, including average ratings and an AI-generated summary of all written comments.
+
+### Handling Host-Initiated Event Changes
+
+To handle cases where a host needs to modify a published event, this flow ensures attendees are informed and treated fairly.
+
+- **Defining a Material Change:** A "material change" is defined as any modification to an event's **date, time, or location**. Changes to text fields like title or description do not trigger this flow.
+- **The Host's Experience:** When a host saves a material change to a published event, they are shown a `HostEditWarningModal`. This modal explains that all confirmed attendees will be notified and given the option to cancel for a full refund, but their spots are otherwise secure. Upon confirmation, an entry is added to the host's `reliabilityLog`.
+- **The Attendee's Experience:**
+  1.  All confirmed attendees are immediately notified of the change via Push Notification and SMS.
+  2.  The attendee's `invitation.status` is updated to `pending_reconfirmation`.
+  3.  On the `EventDetailScreen`, the attendee sees the `EventChangeConfirmationModal`, which clearly displays the "before" and "after" of the change.
+  4.  The attendee can choose to "Keep My Spot" (which reverts their status to `confirmed`) or "Cancel & Get Refund". There is no deadline, and if the user does nothing, their spot remains secure.
+- **Host Accountability:** The `reliabilityLog` allows the system to track patterns of behavior. If a host frequently changes or cancels events, especially close to the start time, the system can automatically trigger warnings or flag the account for manual review to protect the community experience.
+
+### Host Tools & Controls
+
+- **Host Profile:** All hosts have a dedicated public profile with their name, bio, and average rating from past events.
+- **Insights & Best Practices:** Hosts will have access to information and best practices for creating highly-rated events, along with insights from feedback on their own previous events.
+- **Minimum Age:** Hosts can set a minimum age requirement for their event (e.g., 21+). Our matching algorithm will not match users who do not meet this requirement.
+- **Host as Attendee:** A checkbox on the event creation screen for the host to indicate they will be participating in the event, not just organizing it. If selected, the host will occupy one spot, counting towards the `max_participants` limit. They are automatically considered "confirmed" for the event and are exempt from the $5 event fee. This option is only available for hosts who also have a participant social profile.
+- **Public Social Links:** `User Hosts` and `Community Hosts` can make specific social media profiles or websites public on their Host Profile. This builds trust and allows attendees to vet the host.
+- **Event Itinerary:** Hosts can build dynamic events with one or more stops. For each stop, they must define both a **start time** and an **end time**, and can add a location by either searching for a venue (via Google Maps) or dropping a precise pin on the map.
+- **Collaborators:** Hosts can add other people involved in the event, such as a co-host or instructor. If the collaborator is a Momento user, the host can link directly to their profile.
 
 > **Future Enhancement (Phase 2):** > **Feature:** Event Encore Signals.
 > **Rationale:** To encourage hosts to repeat successful events, we can provide them with anonymous, aggregated feedback. On their dashboard, a host could see a highly-rated past event with a note like "✨ 26 people have expressed interest in an event like this again!" This signal would be sourced from "likes" on the event in the public Discovery Feed.
@@ -203,7 +257,7 @@ To avoid misinterpreting a user's reason for declining an event, the app will as
 - **"I'm busy that day"**: This signals a logistical conflict, not a lack of interest. The user's interest profile will not be negatively affected.
 - **"This event isn't for me"**: This is a strong negative signal. The event's characteristics will be used to update the user's `negative_interest_vector`, making them less likely to see similar events.
 - **"I'm looking to try new things"**: This is an explicit request for variety. The algorithm will temporarily increase the "exploration" factor for this user, prioritizing events outside their typical interests.
-- **"Too far away"** or **"Too expensive"**: This signals a logistical or financial mismatch. It does not negatively affect the user's interest profile. Instead, it triggers a **Contextual Nudge**, a one-time prompt asking the user if they'd like to set their travel or price preferences to receive more relevant invitations in the future.
+- **"Too far away"** or **"Too expensive"**: This signals a logistical or financial mismatch. It does not negatively affect the user's interest profile. Instead, if the user has not been prompted before (tracked via the `contextualNudges` object), it triggers a **`PreferencePromptModal`**. This one-time prompt asks if they'd like to set their travel or price preferences to receive more relevant invitations. After they interact with the prompt (either setting the preference or dismissing it), the system flags that nudge as seen to prevent it from reappearing.
 - **"The vibe doesn't feel right"**: A softer "no" that can be logged for analytics without heavily penalizing the event type in the user's profile.
 
 > **Future Enhancement (Phase 3):** > **Feature:** AI-Generated Animated Invitations.
@@ -231,6 +285,7 @@ This is not a traditional "+1" feature. It is a pre-declared pact between two ex
 - **Pre-emptive, Not Reactive:** Duos are formed _before_ an invitation is sent. Users proactively declare, "For our next adventure, we want to go together."
 - **A Shared Journey:** The system's goal is no longer just to find an event for one person, but to find the perfect event that bridges the worlds of two people.
 - **Privacy-First:** Duos are formed by searching for friends via a user's phone contacts, ensuring users can find their real-world friends without turning Momento into a generic social network with searchable user lists. The `MemoryBook` remains a sacred space for connections made _at_ Momento events.
+- **One Pact at a Time:** To keep the experience simple and clear, a user can only have one active (or pending) Duo pact at a time. They cannot send or receive new invitations until the existing pact is fulfilled or expires.
 
 ### The Duo Lifecycle
 
@@ -240,14 +295,25 @@ This is not a traditional "+1" feature. It is a pre-declared pact between two ex
 4.  **The Paired Invitation:** When the algorithm finds an event that is a strong match for the Duo's composite interests, a special "Paired Invitation" is sent to both users simultaneously. The `MatchReasonBanner` will explicitly mention the partnership: _"We found an event that bridges your love for **Hiking** with David's interest in **Japanese Cuisine**."_
 5.  **Individual Acceptance:** Once the Paired Invitation is sent each user can now accept or decline the invitation individually. If one friend declines, the other can still accept and attend, preserving their own opportunity to connect. The curated group dynamic is slightly altered, but this prioritizes individual user freedom.
 
-## 7. Event Preferences & Filtering
+## 7. Event Preferences: Hard Filters & Soft Preferences
 
-To give users more control over their invitations and reduce noise, Momento provides a set of powerful, optional preferences. These are introduced contextually when a user declines an event for a related reason, rather than overwhelming them during onboarding.
+To give users more control over their invitations and reduce noise, Momento provides a set of powerful, optional preferences on a single `EventPreferencesScreen`. These settings are introduced contextually when a user declines an event for a related reason, rather than overwhelming them during onboarding.
+
+This screen is divided into two distinct types of settings to give users both fine-grained control and flexibility.
+
+### Hard Filters (Exclusion Rules)
+
+These are strict rules that will **exclude** a user from receiving an invitation. Setting these may significantly reduce the number of invites a user sees, but ensures those they do see are highly relevant to their logistics and budget.
 
 - **Distance Preference**: Users can set a maximum travel radius from their home (e.g., 5, 10, or 25 miles). The matching algorithm will use this as a **hard filter**, meaning the user will not receive invitations for events outside this radius.
 - **Price Sensitivity**: Users can select a general price comfort level (e.g., $, $$, $$$). This is also a **hard filter**. The app will only show them events whose `Estimated Event Cost` falls within their selected range.
 
-These features ensure that the invitations a user sees are not only a good match for their interests but also for their real-world logistics and budget.
+### Soft Preferences (Matching Signals)
+
+These preferences act as powerful signals to the matching algorithm. They do not exclude a user from seeing an event, but they will heavily influence their `MatchScore`, making it much more likely they receive invitations that fit their schedule and lifestyle. This aligns with the `LeadTimePenalty` and `AvailabilityPenalty` logic in the `MATCHING_ALGORITHM.md` document.
+
+- **Ideal Lead Time**: Users can set their preferred minimum notice for event invites (e.g., "at least 3 days in advance"). An event with less notice isn't filtered out, but it will be penalized in the matching score.
+- **Weekly Availability**: Users can set their general availability for each day and night of the week (e.g., "available Tuesday evenings," "unavailable on weekends"). An event on a less-preferred day will be penalized in the matching score but not entirely excluded.
 
 ## 8. The Arrival Experience: The Signal
 
@@ -315,8 +381,13 @@ The core of the Memory Book is the **Face Card**, a dynamic, collectible memento
 
 1.  **The First Event & The First Photo:** When checking in to their first event, an attendee will be prompted to take an in-app photo. This is for identification, ensuring other guests can find them. This raw, authentic photo becomes their very first Face Card, which might feature a special "First Event" badge.
 2.  **The Immutable Snapshot:** When this Face Card is added to another attendee's Memory Book, it is stored as an **immutable snapshot**. It will forever look exactly as it did at that first meeting, preserving the memory. Even if the original user updates their own Face Card later, it will not change in the Memory Books of those who have already collected it.
-3.  **Styling & Upgrades:** After the event, the user unlocks the ability to "stylize" their Face Card, transforming their authentic photo into a piece of art using Momento's signature AI-driven style.
-4.  **Customization:** Over time, users can earn or unlock new ways to customize their Face Card, such as decorative borders or frames or new image stylizations, by reaching milestones (e.g., hosting their first event, attending five events, receiving high ratings).
+3.  **Styling & Upgrades:** After their first event, the user unlocks the ability to "stylize" their Face Card. This is done on the `FaceCardStylingScreen`, where they can transform their authentic photo into a piece of art using Momento's curated set of artistic filters. Users can preview these styles and revert to a previous design if they wish.
+4.  **Changing the Source Photo:** While the first Face Card is generated from the initial in-app photo, users can change the source image at any time on the `FaceCardStylingScreen`. They can select any of their other verified `photos` to create a new look.
+5.  **Unlocking Customizations:** Over time, users can earn new ways to customize their Face Card by reaching community milestones. This gamifies positive participation and provides a visual representation of a user's journey.
+    - **Attend 3 Events:** Unlocks "Vintage" and "Monochrome" photo styles.
+    - **Receive 10 Kudos:** Unlocks a decorative "Gilded" border.
+    - **Host Your First Event:** Unlocks an exclusive "Curator" frame.
+      When a user unlocks a new item, they are notified via a non-interruptive `CustomizationUnlockToast`.
 
 ### Memory Book Functionality
 
@@ -386,46 +457,75 @@ To build a safe and trustworthy community, users will have access to a multi-tie
 
     - **Functionality:** This is a hard stop for all direct interaction between two users.
     - **User Experience:** When User A blocks User B, the action is silent (User B is not notified).
+
       - User A and User B are immediately and mutually removed from each other's Memory Book.
       - All messaging capabilities between them are disabled.
-      - The system will permanently prevent them from being matched in any future event.
+      - The system will permanently prevent them from being matched in any future event. When one user blocks another, neither user will be able to see the other's profile, content, or receive messages from them.
       - Users will have a "Blocked Users" list in their app settings to manage and, if they choose, unblock individuals.
+
+    - **Blocking in an Event Context:** To prevent logistical issues with upcoming events, the block feature has a specific safeguard:
+      - If a user attempts to block another user with whom they share a confirmed, upcoming event (e.g., a participant blocking the host, or vice-versa), the action will be disallowed.
+      - The user will be shown a `BlockActionErrorModal` explaining that they cannot block the person until after the event is over. They are given the alternative option to cancel their attendance if they do not feel safe.
+      - This rule does not apply to past events or events where the user is not a confirmed attendee.
 
 3.  **Community Violation: "Report"**
     - **Functionality:** This is a formal flag raised to the Momento review team when a user has violated community standards. Reporting a user automatically triggers a "Block" as described above.
     - **User Experience:** To discourage misuse and ensure quality reports, the process is structured and educational.
       - **Guided Flow:** The user is asked to categorize the violation from a predefined list (e.g., Harassment, Inappropriate Content, Misrepresentation, In-Person Misconduct).
       - **Educational Messaging:** The interface will provide clear examples of what constitutes a reportable offense, while also presenting the "Block" feature as the appropriate tool for situations that don't violate guidelines (e.g., "I just didn't enjoy their vibe").
-      - **Managed Expectations:** The app will clearly state that a review team will assess the report and take appropriate action based on the evidence and our internal policies.
+      - **Managed Expectations:** The app will clearly state that a review team will assess the report and take appropriate action based on our internal policies.
+
+### Contacting Support
+
+To ensure users can always get help, Momento provides clear channels for contacting support, accessible to both logged-in and locked-out users.
+
+- **Authenticated Support:**
+
+  - **Access Point:** Logged-in users can access the `HelpCenterScreen` from their settings.
+  - **Process:** From here, they can open a structured support ticket. The system automatically attaches their user ID and other diagnostic metadata, allowing the support team to quickly understand the context of the issue. This is the standard path for general questions, bug reports, and payment issues.
+
+- **Unauthenticated Support (For Locked-Out Users):**
+  - **Access Point:** A "Contact Support" link is available on the main `AuthScreen`.
+  - **Process:** This link leads to a simplified public support form that does not require login. Users must manually provide their account-identifying information (e.g., phone number) and their issue. This flow is critical for account recovery scenarios where a user cannot log in to use the standard support channel.
 
 ### Community Reliability: Cancellations & No-Shows
 
-To protect the quality of events and respect the commitment of hosts and fellow attendees, Momento has a clear, non-refundable cancellation policy. This framework is designed to create a reliable and committed community.
+To protect the quality of events and respect the commitment of hosts and fellow attendees, Momento has a clear cancellation policy. This framework is designed to create a reliable and committed community.
 
-- **Non-Refundable Fee:** The $5 event confirmation fee is **non-refundable** in all cancellation scenarios initiated by the participant. This fee represents a commitment to attend.
+#### Participant-Initiated Cancellations
 
-- **Exception for Host-Initiated Changes:** The non-refundable policy has one critical exception: if a host makes a material change to the event (e.g., time, location) after a user has confirmed and paid, the fee becomes fully refundable. The user will be notified and given the choice to accept the new details or receive an automatic, one-click refund. This ensures users are protected from last-minute changes outside their control.
+The system distinguishes between several scenarios, each with a different impact on a user's internal `absentee_rating`. The $5 event confirmation fee is **non-refundable** in all cancellation scenarios initiated by the participant.
 
-The system distinguishes between several scenarios, each with a different impact on a user's internal `absentee_rating`:
+1.  **The Cancellation Flow:** A confirmed attendee can cancel their spot from the `EventDetailScreen`. They will be presented with a `ParticipantCancelModal` that clearly explains the consequences of their action before they confirm.
 
-1.  **Early Cancellation (Outside 24 hours of event start)**
+2.  **Early Cancellation (Outside 24 hours of event start)**
 
-    - **Action:** User cancels via the app.
-    - **Outcome:** No penalty to their internal rating. The system will attempt to fill the vacant spot by sending a new, time-sensitive invitation to another well-matched user.
+    - **Outcome:** No penalty to their internal rating. The system will attempt to fill the vacant spot by sending a new, time-sensitive "Last-Minute Invitation" to another well-matched user. This invitation will have a short expiry (e.g., 1-2 hours) to ensure the spot is filled quickly.
 
-2.  **Late Cancellation (Within 24 hours of event start)**
+3.  **Late Cancellation (Within 24 hours of event start)**
 
-    - **Action:** User cancels via the app.
     - **Outcome:** A **moderate penalty** is applied to the user's `absentee_rating`. This is seen as less reliable than an early cancellation. The spot will not be filled.
 
-3.  **The "No-Show"**
+4.  **Dynamic Duo Cancellations:** If one member of an active Duo cancels their attendance (either early or late), it does not affect the other member. The remaining partner is still confirmed and can attend the event as planned.
 
-    - **Action:** The user does not cancel and does not check in to the event. They are marked as a no-show by the host or other attendees during post-event feedback.
-    - **Outcome:** A **severe penalty** is applied to the user's `absentee_rating`.
+#### Host-Initiated Cancellations
 
-4.  **The "Check-in & Bail" (Worst-Case Scenario)**
-    - **Action:** The user checks in upon arrival (or spoofs their location) and then leaves the event without participating. This is the most disruptive behavior as it misleads the host and attendees.
-    - **Outcome:** This must be reported by the host or another attendee post-event. It results in the **most severe penalty** to a user's `absentee_rating` and, if repeated, could lead to temporary suspension from the platform.
+While hosts are encouraged to see their events through, sometimes cancellations are unavoidable.
+
+1.  **The Cancellation Flow:** A host can cancel their event from the `ManageEventScreen`. They must confirm this action in a `HostCancelConfirmationModal`, which makes it clear the action is irreversible and triggers refunds.
+2.  **Attendee Refunds:** When a host cancels, all confirmed attendees will automatically receive a **full refund** of their $5 Confirmation Fee.
+3.  **Attendee Notifications:** All confirmed attendees will be notified immediately via **Push Notification and SMS** that the event was cancelled by the host and that their refund has been processed.
+4.  **Host Accountability:** The cancellation is logged. While occasional cancellations are understandable, repeated or last-minute cancellations will trigger a manual review of the host's account to maintain community trust.
+
+#### The "No-Show"
+
+- **Action:** The user does not cancel and does not check in to the event. They are marked as a no-show by the host or other attendees during post-event feedback.
+- **Outcome:** A **severe penalty** is applied to the user's `absentee_rating`.
+
+#### The "Check-in & Bail" (Worst-Case Scenario)
+
+- **Action:** The user checks in upon arrival (or spoofs their location) and then leaves the event without participating. This is the most disruptive behavior as it misleads the host and attendees.
+- **Outcome:** This must be reported by the host or another attendee post-event. It results in the **most severe penalty** to a user's `absentee_rating` and, if repeated, could lead to temporary suspension from the platform.
 
 > **💡 Design Philosophy: The "Cost of a Handshake"**
 >
@@ -433,6 +533,7 @@ The system distinguishes between several scenarios, each with a different impact
 >
 > - **It Represents Commitment:** The small financial stake elevates the RSVP from a casual "maybe" to a firm commitment, which is the foundation of a reliable community. It ensures that when a user accepts, they have skin in the game, just like the host who is investing their time and effort.
 > - **It Simplifies the System:** A universal no-refund policy eliminates the complexity of tiered refunds, payment processor fees for reversals, and potential user confusion. The rule is simple and applies to everyone equally.
+> - **Exception for Host-Initiated Changes or Cancellations:** The non-refundable policy has one critical exception: if a host makes a material change to the event (e.g., time, location) or cancels it entirely after a user has confirmed and paid, the fee becomes fully refundable. This ensures users are protected from last-minute changes outside their control.
 > - **It Defines Our "Worst Case":** We've defined the worst-case scenario not as someone who doesn't show up, but as someone who shows up and _then_ bails. This is the most damaging action to the social fabric of an event. Our penalty system is weighted to reflect this, punishing deception more than absence. By having users commit financially, we can focus our "punishments" on the behavioral metrics that truly matter for community health.
 
 ### Reporting & Consequence Framework

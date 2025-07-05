@@ -16,27 +16,39 @@ The application will be organized into several key user flows and screen groups.
 ### 1. Onboarding & Authentication Flow
 
 - **`SplashScreen`**: Initial launch screen.
-- **`AuthScreen`**: Options for "Log In", "Sign Up", and "Become a Host".
+- **`AuthScreen`**: Options for "Log In", "Sign Up", and "Become a Host". This screen also includes a small, less prominent "Contact Support" link in the footer for users who are locked out or unable to sign in.
+- **`UnauthenticatedSupportScreen`**: A simple, public-facing form for users who cannot log in.
+  - **Accessed From**: The "Contact Support" link on the `AuthScreen`.
+  - **Fields**: A basic form with fields for `name`, `reply_to_email`, `phone_number` (to identify their account), and a `body` for their message.
+  - **Functionality**: This form submits to a public Convex `httpAction` that creates a `support_tickets` document without requiring user authentication.
 - **`SignUpFlow (Participant)`**:
   - `PhoneInputScreen`: For entering a US-based phone number. If the number is already registered, the user is diverted to the `PhoneNumberConflictScreen` instead of the `OTPScreen`.
   - `PhoneNumberConflictScreen`: A screen that asks the user if they are the original owner of the account associated with the phone number, forking the user flow.
   - `OTPScreen`: For entering the one-time password received via SMS to verify the phone number.
+    - **Error State**: Displays messages like "Invalid code, please try again."
+    - **"Resend Code" Button**: Appears after a cooldown (e.g., 30 seconds). Tapping it triggers a new SMS. If abused (e.g., >3 attempts), the button is disabled for a longer period.
   - `SecondFactorAuthScreen`: A screen that prompts an existing user on a new device to verify their identity through a secondary method (e.g., recovery email, ID verification).
   - `ProfileSetupScreen`: For entering initial public profile information (name, bio).
   - `InitialPhotoScreen`: For taking or uploading the first profile photo. This may include a prompt to use the in-app camera to earn an "Authentic" badge.
+    - **Permission Denied State**: If camera permission is denied, the UI hides the "Take Photo" button and emphasizes the "Upload from Library" option.
   - `InterestDiscoveryScreen`: A swipeable deck of "Possibility Cards" to establish the user's initial interest vectors. This is designed to feel like an adventure, not a survey.
 - **`LoginScreen`**: For returning users to sign in using their phone number and a one-time password.
 - **`InternationalWaitlistScreen`**: A screen that informs non-US users that Momento is not yet available in their country and invites them to join a waitlist.
+  - **Success State**: After a user successfully joins the waitlist, the UI provides immediate feedback. The "Notify Me" button becomes disabled and its text changes to "You're on the list!".
 - **`AIOnboardingInterviewScreen` (Future)**: A guided, AI-driven voice conversation to conduct a user interview, as an enhancement to the standard `InterestBuilderScreen`.
 
 ### 2. Host Onboarding Flow (for Organizations)
 
-- **`HostSignUpScreen`**: For hosts to sign up with an email and password.
-- **`HostProfileSetupScreen`**: A dedicated flow for hosts to enter their organization or venue name, bio, and address, and upload brand photos (logo, venue pictures) for their `host_profiles` record.
+- **`CommunityHostSignUpScreen`**: For new `Community Hosts` to sign up with an email and password. This leads into the `HostProfileSetupScreen`.
+- **`HostProfileSetupScreen`**: A dedicated screen for `Community Hosts` to enter their organization name, bio, address, website, and upload brand photos.
+- **`UserHostOnboardingFlow`**: A multi-step flow for existing participants to become a host, launched from a CTA on their `ProfileTab`.
+  1.  **`HostBenefitsScreen`**: Showcases the value proposition of hosting.
+  2.  **`HostProfileCreationScreen`**: A simple form to confirm their `host_name` (pre-populated) and add a `host_bio`. Sets `host_type` to `'user'`.
+  3.  **`HostOnboardingCompleteScreen`**: A final screen congratulating the user, directing them to the new `ModeSwitcher`, and providing a strong CTA to begin identity verification.
 
 ### 3. Core App Navigation (Tab Bar)
 
-_This tab bar represents the primary navigation. The visible tabs and their functionality are determined by the user's active **mode**. A `Hybrid User` can switch between these modes, while single-role users will have a static view._
+_This tab bar represents the primary navigation. Its layout and functionality are determined by the `users.active_role` field, which defaults to `'social'`. For users with only one role (e.g., `Social-Only`), this view is static. For `Hybrid Users` (those with both `socialProfile` and `hostProfile`), this `active_role` can be changed using the `ModeSwitcher` component, which dynamically re-renders the tab bar to match the selected context._
 
 #### Social Mode Navigation
 
@@ -49,7 +61,7 @@ _This is the view for `Social-Only` and `Hybrid` users who are in "Social Mode."
   - **People Mode**: The "Help us Discover your Type" flow, with a swipeable deck of user profiles.
 - **`MemoryBookTab`**: Gallery of "Face Cards" for every person met.
 - **`MessagesTab`**: List of all 1-on-1 conversations with other participants.
-- **`ProfileTab`**: The user's own `Social Profile`. This is the entry point for `Settings` and contains the **`ModeSwitcher`** component for `Hybrid Users`.
+- **`ProfileTab`**: The user's own `Social Profile`. This is the entry point for `Settings` and the `UserHostOnboardingFlow` (via a "Become a Host" CTA). It contains the **`ModeSwitcher`** component for `Hybrid Users`.
 
 #### Host Mode Navigation
 
@@ -64,7 +76,7 @@ _This is the view for `Host-Only` and `Hybrid` users who are in "Host Mode." It 
 
 - **`InvitationDetailScreen`**: Displays all details for a pending event invitation. It prominently features the `MatchReasonBanner` at the top to immediately personalize the experience.
 - **`EventDetailScreen`**: A multi-state screen for a confirmed event.
-  - **Upcoming State**: Shows full itinerary, logistics, collaborator info, and a clear `CostBreakdown` component that separates the **Confirmation Fee** (paid to Momento) from the **Estimated Event Cost** (paid to the host/venue).
+  - **Upcoming State**: Shows full itinerary, logistics, collaborator info, and a clear `CostBreakdown` component that separates the **Confirmation Fee** (paid to Momento) from the **Estimated Event Cost** (paid to the host/venue). For confirmed attendees, this state also includes a "Cancel Attendance" button.
   - **Arrival State**: Reveals the "Deck of Cards" UI for check-in once at least two attendees have arrived.
   - **Post-Event State**: Hub for feedback, messaging, the shared photo gallery, and an event-specific message board (`EventPostFeed`).
 
@@ -78,6 +90,14 @@ _This is the view for `Host-Only` and `Hybrid` users who are in "Host Mode." It 
   - Display of any social media links shared by the other user.
 - **`UserProfileScreen`**: The public profile view of another user, featuring their photos, bio, their `InterestConstellation`, a `KudosShowcase`, their `EventDNAGallery`, and an optional `VibeSummary`.
 - **`FaceCardStylingScreen`**: Where a user can apply AI-driven styles, borders, and other customizations to their Face Card photo after an event.
+  - **Locked State**: For users who have not yet attended an event, this screen is view-only, showing a preview of the feature with a message explaining how to unlock it.
+  - **Unlocked State**: After attending their first event, all controls are enabled.
+  - **Components**:
+    - `FaceCardPreview`: A large preview of the Face Card that updates in real-time.
+    - `SourcePhotoSelector`: A horizontal carousel of the user's verified profile photos.
+    - `StyleSelector`: A grid of available photo styles (e.g., "Vintage"). Locked styles are visually disabled and show their unlock criteria (e.g., "Attend 3 Events").
+    - `BorderSelector`: A grid for available borders and frames, which also shows locked/unlocked states.
+    - `ApplyChangesButton`: A button to save the changes, which shows a loading indicator while the new image is being generated and saved.
 - **`ShareSocialsModal`**: A modal launched from the `ConnectionDetailScreen` that allows a user to select which of their saved social media links they want to share with a specific connection.
 - **`InterestDiscoveryScreen`**: The swipeable deck of `PastEventCard` components used to discover a user's interests. This screen has two distinct states:
   - **Calibration State**: The initial state for a new user. It displays the `CalibrationProgressBar` and is focused on gathering signals from a diverse set of events.
@@ -92,7 +112,7 @@ _This is the view for `Host-Only` and `Hybrid` users who are in "Host Mode." It 
   - **Event Albums**: A list of all attended events, acting as shortcuts to each `SharedEventGalleryScreen`.
     _Note: This screen is for participants. Business hosts manage their photos from the `HostDashboardScreen`._
 - **`InAppNotificationBanner`**: A banner/toast for displaying notifications while the user is inside the app.
-- **`ModeSwitcher`**: A UI control, likely a dropdown or segmented control in the `ProfileTab`, that allows a `Hybrid User` to toggle between "Social Mode" and "Host Mode."
+- **`ModeSwitcher`**: A UI control (e.g., a segmented control) located on the `ProfileTab` for `Hybrid Users`. It is only rendered for users who have both a `socialProfile` and a `hostProfile`. Its state is tied directly to the `users.active_role` field in the database. When the user selects a mode ('Social' or 'Host'), the component triggers a backend mutation to update this field. The app's root navigation component listens to changes in this value to dynamically render the appropriate tab bar layout (`Social Mode Navigation` or `Host Mode Navigation`).
 
 ### 6. Settings & User Management
 
@@ -111,12 +131,13 @@ _Handles core, private settings tied to the `users` account._
   - **`BlockedUsersScreen`**: A sub-screen to view and manage blocked users.
   - **`VerificationScreen`**: The UI flow for identity verification.
 - **`PaymentMethodsScreen`**: For adding/removing payment methods.
+  - **Error State**: If a payment fails (e.g., during first event confirmation), the screen displays a non-blocking toast/banner with a clear error message like, "Payment failed. Please check your card details or try another method."
 - **`TransactionHistoryScreen`**: For viewing past payments made to Momento.
 - **`NotificationSettingsScreen`**: A single, consolidated screen for managing all push and SMS preferences. The UI on this screen will be grouped by context (e.g., "Social & Connections," "Host Notifications") as defined in `_docs/3_engineering/NOTIFICATIONS_PLAN.md`.
 - **`LegalScreen`**: Contains links to legal and policy documents.
   - **`PrivacyPolicyScreen`**: A screen displaying the company's privacy policy.
   - **`TermsOfServiceScreen`**: A screen displaying the company's terms of service.
-- **`HelpCenterScreen`**: The entry point for contacting support.
+- **`HelpCenterScreen`**: The entry point for contacting support. For logged-in users, it contains a "Contact Support" button that opens the standard, authenticated support ticket form. It may also contain links to FAQs.
 
 ---
 
@@ -127,9 +148,11 @@ _Manages the user's public identity as an event attendee and their discovery pre
 - **`EditProfileScreen`**: For updating the user's public-facing social profile (`preferred_name`, `bio`, etc.).
 - **`CameraRollScreen`**: To manage personal photos and access shared event albums.
 - **`FaceCardStylingScreen`**: To customize the visual style of the `FaceCard`.
-- **`InvitationPreferencesScreen`**: For "soft" preferences like ideal event lead-time and weekly availability.
-- **`EventPreferencesScreen`**: For "hard" filters like max travel distance and price sensitivity. This screen is the destination for contextual nudges.
+- **`EventPreferencesScreen`**: A unified screen for managing all event-related preferences, divided into two sections:
+  - **Hard Filters**: Contains the `DistancePreferenceSlider` and `PriceSensitivitySelector`. This section has prominent helper text explaining these are strict exclusion rules.
+  - **Soft Preferences**: Contains the `NoticePreferenceSlider` for ideal lead time and the `AvailabilityGrid` for setting detailed day-and-night availability.
 - **`MySocialLinksScreen`**: For managing private social media links that can be shared one-to-one with connections.
+- **`HelpCenterScreen`**: The entry point for contacting support. For logged-in users, it contains a "Contact Support" button that opens the standard, authenticated support ticket form. It may also contain links to FAQs.
 
 ---
 
@@ -150,18 +173,16 @@ _A dynamic tab that is only visible to users with a `host_profiles` record._
 
 ### 7. Hosting Flow
 
-- **`HostDashboardScreen`**: A dashboard for hosts to manage their events.
-- **`CreateEventFlow`**: A multi-step process for creating and defining a new event. The flow must support:
-  - Defining event details (title, description, age limits, etc.).
-  - Setting a real-world `arrival_signpost` cue for attendees.
-  - Building a detailed itinerary with multiple `ItineraryStop` components (each with a location, start time, and end time).
-  - Adding co-hosts or instructors via the `CollaboratorInput`.
-- **`ManageEventScreen`**: The host's view for managing an active or upcoming event.
-- **`CollaboratorSearchScreen`**: A sub-screen or modal for hosts to find and add collaborators by searching for other Momento users.
+- **`HostDashboardScreen`**: A summary view showing key lifetime metrics (total revenue, overall average rating) and a list of the next 3 upcoming events with their current headcount. It will also display a persistent `VerificationPromptBanner` if the host is not yet verified.
+- **`CreateEventFlow`**: A multi-step process for creating and defining a new event.
+- **`ManageEventScreen`**: The host's primary screen for managing an active or upcoming event. It includes an "Edit Event" button that, upon saving a material change, triggers the `HostEditWarningModal`. During the post-event "Wrap-Up" phase, this screen will display the `AttendanceConfirmationList` component. It will also display the `VerificationPromptBanner` if the host is not yet verified.
+- **`PastEventSummaryScreen`**: A read-only screen where a host can view the details and feedback from a completed event. It visually displays the metrics from the `event_summary` object, including final attendance, average ratings, and an AI-generated summary of comments.
+- **`CollaboratorSearchScreen`**: A modal for hosts to find and add collaborators by searching for other Momento users.
 
 ### 8. Safety & Moderation
 
 - **`ReportAndBlockModal`**: Presents the user with clear options to "Block" or "Report" another user.
+- **`AttendanceConfirmationList`**: An interactive component displayed on the `ManageEventScreen` during the post-event "Wrap-Up" phase. It shows a list of all confirmed attendees and allows the host to mark users as a "No-Show".
 
 ### 9. Discovery & Content
 
@@ -175,15 +196,31 @@ This section catalogs the reusable UI elements that form the building blocks of 
 
 ### Modals & Overlays
 
+- **`BlockActionErrorModal`**: A modal displayed when a user attempts to block another user but is disallowed by a system rule (e.g., they are both confirmed for the same upcoming event).
+  - **Title**: "Cannot Block User"
+  - **Body**: "You and [User's Name] are both confirmed for '[Event Title]' which is happening soon. To ensure a smooth experience for everyone, you cannot block this user until after the event. If you don't feel comfortable attending, you can still cancel your spot."
+  - **Buttons**: "Cancel Attendance" (navigates to the cancellation flow) and "OK" (dismisses the modal).
+- **`CustomizationUnlockToast`**: A non-interruptive toast notification that appears when a user unlocks a new Face Card customization. It displays a message like "🎉 You've unlocked the 'Gilded' border!" and includes an optional "Customize Now" button that deep-links to the `FaceCardStylingScreen`.
 - **`DeclineFeedbackModal`**: A modal presented after a user declines an invitation, asking for a reason. Includes options for "Too short notice," "Too far away," and "Too expensive."
-- **`EventChangeConfirmationModal`**: A modal that appears when a host has made a material change to an event (e.g., time or location) after an attendee has already confirmed. It clearly states the change and gives the user the choice to "Keep My Spot" or "Cancel & Request Refund".
-- **`ContextualNudgeModal`**: A one-time, educational modal that appears after a user action (like declining an event for being "Too far away") to deep-link them to a relevant setting.
+- **`EventChangeConfirmationModal`**: A modal shown to an attendee after a host makes a material change to an event. It must clearly display the "before" and "after" of the change (e.g., "Time changed from **7 PM** to **8 PM**"). The buttons are clearly labeled "Keep My Spot" and "Cancel & Get Refund", and there is no deadline or countdown.
+- **`HostCancelConfirmationModal`**: A modal for a host who initiates an event cancellation. It requires them to confirm the action is irreversible and acknowledges that all attendees will be notified and fully refunded.
+- **`HostEditWarningModal`**: A confirmation dialog shown to a host after they save a material change to an event. It forces them to acknowledge that all attendees will be notified and given the option to cancel for a full refund before the change is finalized.
 - **`MatchReasonBanner`**: An elegant banner displayed prominently on the `InvitationDetailScreen`. It's designed to feel insightful and personal, not like a system debug message. It features a small icon (e.g., ✨) and a short, friendly text that explains why the user was invited to this specific event.
+- **`ParticipantCancelModal`**: A modal for a participant who initiates a cancellation. The content dynamically changes based on the timing:
+  - **Early Cancellation:** A soft warning reminding the user that the $5 fee is non-refundable but confirming there is no rating penalty.
+  - **Late Cancellation:** A stronger warning explicitly stating that the action will negatively impact their `absentee_rating` and that the fee is non-refundable.
+- **`PreferencePromptModal`**: A one-time, educational modal triggered by specific user actions (like declining an event for being "Too far away"). Its content is dynamic based on the trigger.
+  - **Example (Distance Trigger):**
+    - **Title:** "Tired of the Commute?"
+    - **Body:** "You can set a maximum travel distance to only get invites for events near you. This can be changed at any time."
+    - **Buttons:** "Set Travel Preference" and "Maybe Later".
+  - **Behavior:** Both buttons dismiss the modal and trigger a backend mutation to mark the nudge as seen, ensuring it doesn't appear again.
 
 ### Indicators & Badges
 
 - **`ShortNoticeBadge`**: A small, non-intrusive badge displayed on invitation cards for events with a lead-time shorter than the user's preference.
 - **`DuoBadge`**: A visual indicator (e.g., a overlay element over a corner of the card like a passport stamp) displayed on a `FaceCard` within the `DeckOfCardsAttendee` UI. This badge signals to other attendees that the two users have joined the event as a pre-formed pair.
+- **`VerificationPromptBanner`**: A persistent banner displayed at the top of the `HostDashboardScreen` and `ManageEventScreen` for unverified hosts. It contains a message like "Verify your identity to publish your first event" and a "Get Verified" button that launches the Stripe Identity verification flow.
 
 ### Domain-Specific Components
 
@@ -215,7 +252,6 @@ This section catalogs the reusable UI elements that form the building blocks of 
   - `$$` (e.g., $15 - $40)
   - `$$$` (e.g., $40 - $75)
   - `$$$$` (e.g., $75+)
-- **`DayWeekendToggle`**: A simple toggle or segmented control for setting basic "Weekday" vs. "Weekend" availability preferences.
-- **`AvailabilityGrid`**: A 7x2 grid for setting detailed availability preferences for each day and night of the week. Activated via an "Advanced" dropdown in the `InvitationPreferencesScreen`.
+- **`AvailabilityGrid`**: A 7x2 grid for setting detailed availability preferences for each day and night of the week. It directly manipulates the structured `availability_preferences` object in the user's data model.
 
 - **`AIHypeManModal` (Future)**: A modal that can be triggered before an event to build a user's confidence with personalized conversation starters and reminders of their positive qualities, as described in the marketing strategy.
