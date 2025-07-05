@@ -74,7 +74,6 @@ This is the highest level of testing, simulating a complete user journey through
 - **How it works:** The script performs critical user flows from start to finish (e.g., sign-up and onboarding, accepting an event invitation). These tests will interact with the real Convex backend in a staging environment.
 - **Recommended Tools:**
   - **Maestro:** A modern, simple-to-use E2E testing framework. Its declarative YAML syntax makes tests easy to write and maintain, making it the preferred choice for Momento.
-  - **Detox:** A more powerful, but more complex, JavaScript-based alternative.
 - **Role:** E2E tests provide the highest level of confidence that critical user paths are working as expected in a real-world environment. Due to their slow speed and potential for flakiness, they should be used sparingly for the most business-critical flows.
 
 ---

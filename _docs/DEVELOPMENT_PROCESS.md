@@ -130,31 +130,23 @@ Here's how the LLM-assisted, 3-step process fits into this professional structur
 
 ### Step 1: Define the Epic (The PRD)
 
-1.  **Create the Epic Folder**: When you decide on the next feature (e.g., "User Profiles"), you create the next numbered folder: `/_epics/001-user-profile-v1/`.
-2.  **Generate the PRD**: Have your LLM assistant generate the Product Requirements Document. Save this file as `/_epics/001-user-profile-v1/prd.md`.
-3.  **Create a GitHub Issue**:
-    - Go to your repository's "Issues" tab.
-    - Create a new issue titled: `[Epic] User Profile V1 - #001`.
-    - In the issue description, link directly to the PRD file in your repository. This connects the work tracker to the specification.
+1.1 **Create the Epic Folder**: When you decide on the next feature (e.g., "User Profiles"), you create the next numbered folder: `/_epics/001-user-profile-v1/`.
+1.2 **Generate the PRD**: Have your LLM assistant generate the Product Requirements Document. Save this file as `/_epics/001-user-profile-v1/prd.md`.
 
 ### Step 2: Define the Tasks
 
-1.  **Generate the Task List**: Have your LLM break down the `prd.md` into a list of actionable development tasks. Save this as `/_epics/001-user-profile-v1/tasks.md`.
-2.  **Populate the GitHub Issue**:
-    - Go back to the GitHub Issue you created.
-    - Use GitHub's task list feature to copy-paste the tasks from your `tasks.md` file into the issue description.
+2.1 **Generate the Task List**: Have your LLM break down the `prd.md` into a list of actionable development tasks. Save this as `/_epics/001-user-profile-v1/tasks.md`.
 
 ### Step 3: Implement the Feature
 
-1.  **Create a Feature Branch**: Your development work starts here. Create a branch from `main` using the epic's ID:
-    ```bash
+3.1 **Create a Feature Branch**: Your development work starts here. Create a branch from `main` using the epic's ID:
+`bash
     git checkout main
     git pull
     git checkout -b feature/001-user-profile
-    ```
-2.  **Code & Commit**: Do the development work. Your commit messages can even reference the epic ID for clarity (e.g., `git commit -m "feat(profile): create profile view screen #001"`).
-3.  **Create a Pull Request (PR)**: When the work is ready for review, open a PR.
-    - **Link the Issue**: In the PR description, use a GitHub keyword like `Closes #123` (where `#123` is the ID of your Epic issue). This automatically links the PR to the issue.
+    `
+3.2 **Code & Commit**: Do the development work. Your commit messages can even reference the epic ID for clarity (e.g., `git commit -m "feat(profile): create profile view screen #001"`).
+3.3 **Create a Pull Request (PR)**: When the work is ready for review, open a PR.
 
 ## Getting Started
 

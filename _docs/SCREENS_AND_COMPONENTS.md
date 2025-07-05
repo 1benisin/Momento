@@ -9,9 +9,26 @@ This document outlines the application's UI, broken down into two main parts:
 
 This document outlines the high-level structure of the Momento application, detailing the screens and, eventually, the reusable components that will form the UI. This serves as a blueprint for development.
 
-## Screens
+## Table of Contents
 
-The application will be organized into several key user flows and screen groups.
+- **[Screens](#screens)**
+  - [1. Onboarding & Authentication Flow](#1-onboarding--authentication-flow)
+  - [2. Host Onboarding Flow (for Organizations)](#2-host-onboarding-flow-for-organizations)
+  - [3. Core App Navigation (Tab Bar)](#3-core-app-navigation-tab-bar)
+  - [4. Invitation & Event Details](#4-invitation--event-details)
+  - [5. Connection & Profile Details](#5-connection--profile-details)
+  - [6. Settings & User Management](#6-settings--user-management)
+  - [7. Hosting Flow](#7-hosting-flow)
+  - [8. Safety & Moderation](#8-safety--moderation)
+  - [9. Discovery & Content](#9-discovery--content)
+- **[Components](#components)**
+  - [10. Modals & Overlays](#10-modals--overlays)
+  - [11. Indicators & Badges](#11-indicators--badges)
+  - [12. Domain-Specific Components](#12-domain-specific-components)
+  - [13. Dynamic Duos](#13-dynamic-duos)
+  - [14. Controls & Inputs](#14-controls--inputs)
+
+## Screens
 
 ### 1. Onboarding & Authentication Flow
 
@@ -194,7 +211,7 @@ _A dynamic tab that is only visible to users with a `host_profiles` record._
 
 This section catalogs the reusable UI elements that form the building blocks of the application's screens.
 
-### Modals & Overlays
+### 10. Modals & Overlays
 
 - **`BlockActionErrorModal`**: A modal displayed when a user attempts to block another user but is disallowed by a system rule (e.g., they are both confirmed for the same upcoming event).
   - **Title**: "Cannot Block User"
@@ -216,13 +233,13 @@ This section catalogs the reusable UI elements that form the building blocks of 
     - **Buttons:** "Set Travel Preference" and "Maybe Later".
   - **Behavior:** Both buttons dismiss the modal and trigger a backend mutation to mark the nudge as seen, ensuring it doesn't appear again.
 
-### Indicators & Badges
+### 11. Indicators & Badges
 
 - **`ShortNoticeBadge`**: A small, non-intrusive badge displayed on invitation cards for events with a lead-time shorter than the user's preference.
 - **`DuoBadge`**: A visual indicator (e.g., a overlay element over a corner of the card like a passport stamp) displayed on a `FaceCard` within the `DeckOfCardsAttendee` UI. This badge signals to other attendees that the two users have joined the event as a pre-formed pair.
 - **`VerificationPromptBanner`**: A persistent banner displayed at the top of the `HostDashboardScreen` and `ManageEventScreen` for unverified hosts. It contains a message like "Verify your identity to publish your first event" and a "Get Verified" button that launches the Stripe Identity verification flow.
 
-### Domain-Specific Components
+### 12. Domain-Specific Components
 
 - **`InterestConstellation`**: An interactive, minimalist graphic displayed on a user's profile. It visualizes their core "interest personas" as stars in a constellation. Tapping a star reveals keywords and concepts related to that persona (e.g., "Adventurous Side: Hiking, Spontaneous Travel"). This component provides a rich, at-a-glance view of a user's character.
 - **`KudosShowcase`**: A UI component that displays a user's top 2-3 most-received peer-to-peer kudos as elegant badges or icons (e.g., "Welcoming Vibe," "Great Listener"). It provides a qualitative, authentic summary of their social character, validated by others. The design should gracefully handle states with few or no kudos.
@@ -235,7 +252,7 @@ This section catalogs the reusable UI elements that form the building blocks of 
 - **`CalibratedStateIndicator`**: A UI component that replaces the `CalibrationProgressBar` on the `ProfileDiscoveryScreen` once the initial calibration is complete. It could be a simple checkmark icon with text like _"Thanks, your compass is calibrated! We're now sorting people we think you'll connect with to the top."_
 - **`PersonaRevealSummary`**: A UI component used on the `InterestDiscoveryScreen` after a user completes the "Calibration State." It presents the names of the 1-3 "Interest Personas" the algorithm has identified (e.g., "Thrill Seeker," "Cozy Creative") and serves as the transition into the "Refinement State." It's a moment of insight designed to make the user feel understood.
 
-### 6. Dynamic Duos
+### 13. Dynamic Duos
 
 - **`DuoHomeScreen`**: A central hub for managing Duo pacts. It would feature tabbed navigation for:
   - **Active Duo**: Shows the current Duo partner and the pact's expiration date.
@@ -243,7 +260,7 @@ This section catalogs the reusable UI elements that form the building blocks of 
   - **Past Duos**: A history of previous Duo partnerships and the events attended together.
 - **`FormDuoScreen`**: A screen that, after getting user permission, accesses the phone's contacts to display a list of friends who are also on Momento, allowing the user to select one to send a Duo invitation to.
 
-### Controls & Inputs
+### 14. Controls & Inputs
 
 - **`NoticePreferenceSlider`**: A slider control allowing users to set their ideal lead-time for event invitations (from 0 to 14 days).
 - **`DistancePreferenceSlider`**: A slider control allowing a user to set their maximum travel distance for events (e.g., 1-25 miles). Ideally, this control would be overlaid on a map that visually adjusts a circle representing their travel radius from their home address.
