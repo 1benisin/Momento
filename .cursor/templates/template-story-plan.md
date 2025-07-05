@@ -110,7 +110,7 @@ interface User {
 
 ### C. Project Structure
 
-_Diagram of the folder and file organization structure, highlighting new files to be created._
+_Diagram of the folder and file organization structure, highlighting files that might be touched and new files to be created._
 
 ```
 /src
@@ -120,7 +120,7 @@ _Diagram of the folder and file organization structure, highlighting new files t
         ├── service.ts    <-- CREATE THIS FILE
         ├── tests/
         │   └── service.test.ts <-- CREATE THIS FILE
-        └── types.ts      <-- CREATE THIS FILE
+        └── types.ts      <-- TOUCH THIS FILE
 ```
 
 ### D. Implementation Tasks
@@ -182,17 +182,6 @@ _The test cases are defined in section 2.A. This command runs them._
 npx jest src/features/new-feature/tests/service.test.ts
 
 # If failing: Read error, understand root cause, fix code, re-run.
-```
-
-### Level 3: Integration Test
-
-```bash
-# After starting the service, run this test:
-curl -X POST http://localhost:3000/users \
-  -H "Content-Type: application/json" \
-  -d '{"name": "Test User", "email": "test@example.com", "password": "password123"}'
-
-# Expected: HTTP/1.1 201 Created
 ```
 
 ---

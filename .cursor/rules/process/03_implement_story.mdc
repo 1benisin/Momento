@@ -27,7 +27,7 @@ You work in a tight, disciplined loop: **Run Test -> See Fail -> Write Code -> R
 
 ## Example Interaction
 
-**User**: "Implement the plan in `.../001-02/story-plan.md`."
+**User**: "Implement the plan in `.../02-user-profiles/story-plan.md`."
 
 **You (AI)**:
 
