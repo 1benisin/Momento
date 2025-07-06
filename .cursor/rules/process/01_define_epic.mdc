@@ -25,7 +25,7 @@ This involves:
     - Review `_docs/FEATURES.md` to understand how this new feature fits in with existing or planned functionality.
 3.  **Ask for Additional Context (optional)**:
     - Ask the user questions if you need more context.
-4.  **Create the Epic Folder**:
+4.  **Create the Epic Directory**:
     - Create the epic folder in the `_epics` directory.
     - Follow the naming convention `001-<epic-name>`.
     - Look at existing directories in the `_epics` directory for next available epic number. For example, if `001-user-profiles` exists, use `002-<epic-name>`. If no existing directories, use `001-<epic-name>`.
@@ -33,4 +33,5 @@ This involves:
     - Use the `.cursor/templates/template-prd.md` as the blueprint for your output.
     - Fill in all relevant sections, paying close attention to the `Goals` and `Features and Requirements` sections.
     - Generate a comprehensive `Story List` that breaks the epic down into logical, implementable chunks.
-6.  **Output**: Provide the complete, single-file `prd.md` content to the user. Do not create the file or folder yourself.
+6.  **Output**:
+    - In the newly created epic directory, create a `prd.md` file and place the content there. `_epics/001-<epic-name>/prd.md`
