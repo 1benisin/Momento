@@ -18,7 +18,7 @@ Defines the **what** and **why** of the product. Here you'll find our project ov
 Focuses on the **user experience and interface**. This includes our design principles, user flows, and component specifications.
 
 - **[DESIGN.md](./DESIGN.md)**: Outlines the visual design system, including color palettes, typography, and overall aesthetic principles.
-- **[USER_FLOWS.md](./USER_FLOWS.md)**: Maps out the step-by-step journeys users take to accomplish tasks within the app.
+- **[User Journey Maps](./USER_FLOWS/README.md)**: Maps out the step-by-step journeys users take to accomplish tasks within the app.
 - **[SCREENS_AND_COMPONENTS.md](./SCREENS_AND_COMPONENTS.md)**: Provides detailed specifications for each screen and the reusable UI components.
 
 ### Engineering
