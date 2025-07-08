@@ -1,0 +1,20 @@
+appId: com.1benisin.Momento
+---
+- launchApp:
+    clearState: true
+- tapOn: "http://localhost:8081"
+- tapOn: "Continue"
+- tapOn:
+    text: "Go home"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "app-ready"
+- tapOn:
+    text: "+1..."
+- inputText: "+15555551235" # A random number guaranteed not to exist
+- tapOn: "Sign In"
+- assertVisible: "Account Not Found"
+- assertVisible: "Create Account"
+- tapOn: "Create Account"
+- assertVisible: "Already have an account? Sign in"

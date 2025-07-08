@@ -1,0 +1,25 @@
+appId: com.1benisin.Momento
+---
+- launchApp:
+    clearState: true
+- tapOn: "http://localhost:8081"
+- tapOn: "Continue"
+- tapOn:
+    text: "Go home"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "app-ready"
+- tapOn:
+    text: "+1..."
+- inputText: "6613338990" # <-- IMPORTANT: Replace with a real test account phone number
+- tapOn: "Sign In"
+- extendedWaitUntil:
+    visible: "Verification Code"
+    timeout: 10000
+- tapOn:
+    text: "Code..."
+- inputText: "YOUR_OTP_CODE" # <-- IMPORTANT: You will get this via SMS and have to enter it manually while the test is paused, or use a service that can read SMS.
+- tapOn: "Verify"
+- assertVisible: "Tab One" # Verifies that we landed on the main screen
+- assertVisible: "Sign Out"
