@@ -64,8 +64,20 @@
   - [x] 4.5 Add navigation links between the sign-in and sign-up pages.
   - [x] 4.6 Create a `SignOutButton.tsx` component that calls `signOut()` from the `useClerk()` hook.
 
-- [ ] 5.0 **Cleanup and Final Integration**
-  - [ ] 5.1 Delete all deprecated files and tests listed at the top of this document.
-  - [ ] 5.2 Go through the app and replace any UI that relied on the old auth system with Convex's `<Authenticated>` and `<Unauthenticated>` components to conditionally render content.
-  - [ ] 5.3 Ensure the `SignOutButton` is accessible to authenticated users.
-  - [ ] 5.4 Manually test the full sign-up, sign-out, and sign-in flow.
+- [x] 5.0 **Cleanup and Final Integration**
+
+  - [x] 5.1 Delete all deprecated files and tests listed at the top of this document.
+  - [x] 5.2 Go through the app and replace any UI that relied on the old auth system with Convex's `<Authenticated>` and `<Unauthenticated>` components to conditionally render content.
+  - [x] 5.3 Ensure the `SignOutButton` is accessible to authenticated users.
+  - [x] 5.4 Manually test the full sign-up, sign-out, and sign-in flow.
+
+- [x] 6.0 **Finalize UI and Routing**
+
+  - [x] 6.1 In `app/_layout.tsx`, implement a component that checks the authentication state using `useConvexAuth`.
+    - [x] This component should show a loading indicator while the auth state is being determined.
+    - [x] It should use `expo-router`'s `useRouter` and `useEffect` to navigate the user.
+    - [x] If the user is authenticated, it should navigate them to the `(tabs)` group.
+    - [x] If the user is not authenticated, it should navigate them to the `(auth)` group (i.e., `/sign-in`).
+  - [x] 6.2 In `app/(auth)/_layout.tsx`, confirm that an already authenticated user is redirected to `/(tabs)` if they land on an auth screen.
+  - [x] 6.3 Add the `<SignOutButton />` to one of the screens inside the `(tabs)` group, like `app/(tabs)/index.tsx`, to allow for testing the complete authentication lifecycle.
+  - [x] 6.4 Manually re-test the entire authentication flow to confirm that the routing now works as expected.

@@ -1,5 +1,5 @@
 import { useSignUp } from "@clerk/clerk-expo";
-import { Link, useRouter } from "expo-router";
+import { Link, useLocalSearchParams, useRouter } from "expo-router";
 import * as React from "react";
 import {
   Text,
@@ -7,20 +7,26 @@ import {
   TouchableOpacity,
   View,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 
 export default function SignUpScreen() {
   const { isLoaded, signUp, setActive } = useSignUp();
   const router = useRouter();
+  const { phone } = useLocalSearchParams<{ phone: string }>();
 
-  const [phoneNumber, setPhoneNumber] = React.useState("");
+  const [phoneNumber, setPhoneNumber] = React.useState(phone || "");
   const [pendingVerification, setPendingVerification] = React.useState(false);
   const [code, setCode] = React.useState("");
+  const [error, setError] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState(false);
 
   const onSignUpPress = async () => {
-    if (!isLoaded) {
+    if (!isLoaded || loading) {
       return;
     }
+    setLoading(true);
+    setError(null);
 
     try {
       // Create the user on Clerk
@@ -35,18 +41,28 @@ export default function SignUpScreen() {
       setPendingVerification(true);
     } catch (err: any) {
       console.error("Error signing up:", JSON.stringify(err, null, 2));
+      setError(
+        err.errors?.[0]?.longMessage || "An error occurred during sign up."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   const onVerifyPress = async () => {
-    if (!isLoaded) {
+    if (!isLoaded || loading) {
       return;
     }
+    setLoading(true);
+    setError(null);
 
     try {
-      const { createdSessionId } = await signUp.attemptPhoneNumberVerification({
+      const result = await signUp.attemptPhoneNumberVerification({
         code,
       });
+      console.log("Sign up attempt result:", JSON.stringify(result, null, 2));
+
+      const { createdSessionId } = result;
 
       if (createdSessionId) {
         // If the sign-up was successful, set the active session and redirect
@@ -54,10 +70,15 @@ export default function SignUpScreen() {
         router.push("/(tabs)");
       } else {
         // Handle cases where sign-up is not complete
-        console.error("Could not complete sign up.");
+        setError(
+          "Could not complete sign up. Please check the code and try again."
+        );
       }
     } catch (err: any) {
       console.error("Error verifying code:", JSON.stringify(err, null, 2));
+      setError(err.errors?.[0]?.longMessage || "Invalid verification code.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -73,9 +94,18 @@ export default function SignUpScreen() {
             onChangeText={setPhoneNumber}
             style={styles.input}
           />
-          <TouchableOpacity onPress={onSignUpPress} style={styles.button}>
-            <Text style={styles.buttonText}>Sign Up</Text>
+          <TouchableOpacity
+            onPress={onSignUpPress}
+            style={styles.button}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <Text style={styles.buttonText}>Sign Up</Text>
+            )}
           </TouchableOpacity>
+          {error && <Text style={styles.errorText}>{error}</Text>}
           <Link href="/sign-in" asChild>
             <TouchableOpacity style={styles.link}>
               <Text>Already have an account? Sign in</Text>
@@ -92,9 +122,18 @@ export default function SignUpScreen() {
             onChangeText={setCode}
             style={styles.input}
           />
-          <TouchableOpacity onPress={onVerifyPress} style={styles.button}>
-            <Text style={styles.buttonText}>Verify</Text>
+          <TouchableOpacity
+            onPress={onVerifyPress}
+            style={styles.button}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <Text style={styles.buttonText}>Verify</Text>
+            )}
           </TouchableOpacity>
+          {error && <Text style={styles.errorText}>{error}</Text>}
         </View>
       )}
     </View>
@@ -136,5 +175,11 @@ const styles = StyleSheet.create({
   link: {
     marginTop: 15,
     alignItems: "center",
+  },
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    marginTop: 10,
+    marginBottom: 10,
   },
 });

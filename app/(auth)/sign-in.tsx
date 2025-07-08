@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 
 export default function SignInScreen() {
@@ -16,11 +17,19 @@ export default function SignInScreen() {
   const [phoneNumber, setPhoneNumber] = React.useState("");
   const [pendingVerification, setPendingVerification] = React.useState(false);
   const [code, setCode] = React.useState("");
+  const [error, setError] = React.useState<string | null>(null);
+  const [accountNotFound, setAccountNotFound] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
 
   const onSignInPress = async () => {
-    if (!isLoaded) {
+    if (!isLoaded || loading) {
       return;
     }
+    setLoading(true);
+
+    // Reset previous error states
+    setError(null);
+    setAccountNotFound(false);
 
     try {
       // Start the sign-in process, asking for a phone number.
@@ -47,20 +56,32 @@ export default function SignInScreen() {
       }
     } catch (err: any) {
       console.error("Error starting sign in:", JSON.stringify(err, null, 2));
-      // Optionally, show an error message to the user
+      const clerkError = err.errors?.[0];
+      if (clerkError?.code === "form_identifier_not_found") {
+        setError(clerkError.longMessage);
+        setAccountNotFound(true);
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   const onVerifyPress = async () => {
-    if (!isLoaded) {
+    if (!isLoaded || loading) {
       return;
     }
+    setLoading(true);
 
     try {
-      const { createdSessionId } = await signIn.attemptFirstFactor({
+      const result = await signIn.attemptFirstFactor({
         strategy: "phone_code",
         code,
       });
+      console.log("Sign in attempt result:", JSON.stringify(result, null, 2));
+
+      const { createdSessionId } = result;
 
       if (createdSessionId) {
         // If the sign-in was successful, set the active session and redirect
@@ -68,17 +89,27 @@ export default function SignInScreen() {
         router.push("/(tabs)");
       } else {
         // Handle cases where sign-in is not complete
-        console.error("Could not complete sign in.");
+        setError(
+          "Could not complete sign in. Please check the code and try again."
+        );
       }
     } catch (err: any) {
       console.error("Error verifying code:", JSON.stringify(err, null, 2));
-      // Optionally, show an error message to the user
+      setError(err.errors?.[0]?.longMessage || "Invalid verification code.");
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const onTryDifferentNumber = () => {
+    setPhoneNumber("");
+    setError(null);
+    setAccountNotFound(false);
   };
 
   return (
     <View style={styles.container}>
-      {!pendingVerification && (
+      {!pendingVerification && !accountNotFound && (
         <View style={styles.form}>
           <Text style={styles.label}>Phone Number</Text>
           <TextInput
@@ -88,9 +119,18 @@ export default function SignInScreen() {
             onChangeText={setPhoneNumber}
             style={styles.input}
           />
-          <TouchableOpacity onPress={onSignInPress} style={styles.button}>
-            <Text style={styles.buttonText}>Sign In</Text>
+          <TouchableOpacity
+            onPress={onSignInPress}
+            style={styles.button}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <Text style={styles.buttonText}>Sign In</Text>
+            )}
           </TouchableOpacity>
+          {error && <Text style={styles.errorText}>{error}</Text>}
           <Link href="/sign-up" asChild>
             <TouchableOpacity style={styles.link}>
               <Text>Don't have an account? Sign up</Text>
@@ -98,6 +138,30 @@ export default function SignInScreen() {
           </Link>
         </View>
       )}
+
+      {accountNotFound && (
+        <View style={styles.form}>
+          <Text style={styles.label}>Account Not Found</Text>
+          <Text style={styles.errorText}>{error}</Text>
+          <Link
+            href={{ pathname: "/sign-up", params: { phone: phoneNumber } }}
+            asChild
+          >
+            <TouchableOpacity style={styles.button}>
+              <Text style={styles.buttonText}>Create Account</Text>
+            </TouchableOpacity>
+          </Link>
+          <TouchableOpacity
+            onPress={onTryDifferentNumber}
+            style={[styles.button, styles.secondaryButton]}
+          >
+            <Text style={[styles.buttonText, styles.secondaryButtonText]}>
+              Try a different number
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       {pendingVerification && (
         <View style={styles.form}>
           <Text style={styles.label}>Verification Code</Text>
@@ -107,9 +171,18 @@ export default function SignInScreen() {
             onChangeText={setCode}
             style={styles.input}
           />
-          <TouchableOpacity onPress={onVerifyPress} style={styles.button}>
-            <Text style={styles.buttonText}>Verify</Text>
+          <TouchableOpacity
+            onPress={onVerifyPress}
+            style={styles.button}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <Text style={styles.buttonText}>Verify</Text>
+            )}
           </TouchableOpacity>
+          {error && <Text style={styles.errorText}>{error}</Text>}
         </View>
       )}
     </View>
@@ -151,5 +224,20 @@ const styles = StyleSheet.create({
   link: {
     marginTop: 15,
     alignItems: "center",
+  },
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  secondaryButton: {
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: "#007BFF",
+    marginTop: 10,
+  },
+  secondaryButtonText: {
+    color: "#007BFF",
   },
 });
