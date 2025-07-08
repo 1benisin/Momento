@@ -32,27 +32,26 @@ This document outlines the high-level structure of the Momento application, deta
 
 ### 1. Onboarding & Authentication Flow
 
+This flow is now managed by Clerk, which handles user sessions and the complexities of OTP-based phone authentication. We will build custom UI that leverages Clerk's hooks (`useSignIn`, `useSignUp`) for a seamless native experience.
+
 - **`SplashScreen`**: Initial launch screen.
-- **`AuthScreen`**: Options for "Log In", "Sign Up", and "Become a Host". This screen also includes a small, less prominent "Contact Support" link in the footer for users who are locked out or unable to sign in.
-- **`UnauthenticatedSupportScreen`**: A simple, public-facing form for users who cannot log in.
-  - **Accessed From**: The "Contact Support" link on the `AuthScreen`.
-  - **Fields**: A basic form with fields for `name`, `reply_to_email`, `phone_number` (to identify their account), and a `body` for their message.
-  - **Functionality**: This form submits to a public Convex `httpAction` that creates a `support_tickets` document without requiring user authentication.
-- **`SignUpFlow (Participant)`**:
-  - `PhoneInputScreen`: For entering a US-based phone number. If the number is already registered, the user is diverted to the `PhoneNumberConflictScreen` instead of the `OTPScreen`.
-  - `PhoneNumberConflictScreen`: A screen that asks the user if they are the original owner of the account associated with the phone number, forking the user flow.
-  - `OTPScreen`: For entering the one-time password received via SMS to verify the phone number.
-    - **Error State**: Displays messages like "Invalid code, please try again."
-    - **"Resend Code" Button**: Appears after a cooldown (e.g., 30 seconds). Tapping it triggers a new SMS. If abused (e.g., >3 attempts), the button is disabled for a longer period.
-  - `SecondFactorAuthScreen`: A screen that prompts an existing user on a new device to verify their identity through a secondary method (e.g., recovery email, ID verification).
-  - `ProfileSetupScreen`: For entering initial public profile information (name, bio).
-  - `InitialPhotoScreen`: For taking or uploading the first profile photo. This may include a prompt to use the in-app camera to earn an "Authentic" badge.
-    - **Permission Denied State**: If camera permission is denied, the UI hides the "Take Photo" button and emphasizes the "Upload from Library" option.
-  - `InterestDiscoveryScreen`: A swipeable deck of "Possibility Cards" to establish the user's initial interest vectors. This is designed to feel like an adventure, not a survey.
-- **`LoginScreen`**: For returning users to sign in using their phone number and a one-time password.
-- **`InternationalWaitlistScreen`**: A screen that informs non-US users that Momento is not yet available in their country and invites them to join a waitlist.
-  - **Success State**: After a user successfully joins the waitlist, the UI provides immediate feedback. The "Notify Me" button becomes disabled and its text changes to "You're on the list!".
-- **`AIOnboardingInterviewScreen` (Future)**: A guided, AI-driven voice conversation to conduct a user interview, as an enhancement to the standard `InterestBuilderScreen`.
+- **`AuthScreen`**: A simple entry screen with "Log In" and "Sign Up" buttons. It might also include a "Contact Support" link.
+- **`(auth)` Route Group Screens**: These screens live in the `app/(auth)/` directory and are wrapped in a layout that redirects already authenticated users to the core app.
+  - **`SignInScreen`**: For returning users. It contains UI for entering a phone number, submitting it, and then entering the received OTP code. This entire state machine is managed by Clerk's `useSignIn()` hook.
+  - **`SignUpScreen`**: For new users. Similar to the sign-in screen, this uses the `useSignUp()` hook to manage the process of creating a new user account with a phone number and OTP verification.
+- **Post-Authentication Flow**: Once a user is authenticated via Clerk, they proceed to the in-app profile and interest setup.
+  - **`ProfileSetupScreen`**: For entering initial public profile information (name, bio).
+  - **`InitialPhotoScreen`**: For taking or uploading the first profile photo.
+  - **`InterestDiscoveryScreen`**: The swipeable deck of "Possibility Cards" to establish the user's initial interest vectors.
+
+The following screens from the previous design are now **DEPRECATED** as their functionality is handled by Clerk or is no longer needed:
+
+- `PhoneInputScreen`
+- `RecycleAccountScreen`
+- `OTPScreen`
+- `SecondFactorAuthScreen`
+- `LoginScreen`
+- `InternationalWaitlistScreen`
 
 ### 2. Host Onboarding Flow (for Organizations)
 

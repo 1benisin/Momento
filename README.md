@@ -21,7 +21,8 @@ Our user interface is inspired by the elegance and intentionality found in art a
 ## Technology Stack
 
 - **Framework:** React Native with Expo
-- **Backend:** Supabase (Database, Auth, Edge Functions)
+- **Backend:** Convex (Database, Functions, Storage)
+- **Authentication:** Clerk
 - **Navigation:** Expo Router
 - **Styling:** NativeWind
 - **Payments:** Stripe (using `@stripe/stripe-react-native`)
@@ -55,13 +56,13 @@ This project is documented in detail within the [`_docs`](/_docs) directory. For
   - [`FEATURES.md`](_docs/FEATURES.md): A complete list of all app features.
   - [`ROADMAP.md`](_docs/ROADMAP.md): The phased development plan.
 - **Design & User Experience**
-  - [`DESIGN_SYSTEM.md`](_docs/DESIGN_SYSTEM.md): The core visual and experiential aesthetic.
+  - [`DESIGN.md`](_docs/DESIGN.md): The core visual and experiential aesthetic.
   - [`USER_PERSONAS.md`](_docs/USER_PERSONAS.md): Definitions of our target users.
-  - [`USER_FLOWS.md`](_docs/USER_FLOWS.md): Key user journeys within the app.
+  - [`USER_FLOWS/README.md`](_docs/USER_FLOWS/README.md): Key user journeys within the app.
   - [`SCREENS_AND_COMPONENTS.md`](_docs/SCREENS_AND_COMPONENTS.md): A blueprint of the app's UI.
 - **Technical Implementation**
   - [`ARCHITECTURE.md`](_docs/ARCHITECTURE.md): System architecture and data flow diagrams.
-  - [`DATA_MODELS.md`](_docs/DATA_MODELS.md): Detailed database schemas for Supabase.
+  - [`DATA_MODELS.md`](_docs/DATA_MODELS.md): Detailed database schemas for Convex.
   - [`MATCHING_ALGORITHM.md`](_docs/MATCHING_ALGORITHM.md): The strategy for matching users with events.
 
 ## Getting Started

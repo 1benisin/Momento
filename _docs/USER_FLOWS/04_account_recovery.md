@@ -1,6 +1,12 @@
-## 22. Account Recovery (Existing User on New Device)
+## 04: Account Recovery (DEPRECATED)
 
-**Goal:** To securely verify an existing user who is attempting to log in from a new, unrecognized device and grant them access to their account.
+**This flow is now deprecated.**
+
+The process of account recovery, such as when a user gets a new device, is now managed by our third-party authentication provider, **Clerk**.
+
+Clerk handles session management and provides secure, standard methods for users to regain access to their accounts. This eliminates the need for our custom-built logic involving device history, email verification tokens, and fallback identity checks. Users will follow Clerk's standard recovery procedures.
+
+**Goal:** To securely verify an existing user who is attempting to log in from a new, unrecognized device and grant them access to their account. A device is considered "unrecognized" if its app-install-specific UUID is not found in the user's `deviceHistory`.
 
 **Actors:**
 
@@ -31,7 +37,10 @@ graph TD
 
 ### Flow Steps
 
-This flow begins immediately after a user, prompted by the "Recycled Phone Number" flow, selects **"Yes, that's my account"**.
+This flow can be triggered in two ways:
+
+1.  A user identifies themselves as the original owner during the "Recycled Phone Number" flow.
+2.  A returning user attempts to log in, and the client, sending its device UUID, is told by the backend that the device is unrecognized.
 
 #### 1. Initiate Second-Factor Authentication (2FA)
 
@@ -63,12 +72,12 @@ This flow begins immediately after a user, prompted by the "Recycled Phone Numbe
   - The user is seamlessly logged in and redirected to the main app screen.
 - **Backend & Services:**
   - **Client:** The app's root component or navigation container parses the `token` from the incoming deep link URL.
-  - **Client -> Backend:** The client calls the `auth.verifyDeviceToken({ token })` mutation.
+  - **Client -> Backend:** The client calls the `account.verifyDeviceToken({ token, deviceId })` mutation.
   - **Backend (Convex):**
     1.  The backend validates the token against the stored record, checking for expiry.
-    2.  Upon success, it generates a new long-lived session token for the client.
-    3.  It adds the new device's fingerprint (passed from the client) to the `deviceHistory` array in the user's document.
-    4.  It returns the new session token to the client, granting access.
+    2.  Upon success, it uses Convex's session management to authenticate the user.
+    3.  It adds the new device's UUID (`deviceId`) to the `deviceHistory` array in the user's document.
+    4.  Access is granted, and the client is now in an authenticated state.
 
 ---
 
@@ -89,7 +98,7 @@ This is a critical edge case for when a user cannot be verified via email.
 - **User Experience (UI/UX):**
   - Once Stripe confirms verification (which may take a few moments), the app displays a success message and logs the user in.
 - **Backend & Services:**
-  - Upon receiving the successful `verification_session.verified` webhook, the backend can confidently issue a new session token and update the `deviceHistory`, granting the user access.
+  - Upon receiving the successful `verification_session.verified` webhook, the backend can confidently use Convex's session management to authenticate the user and update the `deviceHistory`, granting the user access.
 
 #### B3. Handle Verification Failure
 
