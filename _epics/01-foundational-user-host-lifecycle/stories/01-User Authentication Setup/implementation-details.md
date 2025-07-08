@@ -5,123 +5,87 @@ This document synthesizes all relevant information from the `_docs` directory to
 ## 1. Overview & Goal
 
 - **Story**: 001-01: User Authentication Setup
-- **Goal**: Implement US-only, phone-based authentication using One-Time Passwords (OTP) sent via SMS.
+- **Goal**: Implement US-only, phone-based authentication using Clerk for user management and Convex for the backend.
 
 ## 2. Technology Stack
 
 - **Backend**: Convex
-- **SMS Provider**: Twilio
-- **Transactional Email**: Postmark (for recovery/notifications)
+- **Authentication**: Clerk (handles SMS, session management, user identity)
 - **Frontend**: React Native / Expo
 
 ## 3. Core Data Models
 
-The following collections in `convex/schema.ts` are central to this story.
+With Clerk handling all authentication logic, our Convex data models become much simpler.
 
 ### `users` Collection
 
-This is the main user record. Key fields for authentication:
+This is the main application-specific user record. It links to the authoritative user object in Clerk.
 
-| Field Name            | Type                       | Description                                                                        |
-| --------------------- | -------------------------- | ---------------------------------------------------------------------------------- |
-| `phone_number`        | `v.optional(v.string())`   | User's US-based phone number. Indexed. `null` for archived accounts.               |
-| `status`              | `v.string()`               | Tracks user state, e.g., 'pending_onboarding', 'active', 'archived_for_recycling'. |
-| `otp_attempts`        | `v.optional(v.number())`   | Tracks failed OTP attempts to prevent abuse.                                       |
-| `otp_last_attempt_at` | `v.optional(v.number())`   | Timestamp of the last failed OTP attempt.                                          |
-| `deviceHistory`       | `v.optional(v.array(...))` | Stores fingerprints of trusted devices to detect new logins.                       |
-| `email`               | `v.optional(v.string())`   | Optional private email used for account recovery.                                  |
+| Field Name     | Type         | Description                                                              |
+| :------------- | :----------- | :----------------------------------------------------------------------- |
+| `clerkId`      | `v.string()` | The user's unique ID from Clerk (`identity.subject`). Indexed.           |
+| `phone_number` | `v.string()` | User's US-based phone number (E.164 format). Stored for application use. |
+| `status`       | `v.string()` | Tracks user state within our app, e.g., 'pending_onboarding', 'active'.  |
+
+**Removed Fields:** All `otp_*`, `email`, and `deviceHistory` fields are no longer needed. Clerk manages all of this.
 
 ### `waitlist_users` Collection
 
-Stores contact info for users from unsupported regions.
+- This collection is **DEPRECATED** and will be removed. We are launching US-only, and Clerk will be configured to enforce this.
 
-| Field Name     | Type         | Description                           |
-| -------------- | ------------ | ------------------------------------- |
-| `phone_number` | `v.string()` | The user's full international number. |
-| `region_code`  | `v.string()` | The country code prefix, e.g., "+44". |
+## 4. Authentication Flow with Clerk
 
-## 4. Authentication Flows
+The previous custom authentication flows are replaced by a single, streamlined process managed by Clerk's Expo SDK. We will build custom UI that uses Clerk's underlying hooks.
 
-The implementation must handle several distinct user journeys.
+### The Unified Clerk Flow
 
-### Flow 1: New US-Based User (Golden Path)
+1.  **App Start**:
 
-1.  **`PhoneInputScreen`**: User enters a valid US phone number (`+1` country code).
-2.  **Backend (`auth.sendOtp`)**:
-    - Validates the number is from the US.
-    - Generates a 6-digit OTP.
-    - Calls Twilio via an `httpAction` to send the SMS.
-    - **SMS Content**: "Your new Momento verification code is [Code]. This code will expire in 10 minutes."
-3.  **`OTPScreen`**: User enters the received OTP.
-4.  **Backend (`auth.verifyOtp`)**:
-    - Verifies the code.
-    - On success, creates a new user record with `status: 'pending_onboarding'`.
-    - Returns a session token to the client.
-5.  **Client**: Navigates to the `ProfileSetupScreen`.
+    - The root layout (`app/_layout.tsx`) is wrapped with `<ClerkProvider>` and `<ConvexProviderWithClerk>`.
+    - Clerk attempts to load a session token from its secure cache (`tokenCache.ts`).
+    - The `useConvexAuth()` hook determines the user's authentication state.
 
-### Flow 2: Non-US User
+2.  **Unauthenticated User Journey**:
 
-1.  **`PhoneInputScreen`**: User enters a non-US phone number.
-2.  **Client**: Detects the country code is not `+1`.
-3.  **Navigation**: Redirects to the `InternationalWaitlistScreen`.
-4.  **`InternationalWaitlistScreen`**:
-    - Displays a message that the app is not yet available.
-    - Provides a "Notify Me" button.
-5.  **Backend (`waitlist.join`)**: On button press, saves the phone number to the `waitlist_users` collection.
+    - The user is shown the `app/(auth)/sign-in.tsx` or `app/(auth)/sign-up.tsx` screen.
+    - **Sign-Up (`sign-up.tsx`)**:
+      - The UI uses Clerk's `useSignUp()` hook.
+      - The user enters their phone number.
+      - `signUp.create()` is called.
+      - `signUp.preparePhoneNumberVerification()` sends the OTP via SMS (handled by Clerk).
+      - A second UI step appears for OTP entry.
+      - `signUp.attemptPhoneNumberVerification()` is called with the code.
+      - On success, `setActive({ session: signUp.createdSessionId })` completes the flow.
+    - **Sign-In (`sign-in.tsx`)**:
+      - The UI uses Clerk's `useSignIn()` hook.
+      - The flow is nearly identical to sign-up, using `signIn.create()`, `signIn.prepareFirstFactor()`, and `signIn.attemptFirstFactor()` to handle the OTP process.
 
-### Flow 3: Recycled Phone Number
+3.  **Authenticated State & Data Sync**:
 
-This is triggered when a user enters a phone number that already exists in the `users` collection.
+    - Once `setActive()` is called, the `<ConvexProviderWithClerk>` automatically fetches the JWT from Clerk and authenticates with the Convex backend.
+    - Convex validates the token using the configuration in `convex/auth.config.ts`.
+    - Components wrapped in `<Authenticated>` are now rendered.
+    - The first time an authenticated query or mutation runs, we will trigger an internal mutation (`user.store`) that syncs the Clerk user to our `users` collection. It uses `ctx.auth.getUserIdentity()` to get the `clerkId` and `phone_number` from the token and creates a new record if one doesn't already exist for that `clerkId`.
 
-1.  **Backend (`auth.sendOtp`)**: Finds an existing user with the phone number.
-2.  **Backend Response**: Returns `{ accountExists: true }` to the client.
-3.  **Client**: Navigates to a disambiguation screen: "Is this your account?" with two options:
-    - "Yes, that's my account" -> Go to **Flow 4: Account Recovery**.
-    - "No, I'm a new user" -> Continue below.
-4.  **Security Hold**:
-    - **Client**: Calls `auth.initiateAccountRecycling`.
-    - **Backend**:
-      - Initiates a 24-hour security hold.
-      - Sends an email (via Postmark) to the original owner's email (if available) warning them of the change.
-      - **Email Content**: "A sign-in attempt was made on your Momento account... your account's phone number will be unlinked in 24 hours..."
-      - Creates a scheduled function to run in 24 hours.
-    - **Client**: Shows a screen explaining the 24-hour wait.
-5.  **Account Archival (After 24 hours)**:
-    - The scheduled function runs.
-    - It archives the original user account (`status: 'archived_for_recycling'`) and sets `phone_number` to `null`.
-    - It sends an SMS (via Twilio) to the phone number.
-    - **SMS Content**: "Welcome to Momento! You can now complete your sign-up."
-6.  **New User Onboarding**: The new user can now sign up normally following **Flow 1**.
-
-### Flow 4: Account Recovery (Existing User, New Device)
-
-This flow begins when an existing user tries to log in from an unrecognized device or confirms ownership during the recycled number flow.
-
-1.  **Backend (`auth.requestVerification`)**:
-    - Checks for a verified `email` on the user's record.
-    - **If email exists**:
-      - Generates a time-limited verification token.
-      - Sends an email (via Postmark) with a deep link: `momento://verify-device?token=...`
-    - **If no email exists**: Fallback to Stripe Identity verification.
-2.  **User Action**: Clicks the deep link in the email.
-3.  **Client**:
-    - The app opens from the deep link.
-    - It extracts the token and calls `auth.verifyDeviceToken`.
-4.  **Backend (`auth.verifyDeviceToken`)**:
-    - Validates the token.
-    - On success, adds the new device fingerprint to the user's `deviceHistory`.
-    - Returns a new session token to the client, granting access.
+4.  **Account Recovery & Recycled Numbers**:
+    - These complex flows are now managed entirely by Clerk's settings and security features. We do not need to build any custom logic, UI, or backend functions for these scenarios. Clerk handles phone number ownership verification and provides users with recovery options if configured in the Clerk dashboard.
 
 ## 5. UI Components / Screens
 
 The primary screens for this story will live in the `app/(auth)/` directory.
 
-- `index.tsx`: The main "Sign Up" / "Log In" screen.
-- `otp.tsx`: The screen for entering the one-time password.
-- `waitlist.tsx`: The screen shown to non-US users.
-- **New Screens Needed**:
-  - A screen to handle the recycled number disambiguation.
-  - A screen to inform the user about the 24-hour security hold.
-  - Screens for the account recovery flow (e.g., "Check your email").
+- `_layout.tsx`: The layout for the auth group. It will use the `useAuth()` hook from Clerk to redirect already-signed-in users to the main app.
+- `sign-up.tsx`: A custom screen built with React Native components that uses the `useSignUp()` hook to manage the sign-up state machine.
+- `sign-in.tsx`: A custom screen that uses the `useSignIn()` hook.
+- `SignOutButton.tsx`: A component that calls `signOut()` from Clerk's `useClerk()` hook.
 
-This consolidated guide should provide a clear path for implementation.
+**Removed Screens**:
+
+- `index.tsx` (in `(auth)`)
+- `otp.tsx`
+- `waitlist.tsx`
+- `recycle-account.tsx`
+- `security-hold.tsx`
+- `check-email.tsx`
+
+This consolidated guide provides a clear path for implementation using Clerk.

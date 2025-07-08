@@ -18,10 +18,10 @@ This flow describes the journey of a brand new user from first launch to accepti
 
 3.  **Account Creation (US-Based User)**:
 
-    - `->` **`SignUpFlow`**
-    - **`PhoneInputScreen`**: User enters a valid US phone number. The screen will include a statement like, "By continuing, you agree to our Terms of Service and Privacy Policy," with links to both documents.
-    - **User Action**: Taps "Continue".
-    - `->` **`OTPScreen`**: User receives an SMS with a one-time password and enters it.
+    - `->` **`SignUpScreen`**: The user is navigated to the sign-up screen.
+      - User enters their US phone number.
+      - User receives an SMS with a one-time password and enters it on the same screen.
+      - This entire flow is powered by Clerk's `useSignUp` hook.
     - Upon successful verification, the flow continues to the profile creation steps:
     - **`ProfileSetupScreen`**: User provides their public `first_name` and a short `bio`.
     - **`InitialPhotoScreen`**: User uploads or takes their first profile photo. The UI encourages using the in-app camera to earn the "Authentic" badge.

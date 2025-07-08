@@ -48,12 +48,13 @@ This is the first and most immediate line of defense, catching errors and style 
 
 ### Unit Tests (The Base)
 
-This layer forms the bulk of our automated test suite.
+This layer forms the bulk of our automated test suite, especially for our Convex backend functions.
 
-- **What it is:** Testing the smallest indivisible "unit" of the application (e.g., a single function, a single React component) in complete isolation.
-- **How it works:** We provide known inputs to a unit and assert that it produces the expected output or renders the correct UI. All external dependencies (like API calls or native modules) are mocked.
+- **What it is:** Testing the smallest indivisible "unit" of the application (e.g., a single Convex function, a single React component) in complete isolation.
+- **How it works:** We provide known inputs to a unit and assert that it produces the expected output or behaves as expected. For Convex functions, we can simulate different user authentication states. All external dependencies are mocked.
 - **Recommended Tools:**
-  - **Jest:** The test runner that discovers, runs, and reports on tests.
+  - **Vitest:** A modern, fast test runner that is compatible with our Vite-based environment.
+  - **convex-test:** A utility library from Convex that makes it easy to write tests for our backend functions, including mocking the database and authentication context.
   - **React Native Testing Library:** A library for testing components in a way that resembles user interaction, focusing on rendered output rather than internal implementation details.
 - **Role:** These tests are fast, stable, and precisely identify the location of bugs when they fail.
 
@@ -63,7 +64,7 @@ This layer ensures that different units work together correctly.
 
 - **What it is:** Testing the interaction between several components or modules. This could involve testing a full screen, including its state management and child components.
 - **How it works:** We render a complex component or an entire screen with mock data and simulate user interactions (e.g., tapping a button) to verify that the correct functions are called or UI changes occur.
-- **Recommended Tools:** Jest and React Native Testing Library.
+- **Recommended Tools:** Vitest and React Native Testing Library.
 - **Role:** They provide confidence that the major pieces of the application are wired together correctly.
 
 ### End-to-End (E2E) Tests (The Top)
@@ -95,7 +96,7 @@ This workflow runs on every pull request to ensure that no broken code is merged
     - `Checkout Code`: Pulls the code from the feature branch.
     - `Install Dependencies`: Runs `npm install`.
     - `Run Static Analysis`: Runs `npm run lint` and `npx tsc --noEmit`.
-    - `Run Unit & Integration Tests`: Runs `npm test`.
+    - `Run Unit & Integration Tests`: Runs `npm run test:once`.
 4.  **Outcome:** The job reports a "pass" or "fail" status on the Pull Request, blocking merges that do not pass all checks.
 
 ### Workflow 2: Continuous Delivery (On Merge to Main)
@@ -115,10 +116,10 @@ This workflow runs after a pull request is successfully merged, automatically bu
 
 ## 4. Recommended Tooling Summary
 
-| Category      | Tool(s)                                    |
-| ------------- | ------------------------------------------ |
-| Type Checking | TypeScript                                 |
-| Linting       | ESLint                                     |
-| Unit/Int      | Jest, React Native Testing Library         |
-| End-to-End    | Maestro (recommended), Detox (alternative) |
-| CI/CD         | GitHub Actions, Expo Application Services  |
+| Category      | Tool(s)                                           |
+| ------------- | ------------------------------------------------- |
+| Type Checking | TypeScript                                        |
+| Linting       | ESLint                                            |
+| Unit/Int      | Vitest, convex-test, React Native Testing Library |
+| End-to-End    | Maestro (recommended), Detox (alternative)        |
+| CI/CD         | GitHub Actions, Expo Application Services         |

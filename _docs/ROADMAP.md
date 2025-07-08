@@ -14,7 +14,8 @@ Our guiding principle for the MVP is **Speed to Market**, allowing us to test ou
 
 #### 1. Foundational User & Host Lifecycle
 
-- **Phone-First Authentication:** Secure, US-only sign-up/login via OTP.
+- **Phone-First Authentication:** Secure, US-only sign-up/login via SMS, managed by Clerk.
+- **Simplified Account Management:** Phone number recycling and account recovery are now handled by Clerk's secure, built-in flows.
 - **Basic Profiles:** A simple `socialProfile` (name, photo) and `hostProfile`.
 - **Host Verification Gate:** Mandatory Stripe Identity verification before a host can publish an event. A critical, non-negotiable safety feature for launch.
 - **Mode-Switcher:** A basic UI toggle for hybrid users to switch between social and host contexts.

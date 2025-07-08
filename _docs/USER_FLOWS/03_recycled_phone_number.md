@@ -1,13 +1,18 @@
-## 21. Handling a Recycled Phone Number (New User)
+## 03: Handling a Recycled Phone Number (DEPRECATED)
 
-**Goal:** To securely handle a sign-up attempt with a phone number that is already associated with an existing Momento account, correctly identifying whether the user is the original owner or a new owner, and safely transitioning the number to the new user if appropriate.
+**This flow is now deprecated.**
+
+The complexity of securely handling recycled phone numbers is now managed by our third-party authentication provider, **Clerk**.
+
+Clerk has built-in mechanisms to verify phone number ownership. If a user attempts to sign up with a number that is already in use, Clerk's flows will handle the process of verifying the new user and securing the original account. This removes the need for our own custom UI, backend logic, and multi-step user flows for this scenario.
 
 **Actors:**
 
 - **User:** The person trying to sign up.
 - **Momento App (Client):** The React Native/Expo application.
 - **Momento Backend (Convex):** The Convex server handling logic.
-- **Postmark/Twilio:** Services for sending notification emails/SMS to the original account owner.
+- **Stripe Identity:** Service for optional, instant identity verification.
+- **Postmark/Twilio:** Services for sending notifications.
 
 ### High-Level Flow Diagram
 
@@ -15,82 +20,88 @@
 graph TD
     A[User enters phone number] --> B{Account exists?};
     B -- No --> C[Proceed with Golden Path Onboarding];
-    B -- Yes --> D{Check for dormancy/new device};
-    D --> E[Ask user: "Is this your account?"];
-    E -- No, I'm new --> F[Path A: New User (Recycled Number)];
-    E -- Yes, this is me --> G[Path B: Original Owner (Re-authentication)];
+    B -- Yes --> D[Show RecycleAccountScreen];
+    D --> E{User chooses path};
+    E -- Verify Now --> F[Path A: Accelerated Verification];
+    E -- Wait 24 Hours --> G[Path B: Secure Waiting Period];
 
-    subgraph "Path A: New User"
-        F --> F1[Initiate 24hr security hold];
-        F1 --> F2[Notify original owner via email/SMS];
-        F2 --> F3[Archive original account data];
-        F3 --> F4[Notify new user after 24hrs];
-        F4 --> F5[New user completes onboarding];
+    subgraph "Path A: Accelerated Verification"
+        F --> F1[User completes Stripe Identity flow];
+        F1 --> F2[Client calls account.completeRecycling];
+        F2 --> F3[Backend immediately archives old account];
+        F3 --> F4[New user can sign up instantly];
     end
 
-    subgraph "Path B: Original Owner"
-        G --> G1(Redirect to Account Recovery Flow);
+    subgraph "Path B: Secure Waiting Period"
+        G --> G1[Client calls account.initiateAccountRecycling];
+        G1 --> G2[Backend starts 24hr security hold & notifies original owner];
+        G2 --> G3[Scheduled function archives old account after 24hrs];
+        G3 --> G4[New user notified via SMS to sign up];
     end
 ```
-
-_Note: Path B redirects to the dedicated [Account Recovery](./22_account_recovery_new_device.md) flow._
 
 ---
 
 ### Flow Steps
 
-The flow begins after the user enters their phone number on the initial OTP request screen.
+The flow begins after the user enters their phone number on the initial sign-up screen.
 
-#### 1. Account Existence Check
+#### 1. Account Conflict Detection
 
-- **System Action:** This deviates from the "Golden Path" when the `auth.sendOtp` mutation in the backend discovers an existing `users` document with the provided `phone_number`.
+- **System Action:** This flow is triggered when the `auth.sendOtp` mutation discovers an existing `users` document with the provided `phone_number`.
+- **Backend (Convex):** The backend returns a specific response to the client, e.g., `{ accountExists: true }`, instead of sending an OTP.
+
+#### 2. Empowering the User with a Choice
+
+- **User Experience (UI/UX):** The user is navigated to the `RecycleAccountScreen`.
+  - The screen clearly explains the situation: "This phone number is associated with an existing account. To protect the original owner's privacy, we need to verify you're the new owner."
+  - Two distinct choices are presented:
+    - **Button 1: "Verify My Identity to Continue Now"** (Leads to Path A)
+    - **Button 2: "Notify Me in 24 Hours"** (Leads to Path B)
+
+---
+
+### Path A: Accelerated Verification (Instant Access)
+
+The user has selected **"Verify My Identity to Continue Now"**.
+
+#### A1. Identity Verification
+
+- **User Action:** The user taps the button and is guided into the Stripe Identity flow.
+- **User Experience (UI/UX):** The app presents the native Stripe Identity SDK, prompting the user to scan their driver's license, passport, or other government-issued ID.
+- **Client & Services:** The client handles the interaction with the Stripe SDK. Upon a successful verification result from Stripe, the client proceeds to the next step.
+
+#### A2. Account Transition
+
+- **System Action:** With identity confirmed, the client immediately calls the backend to finalize the account transition.
 - **Backend (Convex):**
-  1.  Instead of immediately sending an OTP, the backend first checks the `last_active_at` timestamp and `deviceHistory` of the existing account.
-  2.  If the account has been inactive for a long period (e.g., > 90 days) or the sign-in attempt comes from a device with an unrecognized fingerprint, the system flags it as a high probability for being a recycled number.
-  3.  The backend returns a specific response to the client, e.g., `{ accountExists: true }`.
-
-#### 2. User Intent Clarification
-
-- **User Action:** The user is presented with a screen asking them to clarify their identity.
-- **User Experience (UI/UX):**
-  - The screen displays a message like: "This phone number is already linked to a Momento account. Are you trying to access your existing account or are you a new user?"
-  - Two clear buttons are shown: **"Yes, that's my account"** and **"No, I'm a new user"**.
+  - **Client -> Backend:** The client calls the `account.completeRecycling` mutation.
+  - **Logic:**
+    1.  This mutation archives the original `users` document (`status: 'archived_for_recycling'`, `phone_number: null`).
+    2.  It may trigger a final "for your records" notification email to the original owner.
+    3.  Crucially, it returns a success response to the client, signaling that the phone number is now free.
+- **User Experience (UI/UX):** The user is seamlessly navigated back to the start of the sign-up flow (`PhoneInputScreen`) where they can now enter their number and proceed with onboarding without any conflict.
 
 ---
 
-### Path A: New User (Recycled Number)
+### Path B: Secure Waiting Period (Passive Path)
 
-The user has selected **"No, I'm a new user"**.
+The user has selected **"Notify Me in 24 Hours"**.
 
-#### A1. Security Hold & Notification
+#### B1. Initiating the Security Hold
 
-- **User Action:** Acknowledges the security hold information.
-- **User Experience (UI/UX):**
-  - The app explains that a 24-hour security waiting period is being initiated to protect the previous owner's privacy.
-  - The message is reassuring: "To ensure a smooth transition, we'll notify you via SMS in 24 hours when your new account is ready to be created. Thank you for your patience."
+- **User Experience (UI/UX):** The app navigates to the `SecurityHoldScreen`, which confirms their choice and explains the 24-hour waiting period. The message is reassuring and manages expectations.
 - **Backend & Services:**
-  - **Client -> Backend:** The client calls a mutation like `auth.initiateAccountRecycling({ phoneNumber })`.
+  - **Client -> Backend:** The client calls the `account.initiateAccountRecycling` mutation.
   - **Backend (Convex):**
-    1.  Logs the recycling request with a 24-hour expiry.
-    2.  Triggers an `httpAction` to send a notification to the original account owner via their registered email (if available) using Postmark. The message is critical: "A sign-in attempt was made on your Momento account with a new device, and the user claims to be new. If this was not you, your account's phone number will be unlinked in 24 hours for security. Please contact support if you believe this is an error."
-    3.  A scheduled function is created to run in 24 hours.
+    1.  Sends a critical warning email to the original account owner via Postmark, informing them of the pending change.
+    2.  Creates a scheduled function (`account.archiveUserAfterHold`) to execute in 24 hours.
 
-#### A2. Account Archival & New User Go-Ahead
+#### B2. Account Archival & Notification
 
-- **System Action:** The 24-hour scheduled function executes.
+- **System Action:** After 24 hours, the scheduled function runs.
 - **Backend & Services:**
-  1.  The function finds the original `users` document.
-  2.  It archives the account by setting its `status` to `'archived_for_recycling'` and, most importantly, **sets the `phone_number` field to `null`**, effectively unlinking it.
-  3.  It then calls Twilio to send an SMS to the phone number, notifying the new user that they can now proceed with onboarding. "Welcome to Momento! You can now complete your sign-up."
-- **User Action:** The new user re-opens the app.
-- **User Experience (UI/UX):** When the user enters their phone number again, the system no longer finds an associated account and they proceed with the standard "Golden Path" onboarding.
-
----
-
-### Path B: Original Owner (Redirection)
-
-The user has selected **"Yes, that's my account"**.
-
-- **System Action:** The application redirects the user to the dedicated **Account Recovery** flow.
-- **Rationale:** This keeps the concerns separate. This flow's primary job is to correctly identify the user's intent. The job of verifying an existing user on a new device belongs to the `Account Recovery` flow.
-- **User Experience (UI/UX):** The user is seamlessly transitioned to the start of the account recovery process. See `_docs/USER_FLOWS/22_account_recovery_new_device.md` for the next steps.
+  1.  The function archives the original `users` account as described in Path A.
+  2.  It then calls Twilio to send an SMS to the phone number: "Welcome to Momento! You can now complete your sign-up."
+- **User Action:** The new user receives the SMS and can re-open the app to sign up.
+- **User Experience (UI/UX):** Same as the final step in Path A. When the user enters their phone number, the path is now clear for them to create their account.

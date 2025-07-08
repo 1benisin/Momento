@@ -11,7 +11,6 @@ The schema will be defined in `convex/schema.ts` using Convex's `defineSchema` a
 ## Core Entities
 
 - **[Users](#users-collection)**: The aggregate root for all user-related data, including social and host profiles.
-- **[Waitlist Users](#waitlist_users-collection)**: Captures users from outside the initial launch area.
 - **[Interests](#interests-collection)**: A global catalog of possible user interests with their vector embeddings.
 - **[Locations](#locations-collection)**: Stores structured data for physical locations, indexed for geospatial queries.
 - **[Events](#events-collection)**: The central entity for all gatherings, with an embedded itinerary.
@@ -43,6 +42,7 @@ Serves as the aggregate root for a user, combining private data (phone, email), 
 | Field Name                 | Type                                                                                                                                              | Description                                                                                                    |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | `_id`                      | `Id<"users">`                                                                                                                                     | Convex system field. Primary Key.                                                                              |
+| `clerkId`                  | `v.string()`                                                                                                                                      | The user's unique ID from Clerk. This links the Convex user to the Clerk user. Indexed.                        |
 | `phone_number`             | `v.optional(v.string())`                                                                                                                          | User's private phone number. Indexed. Can be null for archived accounts.                                       |
 | `email`                    | `v.optional(v.string())`                                                                                                                          | Optional private email for recovery or receipts.                                                               |
 | `last_name`                | `v.optional(v.string())`                                                                                                                          | User's private last name.                                                                                      |
@@ -53,8 +53,6 @@ Serves as the aggregate root for a user, combining private data (phone, email), 
 | `last_active_at`           | `v.number()`                                                                                                                                      | Timestamp of the last user activity.                                                                           |
 | `user_number`              | `v.number()`                                                                                                                                      | A unique, sequential number for early adopters. Managed via a counter or mutation logic.                       |
 | `payment_customer_id`      | `v.optional(v.string())`                                                                                                                          | Stripe customer ID.                                                                                            |
-| `otp_attempts`             | `v.optional(v.number())`                                                                                                                          | Tracks failed OTP attempts to prevent abuse. Reset on success.                                                 |
-| `otp_last_attempt_at`      | `v.optional(v.number())`                                                                                                                          | Timestamp of the last failed OTP attempt.                                                                      |
 | `min_lead_time_days`       | `v.optional(v.number())`                                                                                                                          | User's preferred minimum notice for event invites.                                                             |
 | `availability_preferences` | `v.optional(v.object({ mon: v.string(), tue: v.string(), wed: v.string(), thu: v.string(), fri: v.string(), sat: v.string(), sun: v.string() }))` | Stores day/week availability. Each day can be 'any', 'evening', 'daytime', or 'unavailable'.                   |
 | `distance_preference`      | `v.optional(v.number())`                                                                                                                          | User's max travel distance in miles.                                                                           |
@@ -66,7 +64,6 @@ Serves as the aggregate root for a user, combining private data (phone, email), 
 | `interestVectors`          | `v.optional(v.array(v.object({ ... })))`                                                                                                          | Embedded array of interest vector objects. See details below.                                                  |
 | `socialLinks`              | `v.optional(v.array(v.object({ ... })))`                                                                                                          | Embedded array of the user's social media links. See details below.                                            |
 | `notificationSettings`     | `v.object({ ... })`                                                                                                                               | Embedded object for managing notification preferences. See details below.                                      |
-| `deviceHistory`            | `v.optional(v.array(v.object({ ... })))`                                                                                                          | Embedded array of device login history. See details below.                                                     |
 | `contextualNudges`         | `v.optional(v.object({ shown_distance_preference_nudge: v.boolean(), shown_price_sensitivity_nudge: v.boolean() }))`                              | Tracks whether a user has been shown specific contextual nudges to avoid repetition.                           |
 
 #### Embedded `socialProfile` Object
@@ -90,20 +87,23 @@ Serves as the aggregate root for a user, combining private data (phone, email), 
 | `current_face_card_photo_url`       | `v.string()`                                                               | Denormalized URL of the stylized Face Card.                                                                                                           |
 | `face_card_source_photo_url`        | `v.optional(v.string())`                                                   | The URL of the photo from the `photos` array that is currently being used as the base for the Face Card. Defaults to the first authentic photo taken. |
 | `unlocked_face_card_customizations` | `v.optional(v.array(v.object({ id: v.string(), notified: v.boolean() })))` | An array of objects tracking unlocked customizations and their notification status (e.g., `{id: "style:vintage", notified: false}`).                  |
+| `email_account_and_safety`          | `v.boolean()`                                                              | For critical account alerts (e.g., phone number changes).                                                                                             |
 
 #### Embedded `hostProfile` Object
 
-| Field Name       | Type                                                                                                                           | Description                                                                                              |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
-| `host_type`      | `v.string()`                                                                                                                   | 'user' or 'community'.                                                                                   |
-| `host_name`      | `v.string()`                                                                                                                   | Public name of the host.                                                                                 |
-| `host_bio`       | `v.string()`                                                                                                                   | Biography specific to hosting activities.                                                                |
-| `location_id`    | `v.optional(v.id("locations"))`                                                                                                | The primary, physical location of a `community` host.                                                    |
-| `address`        | `v.optional(v.string())`                                                                                                       | The physical street address for a `community` host. Required for verification.                           |
-| `website_url`    | `v.optional(v.string())`                                                                                                       | The official website for a `community` host, used for verification.                                      |
-| `average_rating` | `v.optional(v.number())`                                                                                                       | Calculated average from all event/host ratings.                                                          |
-| `photos`         | `v.optional(v.array(v.object({ ... })))`                                                                                       | An embedded array of host brand/venue photos.                                                            |
-| `reliabilityLog` | `v.optional(v.array(v.object({ eventId: v.id("events"), actionType: v.string(), timestamp: v.number(), metadata: v.any() })))` | An array of log entries that tracks host reliability signals for internal review and automated flagging. |
+| Field Name                 | Type                                                                                                                           | Description                                                                                              |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
+| `host_type`                | `v.string()`                                                                                                                   | 'user' or 'community'.                                                                                   |
+| `host_name`                | `v.string()`                                                                                                                   | Public name of the host.                                                                                 |
+| `host_bio`                 | `v.string()`                                                                                                                   | Biography specific to hosting activities.                                                                |
+| `location_id`              | `v.optional(v.id("locations"))`                                                                                                | The primary, physical location of a `community` host.                                                    |
+| `address`                  | `v.optional(v.string())`                                                                                                       | The physical street address for a `community` host. Required for verification.                           |
+| `website_url`              | `v.optional(v.string())`                                                                                                       | The official website for a `community` host, used for verification.                                      |
+| `average_rating`           | `v.optional(v.number())`                                                                                                       | Calculated average from all event/host ratings.                                                          |
+| `photos`                   | `v.optional(v.array(v.object({ ... })))`                                                                                       | An embedded array of host brand/venue photos.                                                            |
+| `reliabilityLog`           | `v.optional(v.array(v.object({ eventId: v.id("events"), actionType: v.string(), timestamp: v.number(), metadata: v.any() })))` | An array of log entries that tracks host reliability signals for internal review and automated flagging. |
+| `push_account_and_safety`  | `v.boolean()`                                                                                                                  | Push notifications for payments, reports, etc.                                                           |
+| `email_account_and_safety` | `v.boolean()`                                                                                                                  | For critical account alerts (e.g., phone number changes).                                                |
 
 #### Embedded `internalMetrics` Object
 
@@ -155,26 +155,11 @@ A direct mapping of the `user_notification_settings` table fields, with defaults
 | `push_account_and_safety`  | `v.boolean()` | Push notifications for payments, reports, etc.            |
 | `email_account_and_safety` | `v.boolean()` | For critical account alerts (e.g., phone number changes). |
 
-#### Embedded `deviceHistory` Array of Objects
-
-| Field Name           | Type         | Description                                              |
-| -------------------- | ------------ | -------------------------------------------------------- |
-| `device_fingerprint` | `v.string()` | A unique identifier for the user's device.               |
-| `ip_address`         | `v.string()` | The IP address of the last login from this device.       |
-| `last_login_at`      | `v.number()` | Timestamp of the last successful login from this device. |
-
 ---
 
-### `waitlist_users` Collection
+### `waitlist_users` Collection (DEPRECATED)
 
-Captures phone numbers of individuals who are outside the initial launch area (non-US numbers) and have requested to be notified when Momento becomes available in their region. This collection is intentionally simple and separate from the main `users` collection as it stores data for unauthenticated potential users.
-
-| Column          | Type                   | Description                                     |
-| --------------- | ---------------------- | ----------------------------------------------- |
-| `_id`           | `Id<"waitlist_users">` | Primary Key.                                    |
-| `phone_number`  | `v.string()`           | The user's full phone number. Should be unique. |
-| `region_code`   | `v.string()`           | The country code prefix, e.g., "+44".           |
-| `_creationTime` | `v.number()`           | Timestamp of when the user joined.              |
+This collection is no longer needed. International user management and region-locking will be handled by Clerk's configuration.
 
 ---
 

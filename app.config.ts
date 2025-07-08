@@ -33,7 +33,46 @@ const config: ExpoConfig = {
     output: "static",
     favicon: "./assets/images/favicon.png",
   },
-  plugins: ["expo-router"],
+  plugins: [
+    "expo-router",
+    [
+      "expo-calendar",
+      {
+        calendarPermission:
+          "This app uses calendar to schedule events and set reminders.",
+        remindersPermission:
+          "This app uses reminders to schedule events and set reminders.",
+      },
+    ],
+    [
+      "expo-camera",
+      {
+        cameraPermission: "Allow $(PRODUCT_NAME) to access your camera",
+        microphonePermission: "Allow $(PRODUCT_NAME) to access your microphone",
+        recordAudioAndroid: true,
+      },
+    ],
+    [
+      "expo-image-picker",
+      {
+        photosPermission: "Allow $(PRODUCT_NAME) to access your photos",
+        cameraPermission: "Allow $(PRODUCT_NAME) to access your camera",
+      },
+    ],
+    [
+      "expo-location",
+      {
+        locationAlwaysAndWhenInUsePermission:
+          "Allow $(PRODUCT_NAME) to use your location",
+      },
+    ],
+    [
+      "expo-contacts",
+      {
+        contactsPermission: "Allow $(PRODUCT_NAME) to access your contacts",
+      },
+    ],
+  ],
   experiments: {
     typedRoutes: true,
   },
