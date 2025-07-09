@@ -57,6 +57,21 @@ User profiles will contain three categories of information:
   - **`interested_in`**: A multiple-selection field indicating the genders they are interested in connecting with.
   - **`pronouns`**: An optional field that, if filled out, is displayed on their public profile.
 
+### User Account Management & Settings
+
+To provide a clear and robust user experience, we divide settings into two distinct areas, accessed via a menu from the main `<UserButton>` in the app header:
+
+1.  **Profile & Security (Managed by Clerk)**: This destination is a dedicated screen that renders Clerk's pre-built `<UserProfile />` component. It serves as the single source of truth for core account and security management, including:
+
+    - Updating profile information (name, etc.).
+    - Managing and verifying email addresses and phone numbers.
+    - Changing passwords and managing multi-factor authentication (MFA).
+    - Viewing active sessions and signing out of other devices.
+
+2.  **App Preferences (Managed by Momento)**: This is a fully custom-built settings screen where we house all of Momento's unique application-level preferences. This screen contextually displays settings based on the user's active mode.
+
+This hybrid approach allows us to leverage Clerk's powerful, secure, and pre-built components for the complex parts of account management, while giving us full control to build a tailored experience for our app-specific settings.
+
 ### The Interest Constellation
 
 To showcase a user's personality beyond a simple list of hobbies, profiles will feature an "Interest Constellation." This data visualization moves beyond superficial tags to show the multifaceted nature of a user's character.
@@ -156,7 +171,7 @@ Upon completing the second onboarding flow, the user becomes a `Hybrid User`, an
 
 For users who are both participants and hosts (`Hybrid Users`), the application provides a `ModeSwitcher` to ensure the interface remains clean and contextually relevant. This control prevents UI clutter by presenting only the tools needed for the user's current goal.
 
-- **The Control:** A `ModeSwitcher` component is displayed on the `ProfileTab` for any user who has both a `socialProfile` and a `hostProfile`.
+- **The Control:** A `ModeSwitcher` component is displayed prominently within our custom **"App Preferences"** screen.
 - **The Mechanism:** When a user toggles between "Social Mode" and "Host Mode," the app updates the `users.active_role` field in the database to either `'social'` or `'host'`. This choice is persisted across sessions.
 - **The Impact:** The value of `active_role` acts as a global state that dictates the entire navigation structure. It determines which version of the main tab bar is rendered, ensuring that a user in "Host Mode" sees their hosting dashboard, event management tools, and host inbox, while a user in "Social Mode" sees their invitations, Memory Book, and social discovery feeds. This separation creates a focused and intuitive experience for users who wear multiple hats in the Momento ecosystem.
 
@@ -356,6 +371,9 @@ To ensure accurate attendance data and help users who forget, the app will send 
 
 > **Future Enhancement (Phase 2):** > **Feature:** Geofenced Check-in Reminders.
 > **Rationale:** A geofenced reminder would provide a more magical, context-aware experience than the time-based one. By triggering the check-in prompt the moment a user arrives in the event's vicinity, we reduce friction and improve the accuracy of arrival data.
+
+> **Future Enhancement (Phase 2):** > **Feature:** Reverification for Sensitive Actions.
+> **Rationale:** To enhance security for critical user actions, we can leverage Clerk's `useReverification()` hook. This would prompt a user to re-authenticate (e.g., with their password or a biometric scan) before performing a sensitive operation like deleting their account or changing their primary email address. This adds a professional layer of security and user trust with minimal implementation effort.
 
 ## 9. Post-Event Interaction
 

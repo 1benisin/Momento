@@ -24,3 +24,9 @@ This flow describes the journey for a user who attempts to sign up from outside 
     - **User Action**: Taps the button to confirm.
     - **System Action**: The user's phone number is securely stored in the `waitlist_users` table for future communication.
     - The flow ends here for the user.
+
+---
+
+### Future Consideration
+
+- This custom flow, including the `waitlist_users` table, could be simplified or replaced in the future by leveraging Clerk's pre-built `<Waitlist />` component. This would offload the UI and data storage to Clerk, streamlining our implementation.

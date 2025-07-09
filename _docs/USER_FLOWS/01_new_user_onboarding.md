@@ -19,7 +19,7 @@ The goal of this phase is to create a core Momento account with minimal friction
 
 2.  **`SignUpScreen`**: The user can choose their preferred method for creating an account.
     - **Option A (Phone)**: User enters their phone number, receives an OTP via SMS, and enters it to verify.
-    - **Option B (Email)**: User enters an email and creates a password.
+    - **Option B (Email)**: User enters an email and creates a password. They are then prompted on the same screen to enter a one-time code sent to their email to complete the verification.
     - `->` Upon successful verification, Clerk creates a new user record, and the user is now considered **authenticated**.
 
 ## Phase 2: Intent-Driven Role Selection

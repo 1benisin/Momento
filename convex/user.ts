@@ -75,15 +75,35 @@ export const store = internalMutation({
 export const createUser = internalMutation({
   args: {
     clerkId: v.string(),
-    phone_number: v.string(),
+    phone_number: v.optional(v.string()),
+    email: v.optional(v.string()),
     tokenIdentifier: v.string(),
   },
   handler: async (ctx, args) => {
     await ctx.db.insert("users", {
       clerkId: args.clerkId,
       phone_number: args.phone_number,
+      email: args.email,
       tokenIdentifier: args.tokenIdentifier,
       status: UserStatuses.PENDING_ONBOARDING,
+    });
+  },
+});
+
+export const updateUserEmail = internalMutation({
+  args: {
+    clerkId: v.string(),
+    email: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await getUserByClerkId(ctx, { clerkId: args.clerkId });
+
+    if (user === null) {
+      throw new Error("User not found, cannot update email");
+    }
+
+    await ctx.db.patch(user._id, {
+      email: args.email,
     });
   },
 });

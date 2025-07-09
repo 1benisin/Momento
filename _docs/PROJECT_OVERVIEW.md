@@ -57,7 +57,7 @@ Our technology stack is chosen to support a modern, cross-platform, and real-tim
 - **Navigation:** Expo Router
 - **Styling:** NativeWind
 - **Backend:** Convex
-- **Authentication:** Clerk (using `@clerk/clerk-expo` and `convex/react-clerk`)
+- **Authentication:** Clerk (using `@clerk/clerk-expo` and `convex/react-clerk`, with a hybrid approach leveraging custom UI for onboarding and pre-built components like `<UserProfile />` for account management)
 - **Payments:** Stripe (using `@stripe/stripe-react-native` on the client and `stripe-node` on the server)
 - **Verification:** Stripe Identity
 - **Transactional Email:** Postmark

@@ -17,7 +17,8 @@ export default defineSchema({
   users: defineTable({
     tokenIdentifier: v.string(),
     clerkId: v.string(),
-    phone_number: v.string(),
+    phone_number: v.optional(v.string()),
+    email: v.optional(v.string()),
     status: userStatusValidator,
 
     socialProfile: v.optional(

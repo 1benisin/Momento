@@ -52,8 +52,8 @@ This flow begins with an existing `Participant` using the app in its standard "S
 - **System Action:** The client app detects the change in the user's data model.
 - **User Experience (UI/UX):**
   - Upon successful creation of the host profile, the user is shown a confirmation screen.
-  - This screen explicitly introduces the concept of the **"Mode Switcher"**. It might say: "Congratulations, you're now a host! You'll find a new 'Mode Switcher' in your profile to toggle between your Social and Host dashboards."
-  - The `ProfileTab` now permanently displays the `ModeSwitcher` component, allowing the user to toggle between the two experiences.
+  - This screen explicitly introduces the concept of the **"Mode Switcher"**. It might say: "Congratulations, you're now a host! You'll find a new 'Mode Switcher' on your Profile screen to toggle between your Social and Host dashboards."
+  - The `ProfileTab` now renders Clerk's `<UserProfile />` component for all standard account management, but it also now includes our custom `ModeSwitcher` component, allowing the user to toggle between the two experiences from one central location.
   - By default, the user is switched into "Host Mode" for the first time to explore the new interface.
 
 #### 5. First-Time Host Experience
@@ -62,3 +62,9 @@ This flow begins with an existing `Participant` using the app in its standard "S
   - The app's UI transforms. The main tab bar changes to show the `HostDashboardScreen` and other hosting-related tabs. The `MemoryBookTab` and social discovery feeds are hidden.
   - A welcome message or a short, optional tour might highlight key features of the host dashboard, like the "Create New Event" button.
 - **System Action:** The `active_role` field in the user's document is updated to `'host'`, so the app remembers which mode they were last in when they next open it.
+
+6.  **Confirmation & Role Update**: Upon successful verification, the backend:
+    - Creates a new `hostProfile` document linked to their `users` record.
+    - Sets their `users.active_role` to `'host'`. This is a crucial step that ensures the app will immediately reflect their new capabilities upon the next load.
+7.  **Host Experience**: The user is now in "Host Mode" and can access all their hosting tools, view their event dashboard, manage attendees, and respond to messages from participants.
+8.  **Switching Back**: To return to the social experience, the user navigates from the app header to **App Preferences -> Mode Switcher** and uses the control to select "Switch to Social Mode," which sets their `active_role` back to `'social'`.

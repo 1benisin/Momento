@@ -41,6 +41,7 @@ This flow is now managed by Clerk, which handles user sessions and the complexit
   - **`SignUpScreen`**: For new users. Similar to the sign-in screen, this uses the `useSignUp()` hook to manage the process of creating a new user account with either a phone number and OTP verification or an email and password.
 - **Post-Authentication & Intent-Driven Onboarding Flow**: Once a user is authenticated via Clerk, they are directed to choose their path.
   - **`RoleSelectionScreen`**: A new, mandatory screen shown immediately after a user's first successful sign-up. It asks the user to choose their primary goal: "I want to attend events" or "I want to host events". Their choice determines which onboarding flow they enter.
+  - **`ClerkLoading/ClerkLoaded`**: To prevent a "flash" of the wrong screen when the app first loads, the root layout will use Clerk's control components. It will show a loading indicator via `<ClerkLoading>` while Clerk initializes, and then render the main content inside `<ClerkLoaded>` for a smooth transition.
   - **Participant Onboarding Branch**:
     - **`ProfileSetupScreen`**: For entering initial public profile information (name, bio).
     - **`InitialPhotoScreen`**: For taking or uploading the first profile photo.
@@ -137,64 +138,47 @@ _This is the view for `Host-Only` and `Hybrid` users who are in "Host Mode." It 
   - **Event Albums**: A list of all attended events, acting as shortcuts to each `SharedEventGalleryScreen`.
     _Note: This screen is for participants. Business hosts manage their photos from the `HostDashboardScreen`._
 - **`InAppNotificationBanner`**: A banner/toast for displaying notifications while the user is inside the app.
-- **`ModeSwitcher`**: A UI control (e.g., a segmented control) located on the `ProfileTab` for `Hybrid Users`. It is only rendered for users who have both a `socialProfile` and a `hostProfile`. Its state is tied directly to the `users.active_role` field in the database. When the user selects a mode ('Social' or 'Host'), the component triggers a backend mutation to update this field. The app's root navigation component listens to changes in this value to dynamically render the appropriate tab bar layout (`Social Mode Navigation` or `Host Mode Navigation`).
 
-### 6. Settings & User Management
+### 6. User Management: Profile, Settings & Preferences
 
-The main `SettingsScreen` will feature a tabbed interface to organize all user-configurable options clearly. This keeps all settings in a single, predictable location while separating them by context.
+To provide a clear and organized experience, all user management functions are accessed from a menu presented by the `<UserButton>` component in the main app header. This leads to two distinct destinations: one for core account and security settings (managed by Clerk), and another for app-specific preferences (managed by us).
 
-- **`SettingsScreen`**: The container screen with the three tabs described below.
+- **`<UserButton>` Component**:
 
----
+  - **Location**: Placed in the header of the main `(tabs)` layout.
+  - **Functionality**: On press, it opens a menu with two primary navigation options:
+    1.  **"Profile & Security"** -> Navigates to the `UserProfileScreen`.
+    2.  **"App Preferences"** -> Navigates to the `SettingsScreen`.
+    3.  It also includes a "Sign Out" option.
 
-#### Tab 1: Account (Global Settings)
+- **`UserProfileScreen` (`/account`)**:
 
-_Handles core, private settings tied to the `users` account._
+  - **Purpose**: This screen is dedicated _exclusively_ to rendering Clerk's pre-built `<UserProfile />` component. It acts as the secure, centralized hub for all core identity and security management (name, email, phone, password, MFA).
+  - **File Path**: `app/(tabs)/account/[[...userProfile]].tsx`. The `[[...userProfile]]` catch-all route is required for Clerk's component to handle its own internal routing.
 
-- **`PrivateInfoScreen`**: To manage private details like email and last name.
-- **`SecurityAndPrivacyScreen`**: Hub for safety features.
-  - **`BlockedUsersScreen`**: A sub-screen to view and manage blocked users.
-  - **`VerificationScreen`**: The UI flow for identity verification.
-- **`PaymentMethodsScreen`**: For adding/removing payment methods.
-  - **Error State**: If a payment fails (e.g., during first event confirmation), the screen displays a non-blocking toast/banner with a clear error message like, "Payment failed. Please check your card details or try another method."
-- **`TransactionHistoryScreen`**: For viewing past payments made to Momento.
-- **`NotificationSettingsScreen`**: A single, consolidated screen for managing all push and SMS preferences. The UI on this screen will be grouped by context (e.g., "Social & Connections," "Host Notifications") as defined in `_docs/3_engineering/NOTIFICATIONS_PLAN.md`.
-- **`LegalScreen`**: Contains links to legal and policy documents.
-  - **`PrivacyPolicyScreen`**: A screen displaying the company's privacy policy.
-  - **`TermsOfServiceScreen`**: A screen displaying the company's terms of service.
-- **`HelpCenterScreen`**: The entry point for contacting support. For logged-in users, it contains a "Contact Support" button that opens the standard, authenticated support ticket form. It may also contain links to FAQs.
+- **`SettingsScreen` (`/settings`)**:
 
----
-
-#### Tab 2: Participant (Social Profile Settings)
-
-_Manages the user's public identity as an event attendee and their discovery preferences._
-
-- **`EditProfileScreen`**: For updating the user's public-facing social profile (`preferred_name`, `bio`, etc.).
-- **`CameraRollScreen`**: To manage personal photos and access shared event albums.
-- **`FaceCardStylingScreen`**: To customize the visual style of the `FaceCard`.
-- **`EventPreferencesScreen`**: A unified screen for managing all event-related preferences, divided into two sections:
-  - **Hard Filters**: Contains the `DistancePreferenceSlider` and `PriceSensitivitySelector`. This section has prominent helper text explaining these are strict exclusion rules.
-  - **Soft Preferences**: Contains the `NoticePreferenceSlider` for ideal lead time and the `AvailabilityGrid` for setting detailed day-and-night availability.
-- **`MySocialLinksScreen`**: For managing private social media links that can be shared one-to-one with connections.
-- **`HelpCenterScreen`**: The entry point for contacting support. For logged-in users, it contains a "Contact Support" button that opens the standard, authenticated support ticket form. It may also contain links to FAQs.
-
----
-
-#### Tab 3: Host (Hosting-Specific Settings)
-
-_A dynamic tab that is only visible to users with a `host_profiles` record._
-
-- **`EditHostProfileScreen`**: To manage the public host bio, name, and brand/marketing photos (`host_photos`).
-- **`ManagePublicSocialsScreen`**: A view (likely reusing `MySocialLinksScreen`) where hosts can toggle the `is_public_on_host_profile` flag for their social links.
-- A shortcut to the **`EventsTab`** in Host Mode to manage created events.
-- A section for **`Payouts` (Future)**, which will eventually link to a screen for managing bank details.
-
----
+  - **Purpose**: This is our fully custom, native screen for all Momento-specific settings and preferences. Its content is context-aware and changes based on the user's `active_role`.
+  - **File Path**: `app/(tabs)/settings.tsx`.
+  - **Core Layout & Universal Sections (Always Visible)**:
+    - **`ModeSwitcher`**: For `Hybrid Users`, this is the primary control at the top of the screen to switch between 'Social' and 'Host' contexts. It is only rendered for users who have both a `socialProfile` and a `hostProfile`.
+    - **`NotificationSettingsScreen`**: A single, consolidated screen for managing all push and SMS preferences.
+    - **`PaymentAndHistoryScreen`**: A section for managing payment methods and viewing past transactions.
+    - **`SecurityAndPrivacyScreen`**: Hub for Momento-specific safety features, including the `BlockedUsersScreen`.
+    - **`HelpCenterScreen`**: The entry point for contacting support.
+    - **`LegalScreen`**: Contains links to the `PrivacyPolicyScreen` and `TermsOfServiceScreen`.
+  - **Contextual Sections (Mode-Dependent)**:
+    - **If in 'Social' Mode (Participant Settings)**:
+      - **`EditProfileScreen`**: For updating the public-facing social profile (`preferred_name`, `bio`).
+      - **`EventPreferencesScreen`**: A unified screen for managing all event-related preferences, divided into:
+        - **Hard Filters**: Contains the `DistancePreferenceSlider` and `PriceSensitivitySelector`.
+        - **Soft Preferences**: Contains the `NoticePreferenceSlider` and `AvailabilityGrid`.
+      - **`MySocialLinksScreen`**: For managing private social media links.
+    - **If in 'Host' Mode (Host Settings)**:
+      - This section will contain host-specific settings like `EditHostProfileScreen` and `ManagePublicSocialsScreen`.
 
 - **`ReportUserFlow`**: A guided flow for submitting a formal report against another user. This can be accessed from multiple places, including the `HelpCenterScreen`.
 - **`ReportPhotoModal`**: A modal for reporting an inappropriate photo from the `SharedEventGalleryScreen`.
-- **`CoachingModuleScreen`**: A guided, mandatory walkthrough on community standards for users who have received a serious report.
 
 ### 7. Hosting Flow
 

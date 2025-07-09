@@ -1,7 +1,8 @@
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
 import { internal } from "./_generated/api";
-import type { WebhookEvent } from "@clerk/backend";
+import type { WebhookEvent, UserJSON } from "@clerk/backend";
+import { Webhook } from "svix";
 
 const http = httpRouter();
 
@@ -28,55 +29,60 @@ http.route({
         `convex/http.ts: Webhook validated. Event type: ${result.type}`
       );
 
-      switch (result.type) {
-        case "user.created": {
-          console.log("convex/http.ts: Handling 'user.created' event");
-          const eventData = result.data;
-
-          const user = await ctx.runQuery(internal.user.getUser, {
-            clerkId: eventData.id,
-          });
-
-          if (user) {
-            console.log(
-              `convex/http.ts: User ${eventData.id} already exists, skipping creation.`
-            );
-            break;
-          }
-
-          const phoneNumber = eventData.phone_numbers[0]?.phone_number;
-          if (!phoneNumber) {
-            throw new Error(
-              `User ${eventData.id} created without a phone number.`
-            );
-          }
-
-          const clerkIssuerUrl = process.env.CLERK_ISSUER_URL;
-          if (!clerkIssuerUrl) {
-            throw new Error("CLERK_ISSUER_URL environment variable not set!");
-          }
-
-          const tokenIdentifier = `${clerkIssuerUrl}|${eventData.id}`;
-
-          console.log(
-            `convex/http.ts: About to create user for Clerk ID: ${eventData.id}`
-          );
-          await ctx.runMutation(internal.user.createUser, {
-            clerkId: eventData.id,
-            phone_number: phoneNumber,
-            tokenIdentifier: tokenIdentifier,
-          });
-          console.log(
-            `convex/http.ts: Successfully called createUser for Clerk ID: ${eventData.id}`
-          );
-          break;
-        }
-        default: {
-          console.log(
-            `convex/http.ts: Received unhandled webhook event: ${result.type}`
-          );
-        }
+      const event = result;
+      if (event.type !== "user.created" && event.type !== "user.updated") {
+        return new Response(null, { status: 200 });
       }
+
+      const eventData = event.data;
+      const clerkId = eventData.id;
+
+      const primaryPhoneNumber = eventData.phone_numbers[0]?.phone_number;
+      const primaryEmailAddress = eventData.email_addresses[0]?.email_address;
+
+      console.log(`convex/http.ts: Handling '${event.type}' for ${clerkId}`);
+
+      const user = await ctx.runQuery(internal.user.getUser, {
+        clerkId,
+      });
+
+      if (user) {
+        console.log(`User ${clerkId} already exists. Updating details.`);
+        if (primaryEmailAddress) {
+          await ctx.runMutation(internal.user.updateUserEmail, {
+            clerkId,
+            email: primaryEmailAddress,
+          });
+        }
+        return new Response(null, { status: 200 });
+      }
+
+      if (!primaryPhoneNumber && !primaryEmailAddress) {
+        // This can happen if the user signs up with a social provider that doesn't share email/phone
+        console.warn(
+          `User ${clerkId} created without a phone number or email.`
+        );
+        return new Response(null, { status: 200 });
+      }
+
+      const clerkIssuerUrl = process.env.CLERK_ISSUER_URL;
+      if (!clerkIssuerUrl) {
+        throw new Error("CLERK_ISSUER_URL environment variable not set!");
+      }
+      const tokenIdentifier = `${clerkIssuerUrl}|${clerkId}`;
+
+      console.log(
+        `convex/http.ts: About to create user for Clerk ID: ${clerkId}`
+      );
+      await ctx.runMutation(internal.user.createUser, {
+        clerkId: clerkId,
+        phone_number: primaryPhoneNumber,
+        email: primaryEmailAddress,
+        tokenIdentifier: tokenIdentifier,
+      });
+      console.log(
+        `convex/http.ts: Successfully called createUser for Clerk ID: ${clerkId}`
+      );
 
       return new Response(null, {
         status: 200,

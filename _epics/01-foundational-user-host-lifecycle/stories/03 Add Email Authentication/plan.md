@@ -1,21 +1,36 @@
-# Story 01-03 Plan: Add Email Authentication
+# Story 01-03 Plan: Add Email Authentication & Overhaul User Management
 
 ## 1. High-Level Summary
 
-This plan outlines the implementation of email and password authentication, augmenting the existing phone-based system. We will build custom UI components within the existing `(auth)` screens that use Clerk's `useSignUp` and `useSignIn` hooks. The backend will be updated to handle user creation from email sign-ups via a Clerk webhook, storing the user's email in the Convex `users` table. This involves creating new UI for email/password forms, a verification flow via email deep linking, a password reset mechanism, and a new screen for existing users to add an email to their account.
+This plan outlines two major initiatives:
+
+1.  **Email Authentication**: Implementing email/password sign-up and sign-in, augmenting the existing phone-based system. This includes custom UI using Clerk's headless hooks, a one-time code verification flow, and a password reset mechanism.
+2.  **User Management Overhaul**: Replacing the concept of a single, custom settings screen with a robust, hybrid strategy. We will leverage Clerk's pre-built `<UserProfile />` component for core account/security management and create a new, separate, custom screen for Momento-specific app preferences.
+
+This plan ensures a seamless, secure authentication experience and a scalable, maintainable architecture for user settings.
 
 ## 2. Current Relevant Directory Structure
 
 ```
 app/
+├── _layout.tsx
 ├── (auth)/
 │   ├── _layout.tsx
+│   ├── forgot-password.tsx
 │   ├── sign-in.tsx
 │   └── sign-up.tsx
 ├── (onboarding)/
-│   ├── ...
-└── (tabs)/
-    ├── ...
+│   ├── _layout.tsx
+│   ├── initial-photo.tsx
+│   └── profile-setup.tsx
+├── (tabs)/
+│   ├── _layout.tsx
+│   ├── account.tsx
+│   ├── index.tsx
+│   └── two.tsx
+├── +html.tsx
+├── +not-found.tsx
+└── modal.tsx
 
 components/
 ├── EditScreenInfo.tsx
@@ -24,7 +39,11 @@ components/
 ├── SignOutButton.tsx
 ├── StyledText.tsx
 ├── Themed.tsx
-├── ...
+├── useClientOnlyValue.ts
+├── useClientOnlyValue.web.ts
+├── useColorScheme.ts
+├── useColorScheme.web.ts
+└── UserInfo.tsx
 
 convex/
 ├── _generated/
@@ -40,99 +59,76 @@ convex/
 
 ## 3. Data Model Changes (`convex/schema.ts`)
 
-The `users` table in `convex/schema.ts` is missing the `email` field. It needs to be added to store the user's email address.
+The `users` table requires a new optional `email` field, and the `phone_number` field must be made optional to support email-only sign-ups.
 
 ```typescript
 // convex/schema.ts
-
 // ...
 export default defineSchema({
   users: defineTable({
-    tokenIdentifier: v.string(),
-    clerkId: v.string(),
-    phone_number: v.optional(v.string()), // Make phone optional
+    // ...
+    phone_number: v.optional(v.string()), // <-- MAKE OPTIONAL
     email: v.optional(v.string()), // <-- ADD THIS LINE
-    status: userStatusValidator,
-
-    socialProfile: v.optional(
-// ...
+    // ...
+  }),
+  // ...
+});
 ```
 
 ## 4. Backend Implementation (`convex/`)
 
-### Files to Create
-
-- None.
-
-### Files to Modify
-
-- **`convex/user.ts`**:
-
-  - Modify the `createUser` mutation to accept an optional `email` and handle cases where `phone_number` is not provided.
-  - Add a new `updateUserEmail` mutation to allow existing users to add an email address to their profile.
-
-- **`convex/http.ts`**:
-  - Update the Clerk webhook handler to process `user.created` events for email-based sign-ups. It must extract `email_addresses[0].email_address` from the webhook payload.
-  - Add logic to handle the `user.updated` event to sync changes when a user adds an email to their existing account. The logic should call the new `updateUserEmail` mutation.
+- **Files to Modify**:
+  - **`convex/user.ts`**:
+    - Modify the `createUser` internal mutation to accept an optional `email` and handle cases where `phone_number` is not provided.
+  - **`convex/http.ts`**:
+    - The Clerk webhook handler (`http.route`) must be enhanced to be fully idempotent for both `user.created` and `user.updated` events. It must correctly sync the primary email address from the Clerk payload (`email_addresses[0].email_address`) to our `users` table using a "get-or-create" pattern.
 
 ## 5. Frontend Implementation (`app/`, `components/`)
 
-### Files to Create
+- **Files to Create**:
 
-- **`app/(auth)/verify-email.tsx`**: A new screen to handle the verification deep link. This screen will extract the verification token, call `signUp.attemptEmailAddressVerification()`, and navigate the user to the main app upon success.
-- **`app/(auth)/forgot-password.tsx`**: A new screen that allows users to enter their email to receive a password reset link. This will use Clerk's `signIn.create({ strategy: 'reset_password_email_code' })`.
-- **`app/(tabs)/account.tsx`**: A new screen in the main app where logged-in users can view account details and add/verify an email address if they originally signed up with a phone number.
+  - `app/(tabs)/account/[[...userProfile]].tsx`: A new screen dedicated exclusively to rendering Clerk's `<UserProfile />` component. The `[[...userProfile]]` catch-all route is required for Clerk's component to handle its own internal routing.
+  - `app/(tabs)/settings.tsx`: A new, fully custom screen for all Momento-specific preferences. It will contain the `ModeSwitcher` and contextually render settings. For this story, a placeholder screen is sufficient.
+  - `app/(auth)/forgot-password.tsx`: A new screen to manage the two-step password reset flow (request code, submit new password).
 
-### Files to Modify
-
-- **`app/(auth)/sign-up.tsx`**:
-
-  - Add a UI switcher (e.g., tabs) to allow users to select between "Phone" and "Email" sign-up.
-  - Create new input fields for `emailAddress` and `password`.
-  - Update the `onSignUpPress` handler to call `signUp.create({ emailAddress, password })` and `signUp.prepareEmailAddressVerification()` for the email flow.
-  - Add a new view state to inform the user to check their email for the verification link.
-
-- **`app/(auth)/sign-in.tsx`**:
-
-  - Add a UI switcher for "Phone" and "Email" sign-in.
-  - Add input fields for `emailAddress` and `password`.
-  - Update the `onSignInPress` handler to use `signIn.create({ identifier: emailAddress, password })` for email-based login.
-  - Add a "Forgot Password?" link that navigates to `app/(auth)/forgot-password.tsx`.
-
-- **Expo Router / Deep Linking**:
-  - Configuration will be required to handle deep links for email verification and password resets, likely in `app.config.ts` and the root layout (`app/_layout.tsx`).
+- **Files to Modify**:
+  - **`app/_layout.tsx`**: Wrap the root layout with Clerk's control components (`<ClerkLoading>`, `<ClerkLoaded>`, `<SignedIn>`, `<SignedOut>`) to manage loading and authentication states.
+  - **`app/(auth)/sign-up.tsx` & `sign-in.tsx`**: Refactor to include a tabbed or segmented control UI, allowing users to switch between "Email" and "Phone" methods. Implement forms and state management for the email/password and verification code flows using Clerk's headless hooks.
+  - **`app/(tabs)/_layout.tsx`**: Implement Clerk's `<UserButton />` in the header, configured to open a menu with navigation links to `/account` and `/settings`.
 
 ## 6. Step-by-Step Task Breakdown
 
-1.  **Backend Schema**: Modify `convex/schema.ts` to add the optional `email` field to the `users` table and make `phone_number` optional.
-2.  **Backend Logic**: Update the `createUser` mutation in `convex/user.ts` to support email.
-3.  **Backend Webhook**: Enhance the webhook in `convex/http.ts` to handle `user.created` events with email and `user.updated` events.
-4.  **Sign-Up UI**: Implement the email/password form in `app/(auth)/sign-up.tsx` and the corresponding `useSignUp` logic.
-5.  **Sign-In UI**: Implement the email/password form in `app/(auth)/sign-in.tsx` and the corresponding `useSignIn` logic.
-6.  **Email Verification Screen**: Build the `app/(auth)/verify-email.tsx` screen and configure deep linking to handle the verification flow.
-7.  **Forgot Password Flow**: Build the `app/(auth)/forgot-password.tsx` screen and link it from the sign-in page.
-8.  **Account Management**: Create the `app/(tabs)/account.tsx` screen for existing users to add an email.
-9.  **Backend Linking**: Implement the `updateUserEmail` mutation in `convex/user.ts` and connect it to the account management screen and the `user.updated` webhook.
-10. **Testing**: Thoroughly test all authentication paths: phone sign-up/sign-in, email sign-up/verification/sign-in, password reset, and adding an email to an existing account.
+1.  **Backend Setup**:
 
-## 7. Key Considerations & Edge Cases
+    1.  Modify `convex/schema.ts`: Make `phone_number` optional and add the optional `email` field to the `users` table.
+    2.  Update `convex/user.ts`: Adjust the `createUser` internal mutation to handle the new schema.
+    3.  Enhance `convex/http.ts`: Make the Clerk webhook handler idempotent for `user.created` and `user.updated` events.
 
-### User Experience (UX)
+2.  **Frontend Foundational Changes**:
 
-- **Duplicate Account Prevention**: The sign-up flow must detect if an email is already associated with an account and prompt the user to sign in instead.
-- **Verification Email Resend**: The UI must include a "Resend Email" button with a cooldown period to handle cases where the initial email is missed or delayed.
-- **Expired/Invalid Link Handling**: The `verify-email` screen must gracefully handle expired or invalid tokens and guide the user on what to do next.
-- **Real-time Password Validation**: The password input field should provide immediate feedback on whether the password meets the security requirements.
+    1.  Update `app/_layout.tsx`: Wrap the root layout with the necessary Clerk provider and control components (`<ClerkLoading>`, `<SignedIn>`, etc.).
+    2.  Update `app/(tabs)/_layout.tsx`: Add the `<UserButton>` to the header.
 
-### Architecture & Security
+3.  **Implement Authentication Flow**:
 
-- **Idempotent Webhooks**: The Clerk webhook handler in `convex/http.ts` must be idempotent. It should use a "get-or-create" logic (`query` for `clerkId` first, then `create` if not found, or `update` if found) to prevent data inconsistencies if webhooks are missed or retried.
-- **Webhook Security**: It's critical to verify the signature of every incoming webhook request using Clerk's `WebhookHandler` to prevent forged requests.
-- **Deep Link Navigation**: The root navigator must be configured to allow unauthenticated access to the `verify-email` and `forgot-password` routes to prevent race conditions during redirection.
-- **Robust State Management**: All authentication forms must handle `isLoading` states (e.g., disabling buttons) and display clear error messages returned from the Clerk hooks.
+    1.  Refactor `app/(auth)/sign-in.tsx`: Implement the new tabbed UI for Email/Phone login.
+    2.  Refactor `app/(auth)/sign-up.tsx`: Implement the new tabbed UI and the multi-step email verification flow.
+    3.  Create `app/(auth)/forgot-password.tsx` to handle the password reset user flow.
 
-## 8. Open Questions & Assumptions
+4.  **Implement User Management Screens**:
 
-- **Question**: What is the desired location and navigation path for the "Account Settings" screen? (Assuming `app/(tabs)/account.tsx` for now).
-- **Assumption**: Clerk's email templates are sufficient for the initial implementation, and custom branding is out of scope for this story.
-- **Assumption**: The project is already configured to handle deep linking with Expo. If not, that will be an additional prerequisite task.
+    1.  Create `app/(tabs)/account/[[...userProfile]].tsx` and render the `<UserProfile />` component inside it.
+    2.  Create a placeholder `app/(tabs)/settings.tsx` for Momento-specific app settings.
+
+5.  **Final Integration & Testing**:
+    1.  Configure the `<UserButton>` menu in `app/(tabs)/_layout.tsx` to navigate to `/account` and `/settings`.
+    2.  Thoroughly test the sign-up, sign-in, and password reset flows for both email and phone.
+    3.  Verify that the `<UserProfile />` screen functions correctly and that the settings screen is accessible.
+
+## 7. Open Questions & Assumptions
+
+- **Assumption**: We will use Clerk's headless hooks (`useSignIn`, `useSignUp`) for the authentication logic to maintain full control over the UI.
+- **Assumption**: The new `<UserButton />` will be the single entry point for all profile, security, and app settings, streamlining navigation.
+- **Consideration**: The Clerk webhook handler in `convex/http.ts` **must** be idempotent to prevent data inconsistencies. This will be achieved using a "get-or-create" logic.
+- **Consideration**: It is critical to verify the signature of every incoming webhook to prevent forged requests. This should be implemented from day one.
+- **Consideration**: The `[[...userProfile]]` filename for the account screen is a specific requirement from Expo Router and must not be changed.
