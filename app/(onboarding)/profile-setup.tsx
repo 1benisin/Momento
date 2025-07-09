@@ -1,4 +1,4 @@
-import { useMutation } from "convex/react";
+import { useUser } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -11,27 +11,25 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { api } from "../../convex/_generated/api";
 
 export default function ProfileSetupScreen() {
+  const { user } = useUser();
   const [firstName, setFirstName] = useState("");
-  const [bio, setBio] = useState("");
-  const createSocialProfile = useMutation(api.user.createSocialProfile);
+  const [lastName, setLastName] = useState("");
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleContinue = async () => {
-    if (firstName.trim().length === 0) {
-      // Basic validation
-      alert("Please enter your first name.");
+    if (firstName.trim().length === 0 || lastName.trim().length === 0) {
+      alert("Please enter your first and last name.");
       return;
     }
     setIsLoading(true);
     try {
-      await createSocialProfile({ firstName, bio });
+      await user?.update({ firstName, lastName });
       router.push("/initial-photo");
     } catch (error) {
-      console.error("Failed to create social profile:", error);
+      console.error("Failed to update user:", error);
       alert("Failed to save your profile. Please try again.");
     } finally {
       setIsLoading(false);
@@ -52,11 +50,11 @@ export default function ProfileSetupScreen() {
         autoCapitalize="words"
       />
       <TextInput
-        style={[styles.input, styles.bioInput]}
-        placeholder="A short bio (optional)"
-        value={bio}
-        onChangeText={setBio}
-        multiline
+        style={styles.input}
+        placeholder="Last Name (required)"
+        value={lastName}
+        onChangeText={setLastName}
+        autoCapitalize="words"
       />
       <View style={styles.buttonContainer}>
         {isLoading ? (

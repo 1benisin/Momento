@@ -6,14 +6,14 @@
 - `convex/user.ts`: To update the `createUser` mutation.
 - `convex/http.ts`: To enhance the Clerk webhook handler.
 - `app/_layout.tsx`: For wrapping the app with Clerk providers and routing logic.
-- `app/(tabs)/_layout.tsx`: To add the `<UserButton>` to the header.
+- `app/(tabs)/_layout.tsx`: To add a custom user icon to the header.
 - `app/(auth)/sign-in.tsx`: For the new email/password sign-in UI and logic.
 - `app/(auth)/sign-up.tsx`: For the new email/password sign-up UI and logic.
 - `app/(auth)/forgot-password.tsx`: New screen for the password reset flow.
-- `app/(tabs)/account/[[...userProfile]].tsx`: New screen to host the Clerk `<UserProfile>` component.
+- `app/(tabs)/account.tsx`: New screen for the custom user management UI.
 - `app/(tabs)/settings.tsx`: New screen for custom app settings.
-- `components/SignOutButton.tsx`: To be deleted.
-- `components/UserInfo.tsx`: To be deleted.
+- `components/SignOutButton.tsx`: To be integrated into the account screen.
+- `components/UserInfo.tsx`: To be integrated into the account screen.
 
 ### Notes
 
@@ -43,7 +43,7 @@
   - [ ] 3.1 In `app/_layout.tsx`, wrap the root component with the `<ClerkProvider>` and add your `publishableKey`.
   - [ ] 3.2 Inside the provider, use `<ClerkLoading>` to show a global loading indicator to prevent UI flash.
   - [ ] 3.3 Wrap the main navigation inside `<ClerkLoaded>`. Use `<SignedIn>` to conditionally render the `(tabs)` stack and `<SignedOut>` to render the `(auth)` stack.
-  - [ ] 3.4 In `app/(tabs)/_layout.tsx`, add Clerk's `<UserButton />` to the header.
+  - [ ] 3.4 In `app/(tabs)/_layout.tsx`, add a custom user icon to the header that navigates to the `/account` screen.
 
 - [ ] 4.0 Implement Authentication Flow
 
@@ -55,13 +55,13 @@
 
 - [ ] 5.0 Implement User Management Screens
 
-  - [ ] 5.1 Create the `app/(tabs)/account/[[...userProfile]].tsx` file and render Clerk's `<UserProfile />` component. Remember the `[[...]]` is required for Clerk's routing.
-  - [ ] 5.2 Create the `app/(tabs)/settings.tsx` file. This can be a placeholder for now.
-  - [ ] 5.3 In `app/(tabs)/_layout.tsx`, configure the `<UserButton />`'s `userProfileUrl` and `afterSignOutUrl` props and its menu to navigate to `/account` ("Profile & Security") and `/settings` ("App Preferences").
+  - [ ] 5.1 Create the `app/(tabs)/account.tsx` file and build a custom user profile screen using Clerk's `useUser` hook. Integrate the existing `UserInfo` and `SignOutButton` components.
+  - [ ] 5.2 Create the `app/(tabs)/settings.tsx` file. This can be a placeholder screen, but ensure there is a navigation link to it from the `account.tsx` screen.
+  - [ ] 5.3 Remove any now-redundant props from the custom icon in `app/(tabs)/_layout.tsx`, as navigation is direct.
 
 - [ ] 6.0 Final Integration & Testing
-  - [ ] 6.1 Delete the redundant `components/SignOutButton.tsx` and `components/UserInfo.tsx` files.
+  - [ ] 6.1 Ensure `components/SignOutButton.tsx` and `components/UserInfo.tsx` are correctly integrated into the new `account.tsx` screen.
   - [ ] 6.2 Perform an end-to-end test of the full email sign-up and sign-in flows.
   - [ ] 6.3 Test the "Forgot Password" flow.
-  - [ ] 6.4 Test that the `<UserButton />` menu navigates correctly to both the `/account` and `/settings` screens.
-  - [ ] 6.5 Test the Clerk `<UserProfile />` screen: update the user's name and verify in the Convex dashboard that the `user.updated` webhook was received and the `users` table was updated correctly.
+  - [ ] 6.4 Test that the custom user icon in the header navigates correctly to the `/account` screen.
+  - [ ] 6.5 Test the custom `/account` screen. At a minimum, verify that user data is displayed correctly and that the sign-out button works.

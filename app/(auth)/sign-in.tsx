@@ -17,7 +17,7 @@ export default function SignInScreen() {
   const router = useRouter();
 
   const [signInMethod, setSignInMethod] = React.useState<"email" | "phone">(
-    "email"
+    "phone"
   );
   const [emailAddress, setEmailAddress] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -145,20 +145,32 @@ export default function SignInScreen() {
       <View style={styles.form}>
         <View style={styles.tabContainer}>
           <TouchableOpacity
-            style={[styles.tab, signInMethod === "email" && styles.activeTab]}
-            onPress={() => setSignInMethod("email")}
-          >
-            <Text style={styles.tabText}>Email</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
             style={[styles.tab, signInMethod === "phone" && styles.activeTab]}
             onPress={() => setSignInMethod("phone")}
           >
             <Text style={styles.tabText}>Phone</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, signInMethod === "email" && styles.activeTab]}
+            onPress={() => setSignInMethod("email")}
+          >
+            <Text style={styles.tabText}>Email</Text>
+          </TouchableOpacity>
         </View>
 
-        {signInMethod === "email" ? (
+        {signInMethod === "phone" ? (
+          <>
+            <Text style={styles.label}>Phone Number</Text>
+            <TextInput
+              autoCapitalize="none"
+              placeholder="+1..."
+              value={phoneNumber}
+              onChangeText={setPhoneNumber}
+              style={styles.input}
+              keyboardType="phone-pad"
+            />
+          </>
+        ) : (
           <>
             <Text style={styles.label}>Email Address</Text>
             <TextInput
@@ -176,18 +188,6 @@ export default function SignInScreen() {
               onChangeText={setPassword}
               style={styles.input}
               secureTextEntry
-            />
-          </>
-        ) : (
-          <>
-            <Text style={styles.label}>Phone Number</Text>
-            <TextInput
-              autoCapitalize="none"
-              placeholder="+1..."
-              value={phoneNumber}
-              onChangeText={setPhoneNumber}
-              style={styles.input}
-              keyboardType="phone-pad"
             />
           </>
         )}

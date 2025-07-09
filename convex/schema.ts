@@ -19,11 +19,12 @@ export default defineSchema({
     clerkId: v.string(),
     phone_number: v.optional(v.string()),
     email: v.optional(v.string()),
+    first_name: v.optional(v.string()),
+    last_name: v.optional(v.string()),
     status: userStatusValidator,
 
     socialProfile: v.optional(
       v.object({
-        first_name: v.string(),
         bio: v.optional(v.string()),
         photos: v.array(
           v.object({

@@ -1,99 +1,106 @@
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
 import { internal } from "./_generated/api";
-import type { WebhookEvent, UserJSON } from "@clerk/backend";
+import type { WebhookEvent } from "@clerk/backend";
 import { Webhook } from "svix";
 
 const http = httpRouter();
 
-http.route({
-  path: "/clerk",
-  method: "POST",
-  handler: httpAction(async (ctx, request) => {
-    const payloadString = await request.text();
-    const headerPayload = request.headers;
+const handleClerkWebhook = httpAction(async (ctx, request) => {
+  const event = await validateRequest(request);
+  if (!event) {
+    return new Response("Invalid request", { status: 400 });
+  }
 
-    console.log("convex/http.ts: Received Clerk webhook");
+  switch (event.type) {
+    case "user.created":
+    case "user.updated": {
+      const { id: clerkId, ...attributes } = event.data;
+      const primaryEmailAddress =
+        attributes.email_addresses.find(
+          (email) => email.id === attributes.primary_email_address_id
+        )?.email_address ?? null;
+      const primaryPhoneNumber =
+        attributes.phone_numbers.find(
+          (phone) => phone.id === attributes.primary_phone_number_id
+        )?.phone_number ?? null;
 
-    try {
-      const result: WebhookEvent = await ctx.runAction(internal.clerk.fulfill, {
-        payload: payloadString,
-        headers: {
-          "svix-id": headerPayload.get("svix-id")!,
-          "svix-timestamp": headerPayload.get("svix-timestamp")!,
-          "svix-signature": headerPayload.get("svix-signature")!,
-        },
-      });
-
-      console.log(
-        `convex/http.ts: Webhook validated. Event type: ${result.type}`
-      );
-
-      const event = result;
-      if (event.type !== "user.created" && event.type !== "user.updated") {
-        return new Response(null, { status: 200 });
-      }
-
-      const eventData = event.data;
-      const clerkId = eventData.id;
-
-      const primaryPhoneNumber = eventData.phone_numbers[0]?.phone_number;
-      const primaryEmailAddress = eventData.email_addresses[0]?.email_address;
-
-      console.log(`convex/http.ts: Handling '${event.type}' for ${clerkId}`);
-
-      const user = await ctx.runQuery(internal.user.getUser, {
-        clerkId,
-      });
-
-      if (user) {
-        console.log(`User ${clerkId} already exists. Updating details.`);
-        if (primaryEmailAddress) {
-          await ctx.runMutation(internal.user.updateUserEmail, {
-            clerkId,
-            email: primaryEmailAddress,
-          });
-        }
-        return new Response(null, { status: 200 });
-      }
-
-      if (!primaryPhoneNumber && !primaryEmailAddress) {
-        // This can happen if the user signs up with a social provider that doesn't share email/phone
-        console.warn(
-          `User ${clerkId} created without a phone number or email.`
-        );
-        return new Response(null, { status: 200 });
-      }
-
+      // Construct tokenIdentifier from issuer URL and clerkId
       const clerkIssuerUrl = process.env.CLERK_ISSUER_URL;
       if (!clerkIssuerUrl) {
         throw new Error("CLERK_ISSUER_URL environment variable not set!");
       }
       const tokenIdentifier = `${clerkIssuerUrl}|${clerkId}`;
 
-      console.log(
-        `convex/http.ts: About to create user for Clerk ID: ${clerkId}`
-      );
-      await ctx.runMutation(internal.user.createUser, {
+      const existingUser = await ctx.runQuery(internal.user.getUser, {
         clerkId: clerkId,
-        phone_number: primaryPhoneNumber,
-        email: primaryEmailAddress,
-        tokenIdentifier: tokenIdentifier,
       });
-      console.log(
-        `convex/http.ts: Successfully called createUser for Clerk ID: ${clerkId}`
-      );
 
-      return new Response(null, {
-        status: 200,
-      });
-    } catch (err) {
-      console.error("convex/http.ts: Webhook Error Caught:", err);
-      return new Response("Webhook Error", {
-        status: 400,
-      });
+      if (existingUser) {
+        console.log(`Updating user: ${clerkId}`);
+        await ctx.runMutation(internal.user.updateUser, {
+          clerkId,
+          email: primaryEmailAddress ?? undefined,
+          phone_number: primaryPhoneNumber ?? undefined,
+          firstName: attributes.first_name ?? undefined,
+          lastName: attributes.last_name ?? undefined,
+        });
+      } else {
+        console.log(`Creating new user: ${clerkId}`);
+        await ctx.runMutation(internal.user.createUser, {
+          clerkId,
+          email: primaryEmailAddress ?? undefined,
+          phone_number: primaryPhoneNumber ?? undefined,
+          firstName: attributes.first_name ?? undefined,
+          lastName: attributes.last_name ?? undefined,
+          tokenIdentifier,
+        });
+      }
+      break;
     }
-  }),
+    case "user.deleted": {
+      const { id: clerkId, deleted } = event.data;
+      if (deleted) {
+        console.log(`Deleting user: ${clerkId}`);
+        await ctx.runMutation(internal.user.deleteUser, { clerkId: clerkId! });
+      }
+      break;
+    }
+    default: {
+      console.log("Ignored Clerk webhook event:", event.type);
+    }
+  }
+
+  return new Response(null, { status: 200 });
 });
+
+http.route({
+  path: "/clerk",
+  method: "POST",
+  handler: handleClerkWebhook,
+});
+
+async function validateRequest(
+  req: Request
+): Promise<WebhookEvent | undefined> {
+  const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
+  if (!webhookSecret) {
+    console.error("CLERK_WEBHOOK_SECRET is not set");
+    return;
+  }
+  const payloadString = await req.text();
+  const svixHeaders = {
+    "svix-id": req.headers.get("svix-id")!,
+    "svix-timestamp": req.headers.get("svix-timestamp")!,
+    "svix-signature": req.headers.get("svix-signature")!,
+  };
+  const wh = new Webhook(webhookSecret);
+  try {
+    return wh.verify(payloadString, svixHeaders) as WebhookEvent;
+  } catch (error) {
+    console.error("Error verifying webhook:", error);
+    return;
+  }
+}
 
 export default http;

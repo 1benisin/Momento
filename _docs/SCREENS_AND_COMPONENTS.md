@@ -141,24 +141,26 @@ _This is the view for `Host-Only` and `Hybrid` users who are in "Host Mode." It 
 
 ### 6. User Management: Profile, Settings & Preferences
 
-To provide a clear and organized experience, all user management functions are accessed from a menu presented by the `<UserButton>` component in the main app header. This leads to two distinct destinations: one for core account and security settings (managed by Clerk), and another for app-specific preferences (managed by us).
+To provide a clear and organized experience, all user management functions are centralized in a custom-built account screen. This approach gives us full native control over the UI while still leveraging Clerk's powerful backend hooks for security and data management.
 
-- **`<UserButton>` Component**:
+- **Custom User Icon**:
 
   - **Location**: Placed in the header of the main `(tabs)` layout.
-  - **Functionality**: On press, it opens a menu with two primary navigation options:
-    1.  **"Profile & Security"** -> Navigates to the `UserProfileScreen`.
-    2.  **"App Preferences"** -> Navigates to the `SettingsScreen`.
-    3.  It also includes a "Sign Out" option.
+  - **Functionality**: On press, it navigates the user directly to the main `AccountScreen`.
 
-- **`UserProfileScreen` (`/account`)**:
+- **`AccountScreen` (`/account`)**:
 
-  - **Purpose**: This screen is dedicated _exclusively_ to rendering Clerk's pre-built `<UserProfile />` component. It acts as the secure, centralized hub for all core identity and security management (name, email, phone, password, MFA).
-  - **File Path**: `app/(tabs)/account/[[...userProfile]].tsx`. The `[[...userProfile]]` catch-all route is required for Clerk's component to handle its own internal routing.
+  - **Purpose**: This screen is our custom, native replacement for Clerk's web-based `<UserProfile />`. It serves as the secure hub for core identity and security management, built using Clerk's hooks like `useUser()`. Its responsibilities include:
+    - Displaying user information (name, email, phone).
+    - Providing forms to update profile details (e.g., `user.update()`).
+    - Allowing users to manage their email address and phone number.
+    - A clear "Sign Out" option.
+    - A "Danger Zone" with options to "Pause Account" and "Delete Account", guiding users toward pausing as a non-permanent alternative.
+  - **File Path**: `app/(tabs)/account.tsx`.
 
 - **`SettingsScreen` (`/settings`)**:
 
-  - **Purpose**: This is our fully custom, native screen for all Momento-specific settings and preferences. Its content is context-aware and changes based on the user's `active_role`.
+  - **Purpose**: This remains our fully custom, native screen for all Momento-specific settings and preferences, accessible from the `AccountScreen`. Its content is context-aware and changes based on the user's `active_role`.
   - **File Path**: `app/(tabs)/settings.tsx`.
   - **Core Layout & Universal Sections (Always Visible)**:
     - **`ModeSwitcher`**: For `Hybrid Users`, this is the primary control at the top of the screen to switch between 'Social' and 'Host' contexts. It is only rendered for users who have both a `socialProfile` and a `hostProfile`.
@@ -207,8 +209,15 @@ This section catalogs the reusable UI elements that form the building blocks of 
 
 - **`BlockActionErrorModal`**: A modal displayed when a user attempts to block another user but is disallowed by a system rule (e.g., they are both confirmed for the same upcoming event).
   - **Title**: "Cannot Block User"
-  - **Body**: "You and [User's Name] are both confirmed for '[Event Title]' which is happening soon. To ensure a smooth experience for everyone, you cannot block this user until after the event. If you don't feel comfortable attending, you can still cancel your spot."
+  - **Body**: "You and [User's Name] are both confirmed for '[Event Title]' which is happening soon. To ensure a smooth experience for everyone, you cannot block this user until after the event. If you don't feel comfortable attending, you can still cancel your attendance."
   - **Buttons**: "Cancel Attendance" (navigates to the cancellation flow) and "OK" (dismisses the modal).
+- **`PauseOrDeleteModal`**: A modal that appears when a user taps "Delete Account". It is designed to be a user-retention mechanism that nudges the user toward pausing instead of deleting.
+  - **Title**: "Before you go..."
+  - **Body**: "Deleting your account is permanent and will erase all your memories and connections. If you just need a break, you can **pause your account** instead. This will hide your profile from public view and stop all new invitations, but you can still message your connections and reactivate anytime."
+  - **Buttons**: "Pause Account" (primary), "Delete Permanently" (destructive), "Cancel" (secondary).
+- **`PausedAccountBanner`**: A persistent banner or overlay shown to a user whose account status is `'paused'`.
+  - **Body**: "Your account is currently paused."
+  - **Button**: "Reactivate Account".
 - **`CustomizationUnlockToast`**: A non-interruptive toast notification that appears when a user unlocks a new Face Card customization. It displays a message like "🎉 You've unlocked the 'Gilded' border!" and includes an optional "Customize Now" button that deep-links to the `FaceCardStylingScreen`.
 - **`DeclineFeedbackModal`**: A modal presented after a user declines an invitation, asking for a reason. Includes options for "Too short notice," "Too far away," and "Too expensive."
 - **`EventChangeConfirmationModal`**: A modal shown to an attendee after a host makes a material change to an event. It must clearly display the "before" and "after" of the change (e.g., "Time changed from **7 PM** to **8 PM**"). The buttons are clearly labeled "Keep My Spot" and "Cancel & Get Refund", and there is no deadline or countdown.

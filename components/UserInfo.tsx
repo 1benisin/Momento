@@ -1,30 +1,31 @@
+import { useUser } from "@clerk/clerk-expo";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Text, View, ActivityIndicator, Image, StyleSheet } from "react-native";
 
 export default function UserInfo() {
-  const user = useQuery(api.user.me);
+  const { user, isLoaded } = useUser();
+  const convexUser = useQuery(api.user.me);
 
-  if (user === undefined) {
+  const isLoading = !isLoaded || convexUser === undefined;
+
+  if (isLoading) {
     return <ActivityIndicator />;
   }
 
-  if (user === null) {
+  if (!user || convexUser === null) {
     return <Text>User not found</Text>;
   }
 
   return (
     <View style={styles.container}>
-      {user.socialProfile?.current_photo_url && (
-        <Image
-          source={{ uri: user.socialProfile.current_photo_url }}
-          style={styles.profilePhoto}
-        />
+      {user.imageUrl && (
+        <Image source={{ uri: user.imageUrl }} style={styles.profilePhoto} />
       )}
       <Text style={styles.greeting}>
-        Hi, {user.socialProfile?.first_name || user.phone_number}!
+        Hi, {user.firstName || user.primaryEmailAddress?.emailAddress}!
       </Text>
-      <Text>Your status is: {user.status}</Text>
+      <Text>Your status is: {convexUser.status}</Text>
     </View>
   );
 }

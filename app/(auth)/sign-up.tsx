@@ -17,7 +17,7 @@ export default function SignUpScreen() {
   const router = useRouter();
 
   const [signUpMethod, setSignUpMethod] = React.useState<"email" | "phone">(
-    "email"
+    "phone"
   );
   const [emailAddress, setEmailAddress] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -97,16 +97,16 @@ export default function SignUpScreen() {
     <>
       <View style={styles.tabContainer}>
         <TouchableOpacity
-          style={[styles.tab, signUpMethod === "email" && styles.activeTab]}
-          onPress={() => setSignUpMethod("email")}
-        >
-          <Text style={styles.tabText}>Email</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
           style={[styles.tab, signUpMethod === "phone" && styles.activeTab]}
           onPress={() => setSignUpMethod("phone")}
         >
           <Text style={styles.tabText}>Phone</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, signUpMethod === "email" && styles.activeTab]}
+          onPress={() => setSignUpMethod("email")}
+        >
+          <Text style={styles.tabText}>Email</Text>
         </TouchableOpacity>
       </View>
 

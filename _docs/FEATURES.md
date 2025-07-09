@@ -59,18 +59,35 @@ User profiles will contain three categories of information:
 
 ### User Account Management & Settings
 
-To provide a clear and robust user experience, we divide settings into two distinct areas, accessed via a menu from the main `<UserButton>` in the app header:
+To provide a clear and robust user experience, we divide settings into two distinct areas, accessed via a menu from the custom user icon in the app header:
 
-1.  **Profile & Security (Managed by Clerk)**: This destination is a dedicated screen that renders Clerk's pre-built `<UserProfile />` component. It serves as the single source of truth for core account and security management, including:
+1.  **Profile & Security (Custom Built)**: This destination is a dedicated, custom-built screen that serves as the single source of truth for core account and security management. While it gives us full native UI control, it is powered entirely by Clerk's hooks (`useUser`, etc.). Its responsibilities include:
 
-    - Updating profile information (name, etc.).
-    - Managing and verifying email addresses and phone numbers.
-    - Changing passwords and managing multi-factor authentication (MFA).
+    - Updating profile information (name, etc.) via `user.update()`.
+    - Managing and verifying the user's email address and phone number.
+    - Providing a path to change passwords and manage multi-factor authentication (MFA).
     - Viewing active sessions and signing out of other devices.
 
-2.  **App Preferences (Managed by Momento)**: This is a fully custom-built settings screen where we house all of Momento's unique application-level preferences. This screen contextually displays settings based on the user's active mode.
+### Pausing & Deleting Your Account
 
-This hybrid approach allows us to leverage Clerk's powerful, secure, and pre-built components for the complex parts of account management, while giving us full control to build a tailored experience for our app-specific settings.
+To give users full control over their account lifecycle while encouraging user retention, Momento provides both a "pause" and a "delete" option.
+
+- **Pause Account (Hibernation Mode)**: This is a non-permanent way for a user to take a break.
+
+  - **Functionality**: When paused, a user's `status` in the database is set to `'paused'`. This makes them socially invisible. They will not receive any new invitations or notifications (except for critical security alerts), and their profile will not appear in any public discovery feeds.
+  - **User Experience**: A paused user can still log in, view their Memory Book, and exchange messages with existing connections. However, they cannot engage in any new social activities. A persistent banner with a "Reactivate Account" button will be displayed, making it easy to return.
+
+- **Delete Account (Permanent Action)**: This is a permanent, irreversible action.
+  - **The "Nudge-to-Pause" Flow**: To prevent accidental deletion and retain users, the "Delete Account" button first opens a modal that presents pausing as a preferable alternative.
+  - **Modal Content**:
+    - **Title**: "Before you go..."
+    - **Body**: Explains that deletion is permanent, while pausing is a temporary break that preserves their data and connections.
+    - **Actions**: The modal offers three clear choices: "Pause Account" (primary action), "Delete Permanently" (destructive action), and "Cancel".
+  - **Backend Process**: If the user proceeds with deletion, their user record in Clerk is deleted. A `user.deleted` webhook then triggers the deletion of their corresponding record in the Convex database.
+
+2.  **App Preferences (Managed by Momento)**: This is our fully custom-built settings screen where we house all of Momento's unique application-level preferences. This screen contextually displays settings based on the user's active mode.
+
+This hybrid approach allows us to have a fully native and branded experience while still relying on Clerk's powerful and secure backend for the complex parts of account management.
 
 ### The Interest Constellation
 

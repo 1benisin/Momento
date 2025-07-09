@@ -1,137 +1,280 @@
-import { useAuth, useUser } from "@clerk/clerk-expo";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
+  Pressable,
+  TextInput,
   ActivityIndicator,
+  Image,
   Alert,
 } from "react-native";
+import { useUser } from "@clerk/clerk-expo";
+import { useRouter } from "expo-router";
+import { SignOutButton } from "@/components/SignOutButton";
 
-export default function AccountScreen() {
-  const { signOut } = useAuth();
-  const { user } = useUser();
-  const [loading, setLoading] = React.useState(false);
+const AccountScreen = () => {
+  const { user, isLoaded } = useUser();
+  const router = useRouter();
 
-  const onSignOutPress = async () => {
-    setLoading(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setFirstName(user.firstName ?? "");
+      setLastName(user.lastName ?? "");
+    }
+  }, [user]);
+
+  const onSave = async () => {
+    if (!user) return;
+    setIsSaving(true);
     try {
-      await signOut();
-      // The user will be redirected to the sign-in screen automatically
-    } catch (err) {
-      console.error("Error signing out:", err);
-      Alert.alert("Error", "Could not sign out.");
+      await user.update({
+        firstName: firstName,
+        lastName: lastName,
+      });
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error updating user:", error);
+      Alert.alert("Error", "Could not save your changes. Please try again.");
     } finally {
-      setLoading(false);
+      setIsSaving(false);
     }
   };
 
-  const onAddEmailPress = () => {
-    // This would navigate to a new screen or show a modal
-    // to handle the `user.createEmailAddress` flow.
+  const onEdit = () => {
+    setIsEditing(true);
+  };
+
+  const onCancel = () => {
+    setIsEditing(false);
+    // Reset fields to original values
+    if (user) {
+      setFirstName(user.firstName ?? "");
+      setLastName(user.lastName ?? "");
+    }
+  };
+
+  const onDeleteAccount = async () => {
+    if (!user) return;
+
     Alert.alert(
-      "Add Email",
-      "This feature is not yet implemented. It will allow you to add and verify an email address."
+      "Delete Account",
+      "Are you sure you want to delete your account? This action is permanent and cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await user.delete();
+              // The user will be signed out automatically and the root layout will redirect to the sign-in screen.
+            } catch (error) {
+              console.error("Error deleting account:", error);
+              Alert.alert("Error", "Could not delete your account.");
+            }
+          },
+        },
+      ]
     );
   };
 
-  const getPrimaryEmail = () => {
-    return user?.primaryEmailAddress?.emailAddress || "No email added";
-  };
+  if (!isLoaded || !user) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.title}>Account Info</Text>
-        <View style={styles.infoRow}>
-          <Text style={styles.label}>User ID:</Text>
-          <Text style={styles.info}>{user?.id}</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.label}>Email:</Text>
-          <Text style={styles.info}>{getPrimaryEmail()}</Text>
-        </View>
-
-        {!user?.primaryEmailAddress && (
-          <TouchableOpacity
-            style={[styles.button, styles.outlineButton]}
-            onPress={onAddEmailPress}
-          >
-            <Text style={[styles.buttonText, styles.outlineButtonText]}>
-              Add Email Address
-            </Text>
-          </TouchableOpacity>
+      <View style={styles.profileContainer}>
+        <Image source={{ uri: user.imageUrl }} style={styles.profileImage} />
+        {isEditing ? (
+          <View style={styles.editNameContainer}>
+            <TextInput
+              placeholder="First Name"
+              value={firstName}
+              onChangeText={setFirstName}
+              style={[styles.input, styles.nameInput]}
+            />
+            <TextInput
+              placeholder="Last Name"
+              value={lastName}
+              onChangeText={setLastName}
+              style={[styles.input, styles.nameInput]}
+            />
+          </View>
+        ) : (
+          <Text style={styles.name}>
+            {user.firstName} {user.lastName}
+          </Text>
         )}
+        <Text style={styles.email}>
+          {user.primaryEmailAddress?.emailAddress}
+        </Text>
+        <Text style={styles.phone}>{user.primaryPhoneNumber?.phoneNumber}</Text>
       </View>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={onSignOutPress}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator color="white" />
+      <View style={styles.buttonContainer}>
+        {isEditing ? (
+          <>
+            <Pressable
+              onPress={onSave}
+              style={styles.button}
+              disabled={isSaving}
+            >
+              <Text style={styles.buttonText}>
+                {isSaving ? "Saving..." : "Save"}
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={onCancel}
+              style={[styles.button, styles.secondaryButton]}
+              disabled={isSaving}
+            >
+              <Text style={[styles.buttonText, styles.secondaryButtonText]}>
+                Cancel
+              </Text>
+            </Pressable>
+          </>
         ) : (
-          <Text style={styles.buttonText}>Sign Out</Text>
+          <Pressable onPress={onEdit} style={styles.button}>
+            <Text style={styles.buttonText}>Edit Profile</Text>
+          </Pressable>
         )}
-      </TouchableOpacity>
+        <Pressable
+          onPress={() => router.push("/settings")}
+          style={[styles.button, styles.secondaryButton]}
+        >
+          <Text style={[styles.buttonText, styles.secondaryButtonText]}>
+            App Settings
+          </Text>
+        </Pressable>
+        <Pressable
+          onPress={() => router.push("/account/change-password")}
+          style={[styles.button, styles.secondaryButton]}
+        >
+          <Text style={[styles.buttonText, styles.secondaryButtonText]}>
+            Change Password
+          </Text>
+        </Pressable>
+        <Pressable
+          onPress={() => router.push("/account/two-factor-auth")}
+          style={[styles.button, styles.secondaryButton]}
+          disabled={user.twoFactorEnabled}
+        >
+          <Text style={[styles.buttonText, styles.secondaryButtonText]}>
+            {user.twoFactorEnabled
+              ? "Two-Factor Authentication Enabled"
+              : "Set Up Two-Factor Authentication"}
+          </Text>
+        </Pressable>
+        <SignOutButton />
+      </View>
+
+      <View style={styles.dangerZone}>
+        <Text style={styles.dangerZoneText}>Danger Zone</Text>
+        <Pressable
+          onPress={onDeleteAccount}
+          style={[styles.button, styles.dangerButton]}
+        >
+          <Text style={styles.buttonText}>Delete Account</Text>
+        </Pressable>
+      </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    justifyContent: "space-between",
+    backgroundColor: "#fff",
   },
-  card: {
-    backgroundColor: "white",
-    borderRadius: 10,
-    padding: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+  profileContainer: {
+    alignItems: "center",
+    marginBottom: 30,
   },
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
+  profileImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     marginBottom: 20,
   },
-  infoRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 15,
+  name: {
+    fontSize: 24,
+    fontWeight: "bold",
   },
-  label: {
+  email: {
     fontSize: 16,
     color: "#666",
+    marginTop: 5,
   },
-  info: {
+  phone: {
     fontSize: 16,
-    fontWeight: "500",
-    maxWidth: "70%",
+    color: "#666",
+    marginTop: 5,
+  },
+  editNameContainer: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  nameInput: {
+    flex: 1,
+  },
+  input: {
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+    width: "100%",
+    marginBottom: 10,
+  },
+  buttonContainer: {
+    width: "100%",
+    gap: 10,
   },
   button: {
-    backgroundColor: "#d9534f",
+    backgroundColor: "#007BFF",
     padding: 15,
     borderRadius: 5,
     alignItems: "center",
-    marginTop: 20,
   },
   buttonText: {
     color: "white",
     fontWeight: "bold",
   },
-  outlineButton: {
+  secondaryButton: {
     backgroundColor: "transparent",
     borderWidth: 1,
     borderColor: "#007BFF",
   },
-  outlineButtonText: {
+  secondaryButtonText: {
     color: "#007BFF",
   },
+  dangerZone: {
+    marginTop: 40,
+    borderTopWidth: 1,
+    borderTopColor: "#eee",
+    paddingTop: 20,
+  },
+  dangerZoneText: {
+    textAlign: "center",
+    color: "red",
+    marginBottom: 10,
+    fontWeight: "bold",
+  },
+  dangerButton: {
+    backgroundColor: "red",
+  },
 });
+
+export default AccountScreen;

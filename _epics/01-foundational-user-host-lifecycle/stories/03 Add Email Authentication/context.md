@@ -16,24 +16,18 @@ This section captures the high-level "what and why" from our main planning docum
 
 Our strategy for authentication is a hybrid approach, which is a key decision:
 
-- **Authentication:** Clerk (using `@clerk/clerk-expo` and `convex/react-clerk`, with a hybrid approach leveraging custom UI for onboarding and pre-built components like `<UserProfile />` for account management).
+- **Authentication:** Clerk (using `@clerk/clerk-expo` and `convex/react-clerk`, with a fully custom UI built using Clerk's hooks for all authentication and account management flows).
 
 ### From `FEATURES.md`: User Account Management & Settings
 
 This defines our "Two Destinations" architecture for all settings:
 
-To provide a clear and robust user experience, we divide settings into two distinct areas, accessed via a menu from the main `<UserButton>` in the app header:
+To provide a clear and robust user experience, we divide settings into two distinct areas, accessed via a menu from the custom user icon in the app header:
 
-1.  **Profile & Security (Managed by Clerk)**: This destination is a dedicated screen that renders Clerk's pre-built `<UserProfile />` component. It serves as the single source of truth for core account and security management, including:
+1.  **Profile & Security (Custom Built)**: This destination is a dedicated, custom-built screen that serves as the single source of truth for core account and security management. While it gives us full native UI control, it is powered entirely by Clerk's hooks (`useUser`, etc.).
+2.  **App Preferences (Managed by Momento)**: This is our fully custom-built settings screen where we house all of Momento's unique application-level preferences, typically accessed from the main Profile & Security screen.
 
-    - Updating profile information (name, etc.).
-    - Managing and verifying email addresses and phone numbers.
-    - Changing passwords and managing multi-factor authentication (MFA).
-    - Viewing active sessions and signing out of other devices.
-
-2.  **App Preferences (Managed by Momento)**: This is a fully custom-built settings screen where we house all of Momento's unique application-level preferences. This screen contextually displays settings based on the user's active mode.
-
-This hybrid approach allows us to leverage Clerk's powerful, secure, and pre-built components for the complex parts of account management, while giving us full control to build a tailored experience for our app-specific settings.
+This approach allows us to have a fully native and branded experience while still relying on Clerk's powerful and secure backend for the complex parts of account management.
 
 ---
 
@@ -60,24 +54,20 @@ To manage the initial authentication state gracefully, the root layout will be w
 
 ### User Management: Profile, Settings & Preferences
 
-To provide a clear and organized experience, all user management functions are accessed from a menu presented by the `<UserButton>` component in the main app header. This leads to two distinct destinations: one for core account and security settings (managed by Clerk), and another for app-specific preferences (managed by us).
+To provide a clear and organized experience, all user management functions are centralized in a custom-built account screen.
 
-- **`<UserButton>` Component**:
+- **Custom User Icon**:
 
   - **Location**: Placed in the header of the main `(tabs)` layout.
-  - **Functionality**: On press, it opens a menu with two primary navigation options:
-    1.  **"Profile & Security"** -> Navigates to the `UserProfileScreen`.
-    2.  **"App Preferences"** -> Navigates to the `SettingsScreen`.
-    3.  It also includes a "Sign Out" option.
+  - **Functionality**: On press, it navigates the user directly to the main `AccountScreen`.
 
-- **`UserProfileScreen` (`/account`)**:
+- **`AccountScreen` (`/account`)**:
 
-  - **Purpose**: This screen is dedicated _exclusively_ to rendering Clerk's pre-built `<UserProfile />` component. It acts as the secure, centralized hub for all core identity and security management (name, email, phone, password, MFA).
-  - **File Path**: `app/(tabs)/account/[[...userProfile]].tsx`.
-  - **Note on Routing**: The `[[...userProfile]]` catch-all route structure is a **requirement** from Expo Router. It allows the Clerk component to manage its own internal URL state and navigation, and removing it will break the component.
+  - **Purpose**: This screen is our custom, native replacement for Clerk's web-based `<UserProfile />`. It serves as the secure hub for core identity and security management, built using Clerk's hooks like `useUser()`.
+  - **File Path**: `app/(tabs)/account.tsx`.
 
 - **`SettingsScreen` (`/settings`)**:
-  - **Purpose**: This is our fully custom, native screen for all Momento-specific settings and preferences. Its content is context-aware and changes based on the user's `active_role`.
+  - **Purpose**: This is our fully custom, native screen for all Momento-specific settings and preferences, which will be accessible from the `AccountScreen`.
   - **File Path**: `app/(tabs)/settings.tsx`.
   - **Core Layout & Universal Sections (Always Visible)**:
     - **`ModeSwitcher`**: For `Hybrid Users`, this is the primary control at the top of the screen to switch between 'Social' and 'Host' contexts.
@@ -115,7 +105,7 @@ export default defineSchema({
 
 ### Note on Data Synchronization
 
-While the `users` table stores a comprehensive view of the user, the "source of truth" for user-editable account information (like name, email, phone numbers) and security settings (password, MFA) is **Clerk**. Users modify this data through Clerk's `<UserProfile />` component. Changes are then synchronized to this `users` collection via webhooks to power Momento's internal application logic. This architecture allows us to leverage Clerk's robust, pre-built UI for account management, saving significant development effort and ensuring a high standard of security.
+While the `users` table stores a comprehensive view of the user, the "source of truth" for user-editable account information (like name, email, phone numbers) and security settings (password, MFA) is **Clerk**. Users modify this data through our custom-built account management screen, which uses Clerk's hooks (e.g., `useUser`) to send updates to Clerk's backend. Changes are then synchronized to this `users` collection via webhooks to power Momento's internal application logic. This architecture allows us to leverage Clerk's robust backend for account management while maintaining a fully custom native UI.
 
 ---
 
@@ -130,10 +120,10 @@ While the `users` table stores a comprehensive view of the user, the "source of 
 
 - The `ModeSwitcher` component is no longer located on a generic "Profile" tab.
 - The canonical flow for a user to switch modes is now:
-  1.  Tap the `<UserButton>` in the app header.
-  2.  Select "App Preferences" from the menu.
-  3.  Navigate to the custom `SettingsScreen`.
-  4.  Use the `ModeSwitcher` control at the top of that screen.
+  1.  Tap the custom user icon in the app header.
+  2.  Navigate to the custom `AccountScreen`.
+  3.  Navigate to the `SettingsScreen` from there.
+  4.  Use the `ModeSwitcher` control at the top of the settings screen.
 
 ### `02_non_us_user_onboarding.md`
 
@@ -155,4 +145,4 @@ This section captures critical implementation details and user experience requir
 - **Robust State Management**: All authentication forms must handle `isLoading` states (e.g., disabling buttons during submission) and display clear, user-friendly error messages returned from the Clerk hooks.
 - **Duplicate Account Prevention**: The sign-up flow must gracefully handle the case where an email is already in use and prompt the user to sign in instead of showing a generic error.
 - **Verification Code Resend**: The UI for email verification must include a "Resend Code" button, ideally with a cooldown period, to handle cases where the initial email is missed by the user or delayed.
-- **Clear Settings Navigation**: The menu presented by the `<UserButton>` must use clear, distinct language for "Profile & Security" vs. "App Preferences" to guide the user to the correct destination and avoid confusion.
+- **Clear Settings Navigation**: The navigation flow from the custom user icon -> account screen -> settings screen must be clear and intuitive for the user.

@@ -10,10 +10,17 @@ import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
-import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
+import {
+  ClerkProvider,
+  useAuth,
+  ClerkLoading,
+  ClerkLoaded,
+  SignedIn,
+  SignedOut,
+} from "@clerk/clerk-expo";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
-import { ConvexReactClient, useConvexAuth, useQuery } from "convex/react";
+import { ConvexReactClient, useQuery } from "convex/react";
 import { ActivityIndicator, View } from "react-native";
 import { api } from "@/convex/_generated/api";
 import { UserStatuses } from "@/convex/schema";
@@ -78,74 +85,80 @@ export default function RootLayout() {
 
 /**
  * RootLayoutNav is responsible for setting up the navigation theme (dark/light mode)
- * and rendering the core routing logic.
+ * and rendering the core routing logic using Clerk's loading and authentication state components.
  */
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <InitialLayout />
+      <ClerkLoading>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <ActivityIndicator size="large" />
+        </View>
+      </ClerkLoading>
+      <ClerkLoaded>
+        <InitialLayout />
+      </ClerkLoaded>
     </ThemeProvider>
   );
 }
 
 /**
  * InitialLayout is the core component that handles the routing logic based on authentication state.
- * - It uses `useConvexAuth` to check if the user is authenticated.
- * - While checking (`isLoading`), it can show a loading indicator.
- * - Based on the `isAuthenticated` status, it uses `useRouter` to navigate the user to either:
- *   - The main app content `(tabs)` if they are signed in.
- *   - The sign-in screen `(auth)` if they are not.
- * It ensures that users cannot access protected routes without being authenticated.
+ * - It uses Clerk's `useAuth` to check if the user is signed in.
+ * - It uses Convex's `useQuery` to fetch the user's data, including their onboarding status.
+ * - Based on these states, it imperatively navigates the user to the correct screen:
+ *   - `(auth)` flow if signed out.
+ *   - `(onboarding)` flow if signed in but onboarding is not complete.
+ *   - `(tabs)` flow if signed in and onboarded.
  */
 function InitialLayout() {
-  const { isLoading: isConvexAuthLoading, isAuthenticated } = useConvexAuth();
+  const { isLoaded, isSignedIn } = useAuth();
   const userData = useQuery(api.user.me);
   const segments = useSegments();
   const router = useRouter();
 
-  const inTabsGroup = segments[0] === "(tabs)";
+  const inAuthGroup = segments[0] === "(auth)";
   const inOnboardingGroup = segments[0] === "(onboarding)";
+  const inTabsGroup = segments[0] === "(tabs)";
 
-  // Wait until both auth and user data fetching are complete.
-  // userData === undefined means the query is still loading for the first time.
-  const isLoading = isConvexAuthLoading || userData === undefined;
+  const isLoading = !isLoaded || (isSignedIn && userData === undefined);
 
   useEffect(() => {
     if (isLoading) return;
 
-    // If the user is authenticated
-    if (isAuthenticated) {
-      // and we have their data
+    if (isSignedIn) {
       if (userData) {
         if (userData.status === UserStatuses.PENDING_ONBOARDING) {
-          // If they are not already in the onboarding flow, redirect them.
           if (!inOnboardingGroup) {
-            // Check if they've set their name yet
-            if (!userData.socialProfile?.first_name) {
+            if (!userData.first_name) {
               router.replace("/(onboarding)/profile-setup");
             } else {
               router.replace("/(onboarding)/initial-photo");
             }
           }
         } else if (userData.status === UserStatuses.ACTIVE) {
-          // If they are active and not in the main app, send them there.
           if (!inTabsGroup) {
             router.replace("/(tabs)");
           }
         }
-      } else {
-        // This case handles the race condition: user is auth'd but the Convex user
-        // record hasn't been created yet. We do nothing and let the loading
-        // indicator continue until `userData` is populated.
-        // If userData remains null, something is wrong with the webhook setup.
       }
-    } else if (!isAuthenticated) {
-      // If they are not authenticated, send them to the sign-in page.
-      router.replace("/sign-in");
+    } else {
+      if (!inAuthGroup) {
+        router.replace("/sign-in");
+      }
     }
-  }, [isLoading, isAuthenticated, userData, inTabsGroup, inOnboardingGroup]);
+  }, [
+    isLoading,
+    isSignedIn,
+    userData,
+    inAuthGroup,
+    inOnboardingGroup,
+    inTabsGroup,
+  ]);
 
   if (isLoading) {
     return (
