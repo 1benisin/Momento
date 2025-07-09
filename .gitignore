@@ -90,3 +90,13 @@ project.xcworkspace/
 Network Trash Folder
 Temporary Items
 .apdisk 
+
+# Editor-specific files
+*.swp
+*.swo
+*.swp.*
+*.swn
+*.swh
+*.swx
+.idea/
+.vscode/
