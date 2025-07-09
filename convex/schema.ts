@@ -4,13 +4,15 @@ import { v } from "convex/values";
 export const UserStatuses = {
   PENDING_ONBOARDING: "pending_onboarding",
   ACTIVE: "active",
+  PAUSED: "paused",
 } as const;
 
 export type UserStatus = (typeof UserStatuses)[keyof typeof UserStatuses];
 
 export const userStatusValidator = v.union(
   v.literal(UserStatuses.PENDING_ONBOARDING),
-  v.literal(UserStatuses.ACTIVE)
+  v.literal(UserStatuses.ACTIVE),
+  v.literal(UserStatuses.PAUSED)
 );
 
 export default defineSchema({

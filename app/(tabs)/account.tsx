@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -8,14 +8,22 @@ import {
   ActivityIndicator,
   Image,
   Alert,
+  ScrollView,
 } from "react-native";
 import { useUser } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
+import { useMutation, useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 import { SignOutButton } from "@/components/SignOutButton";
+import { UserStatuses } from "@/convex/schema";
 
 const AccountScreen = () => {
   const { user, isLoaded } = useUser();
   const router = useRouter();
+  const convexUser = useQuery(api.user.me);
+  const pauseAccount = useMutation(api.user.pauseAccount);
+  const unpauseAccount = useMutation(api.user.unpauseAccount);
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const [isEditing, setIsEditing] = useState(false);
   const [firstName, setFirstName] = useState("");
@@ -59,24 +67,22 @@ const AccountScreen = () => {
     }
   };
 
-  const onDeleteAccount = async () => {
-    if (!user) return;
-
+  const onPauseAccount = async () => {
     Alert.alert(
-      "Delete Account",
-      "Are you sure you want to delete your account? This action is permanent and cannot be undone.",
+      "Pause Account",
+      "Pausing your account will hide your profile from others and stop all non-critical notifications. You can reactivate it at any time. Are you sure?",
       [
         { text: "Cancel", style: "cancel" },
         {
-          text: "Delete",
+          text: "Pause",
           style: "destructive",
           onPress: async () => {
             try {
-              await user.delete();
-              // The user will be signed out automatically and the root layout will redirect to the sign-in screen.
+              await pauseAccount();
+              // The root layout will handle showing the paused banner.
             } catch (error) {
-              console.error("Error deleting account:", error);
-              Alert.alert("Error", "Could not delete your account.");
+              console.error("Error pausing account:", error);
+              Alert.alert("Error", "Could not pause your account.");
             }
           },
         },
@@ -84,7 +90,47 @@ const AccountScreen = () => {
     );
   };
 
-  if (!isLoaded || !user) {
+  const onReactivateAccount = async () => {
+    try {
+      await unpauseAccount();
+    } catch (error) {
+      console.error("Error reactivating account:", error);
+      Alert.alert("Error", "Could not reactivate your account.");
+    }
+  };
+
+  const onDeleteAccount = async () => {
+    if (!user) return;
+
+    Alert.alert(
+      "Are you sure?",
+      "Pausing your account hides your profile and stops notifications. Deleting is permanent and cannot be undone. We recommend pausing if you just need a break.",
+      [
+        {
+          text: "Pause Account",
+          onPress: onPauseAccount,
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await user.delete();
+            } catch (error) {
+              console.error("Error deleting account:", error);
+              Alert.alert("Error", "Could not delete your account.");
+            }
+          },
+        },
+        { text: "Cancel", style: "cancel" },
+      ]
+    );
+  };
+
+  const isLoading = !isLoaded || convexUser === undefined;
+  const isPaused = convexUser?.status === UserStatuses.PAUSED;
+
+  if (isLoading || !user) {
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" />
@@ -93,7 +139,16 @@ const AccountScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView ref={scrollViewRef} contentContainerStyle={styles.container}>
+      {isPaused && (
+        <Pressable onPress={() => scrollViewRef.current?.scrollToEnd()}>
+          <View style={styles.pausedBanner}>
+            <Text style={styles.pausedBannerText}>
+              Your account is currently paused. Tap to manage.
+            </Text>
+          </View>
+        </Pressable>
+      )}
       <View style={styles.profileContainer}>
         <Image source={{ uri: user.imageUrl }} style={styles.profileImage} />
         {isEditing ? (
@@ -120,6 +175,13 @@ const AccountScreen = () => {
           {user.primaryEmailAddress?.emailAddress}
         </Text>
         <Text style={styles.phone}>{user.primaryPhoneNumber?.phoneNumber}</Text>
+        {convexUser?.status && (
+          <Text style={styles.statusText}>
+            Status:{" "}
+            {convexUser.status.charAt(0).toUpperCase() +
+              convexUser.status.slice(1)}
+          </Text>
+        )}
       </View>
 
       <View style={styles.buttonContainer}>
@@ -182,21 +244,43 @@ const AccountScreen = () => {
       <View style={styles.dangerZone}>
         <Text style={styles.dangerZoneText}>Danger Zone</Text>
         <Pressable
+          onPress={isPaused ? onReactivateAccount : onPauseAccount}
+          style={[styles.button, styles.warningButton, { marginBottom: 10 }]}
+        >
+          <Text style={[styles.buttonText, styles.warningButtonText]}>
+            {isPaused ? "Reactivate Account" : "Pause Account"}
+          </Text>
+        </Pressable>
+        <Pressable
           onPress={onDeleteAccount}
           style={[styles.button, styles.dangerButton]}
         >
           <Text style={styles.buttonText}>Delete Account</Text>
         </Pressable>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 20,
     backgroundColor: "#fff",
+    flexGrow: 1,
+  },
+  pausedBanner: {
+    backgroundColor: "#FFFBEA",
+    borderColor: "#FACC15",
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 20,
+    alignItems: "center",
+  },
+  pausedBannerText: {
+    color: "#B45309",
+    fontWeight: "500",
+    textAlign: "center",
   },
   profileContainer: {
     alignItems: "center",
@@ -221,6 +305,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#666",
     marginTop: 5,
+  },
+  statusText: {
+    fontSize: 16,
+    color: "#666",
+    marginTop: 10,
+    fontWeight: "bold",
   },
   editNameContainer: {
     flexDirection: "row",
@@ -268,12 +358,18 @@ const styles = StyleSheet.create({
   },
   dangerZoneText: {
     textAlign: "center",
-    color: "red",
+    color: "#B45309",
     marginBottom: 10,
     fontWeight: "bold",
   },
   dangerButton: {
     backgroundColor: "red",
+  },
+  warningButton: {
+    backgroundColor: "#FACC15",
+  },
+  warningButtonText: {
+    color: "#422006",
   },
 });
 

@@ -1,11 +1,14 @@
 import React from "react";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { FontAwesome } from "@expo/vector-icons";
 import { Link, Tabs, useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/components/useColorScheme";
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { UserStatuses } from "@/convex/schema";
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -18,6 +21,9 @@ function TabBarIcon(props: {
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const router = useRouter();
+  const convexUser = useQuery(api.user.me);
+
+  const isPaused = convexUser?.status === UserStatuses.PAUSED;
 
   return (
     <Tabs
@@ -47,16 +53,26 @@ export default function TabLayout() {
                 )}
               </Pressable>
             </Link>
-            <Pressable onPress={() => router.push("/account")}>
-              {({ pressed }) => (
+            <View>
+              <Pressable onPress={() => router.push("/account")}>
+                {({ pressed }) => (
+                  <FontAwesome
+                    name="user-circle"
+                    size={25}
+                    color={Colors[colorScheme ?? "light"].text}
+                    style={{ opacity: pressed ? 0.5 : 1 }}
+                  />
+                )}
+              </Pressable>
+              {isPaused && (
                 <FontAwesome
-                  name="user-circle"
-                  size={25}
-                  color={Colors[colorScheme ?? "light"].text}
-                  style={{ opacity: pressed ? 0.5 : 1 }}
+                  name="pause-circle"
+                  size={14}
+                  color="orange"
+                  style={{ position: "absolute", right: -2, top: -2 }}
                 />
               )}
-            </Pressable>
+            </View>
           </View>
         ),
       }}

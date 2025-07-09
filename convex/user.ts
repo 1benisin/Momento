@@ -104,6 +104,44 @@ export const deleteUser = internalMutation({
   },
 });
 
+export const pauseAccount = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Called pauseAccount without authentication present");
+    }
+
+    const user = await getUserByClerkId(ctx, { clerkId: identity.subject });
+    if (user === null) {
+      throw new Error("User not found, cannot pause account");
+    }
+
+    await ctx.db.patch(user._id, {
+      status: UserStatuses.PAUSED,
+    });
+  },
+});
+
+export const unpauseAccount = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Called unpauseAccount without authentication present");
+    }
+
+    const user = await getUserByClerkId(ctx, { clerkId: identity.subject });
+    if (user === null) {
+      throw new Error("User not found, cannot unpause account");
+    }
+
+    await ctx.db.patch(user._id, {
+      status: UserStatuses.ACTIVE,
+    });
+  },
+});
+
 export const addProfilePhoto = mutation({
   args: {
     storageId: v.string(),
