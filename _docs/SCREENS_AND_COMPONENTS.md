@@ -37,12 +37,14 @@ This flow is now managed by Clerk, which handles user sessions and the complexit
 - **`SplashScreen`**: Initial launch screen.
 - **`AuthScreen`**: A simple entry screen with "Log In" and "Sign Up" buttons. It might also include a "Contact Support" link.
 - **`(auth)` Route Group Screens**: These screens live in the `app/(auth)/` directory and are wrapped in a layout that redirects already authenticated users to the core app.
-  - **`SignInScreen`**: For returning users. It contains UI for entering a phone number, submitting it, and then entering the received OTP code. This entire state machine is managed by Clerk's `useSignIn()` hook.
-  - **`SignUpScreen`**: For new users. Similar to the sign-in screen, this uses the `useSignUp()` hook to manage the process of creating a new user account with a phone number and OTP verification.
-- **Post-Authentication Flow**: Once a user is authenticated via Clerk, they proceed to the in-app profile and interest setup.
-  - **`ProfileSetupScreen`**: For entering initial public profile information (name, bio).
-  - **`InitialPhotoScreen`**: For taking or uploading the first profile photo.
-  - **`InterestDiscoveryScreen`**: The swipeable deck of "Possibility Cards" to establish the user's initial interest vectors.
+  - **`SignInScreen`**: For returning users. It contains UI for entering a phone number (for OTP) or an email and password. This entire state machine is managed by Clerk's `useSignIn()` hook.
+  - **`SignUpScreen`**: For new users. Similar to the sign-in screen, this uses the `useSignUp()` hook to manage the process of creating a new user account with either a phone number and OTP verification or an email and password.
+- **Post-Authentication & Intent-Driven Onboarding Flow**: Once a user is authenticated via Clerk, they are directed to choose their path.
+  - **`RoleSelectionScreen`**: A new, mandatory screen shown immediately after a user's first successful sign-up. It asks the user to choose their primary goal: "I want to attend events" or "I want to host events". Their choice determines which onboarding flow they enter.
+  - **Participant Onboarding Branch**:
+    - **`ProfileSetupScreen`**: For entering initial public profile information (name, bio).
+    - **`InitialPhotoScreen`**: For taking or uploading the first profile photo.
+    - **`InterestDiscoveryScreen`**: The swipeable deck of "Possibility Cards" to establish the user's initial interest vectors.
 
 The following screens from the previous design are now **DEPRECATED** as their functionality is handled by Clerk or is no longer needed:
 
@@ -53,11 +55,18 @@ The following screens from the previous design are now **DEPRECATED** as their f
 - `LoginScreen`
 - `InternationalWaitlistScreen`
 
-### 2. Host Onboarding Flow (for Organizations)
+### 2. Host Onboarding Flow
 
-- **`CommunityHostSignUpScreen`**: For new `Community Hosts` to sign up with an email and password. This leads into the `HostProfileSetupScreen`.
-- **`HostProfileSetupScreen`**: A dedicated screen for `Community Hosts` to enter their organization name, bio, address, website, and upload brand photos.
-- **`UserHostOnboardingFlow`**: A multi-step flow for existing participants to become a host, launched from a CTA on their `ProfileTab`.
+This section describes the various paths for a user to create a `hostProfile`.
+
+- **Primary Host Onboarding Flow**: This is the path for a new user who selects "I want to host events" on the `RoleSelectionScreen`.
+
+  - **`HostTypeSelectionScreen`**: (Optional but recommended) A screen that asks if they are hosting as an "Individual" or for a "Business/Organization". This helps tailor the next step.
+  - **`HostProfileSetupScreen`**: A form for entering host details. For `Community Hosts`, this will include fields like business address and website. For `User Hosts`, it's simpler, focusing on their host name and bio.
+  - **`HostOnboardingCompleteScreen`**: A final screen congratulating the user, directing them to Host Mode, and providing a strong CTA to begin identity verification.
+
+- **Secondary "Add-a-Role" Flow (Participant to Host)**:
+  - **`UserHostOnboardingFlow`**: This is the original flow, now used for an existing participant who decides to become a host. It is launched from a CTA on their `ProfileTab`.
   1.  **`HostBenefitsScreen`**: Showcases the value proposition of hosting.
   2.  **`HostProfileCreationScreen`**: A simple form to confirm their `host_name` (pre-populated) and add a `host_bio`. Sets `host_type` to `'user'`.
   3.  **`HostOnboardingCompleteScreen`**: A final screen congratulating the user, directing them to the new `ModeSwitcher`, and providing a strong CTA to begin identity verification.

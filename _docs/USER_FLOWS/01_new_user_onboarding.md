@@ -1,61 +1,74 @@
-## 1. New User Onboarding & First Invitation Acceptance
+# User Flow: New User Onboarding
 
-This flow describes the journey of a brand new user from first launch to accepting their first event invitation.
+This document outlines the step-by-step journey for a brand new user, from initial sign-up to landing in the core application. This flow is designed to be **intent-driven**, allowing the user to choose their primary goal upfront, which then directs them to a tailored onboarding experience.
 
-- **Role:** `Participant` (default for all new users)
-- **Goal:** Create an account, set up a basic profile, and confirm attendance for an event.
+- **[Phase 1: Universal Account Creation](#phase-1-universal-account-creation)**: The initial sign-up process, which is flexible and provider-agnostic.
+- **[Phase 2: Intent-Driven Role Selection](#phase-2-intent-driven-role-selection)**: The critical fork in the road where the user defines their primary goal.
+- **[Phase 3A: Participant Onboarding](#phase-3a-participant-onboarding-branch)**: The flow for users who want to attend events.
+- **[Phase 3B: Host Onboarding](#phase-3b-host-onboarding-branch)**: The flow for users who want to create events.
 
-### Flow Steps:
+---
 
-1.  **Entry Point**: User opens the app for the first time.
+## Phase 1: Universal Account Creation
 
-    - `->` **`SplashScreen`**: Displays the Momento logo.
+The goal of this phase is to create a core Momento account with minimal friction, leveraging our authentication provider, Clerk.
 
-2.  **Authentication Choice**:
+1.  **`AuthScreen`**: The user is presented with options to "Sign Up" or "Log In."
 
-    - `->` **`AuthScreen`**: Presents "Sign Up" and "Log In" options.
-    - **User Action**: Taps "Sign Up".
+    - `->` User taps **`Sign Up`**.
 
-3.  **Account Creation (US-Based User)**:
+2.  **`SignUpScreen`**: The user can choose their preferred method for creating an account.
+    - **Option A (Phone)**: User enters their phone number, receives an OTP via SMS, and enters it to verify.
+    - **Option B (Email)**: User enters an email and creates a password.
+    - `->` Upon successful verification, Clerk creates a new user record, and the user is now considered **authenticated**.
 
-    - `->` **`SignUpScreen`**: The user is navigated to the sign-up screen.
-      - User enters their US phone number.
-      - User receives an SMS with a one-time password and enters it on the same screen.
-      - This entire flow is powered by Clerk's `useSignUp` hook.
-    - Upon successful verification, the flow continues to the profile creation steps:
-    - **`ProfileSetupScreen`**: User provides their public `first_name` and a short `bio`.
-    - **`InitialPhotoScreen`**: User uploads or takes their first profile photo. The UI encourages using the in-app camera to earn the "Authentic" badge.
-    - **`InterestDiscoveryScreen`**: The user is presented with a swipeable deck of "Possibility Cards." They swipe right or left on a series of beautifully designed, fictitious event concepts. This engaging flow establishes their initial interest vectors for the matching algorithm.
+## Phase 2: Intent-Driven Role Selection
 
-4.  **Landing in the App**:
+This is the most critical step in the new onboarding process. It ensures the user's first experience is tailored to their primary motivation for joining Momento.
 
-    - Upon successful sign-up, the user is directed to the main app interface.
-    - `->` **`HomeTab`**: The main dashboard. It may be in an empty state, perhaps with a welcome message.
+3.  **`RoleSelectionScreen`**: Immediately after their first successful sign-up, the user is presented with a clear, simple choice.
+    - **UI**: The screen presents two large, tappable cards:
+      - **"I want to attend events"**: Describes the participant experience.
+      - **"I want to host events"**: Describes the host experience.
+    - `->` The user's selection determines which onboarding branch they will enter.
 
-5.  **Receiving First Invitation**:
+## Phase 3A: Participant Onboarding Branch
 
-    - **Trigger**: The backend matching algorithm identifies the new user as a good fit for an event.
-    - **Notification**: The user receives a push notification and/or an SMS.
-    - **`InAppNotificationBanner`**: If the user is in the app, a banner appears.
-    - **User Action**: Taps the notification or a prompt on the `HomeTab`.
+This flow is for users who want to find and attend events.
 
-6.  **Viewing the Invitation**:
+4.  **`ProfileSetupScreen`**: The user is prompted to create their public-facing `socialProfile`.
 
-    - `->` **`InvitationDetailScreen`**: Displays all details for the event: itinerary, host info, description, etc. Upon opening the screen, the user first sees the `MatchReasonBanner` at the top, explaining why they were invited (e.g., "We thought you'd like this because you're interested in Live Music."). This immediately reassures the user that the invitation is personalized. The UI will also prominently display a `ShortNoticeBadge` if the event's lead-time is less than the user's preference.
-    - **User Actions**:
-      - Taps "Accept." (Proceeds to Step 7)
-      - Taps "Decline."
-        - `->` **`DeclineFeedbackModal`**: A modal appears asking for a reason.
-        - **User Action**: Selects the "Too short notice" option.
-        - **System Action**: The user's `min_lead_time` preference is slightly increased. The invitation is dismissed.
+    - **Inputs**: `first_name`, `preferred_name` (optional), `bio` (optional).
+    - `->` User completes the form and proceeds.
 
-7.  **First-Time Payment**:
+5.  **`InitialPhotoScreen`**: The user is prompted to add their first profile photo.
 
-    - **Trigger**: The system detects the user has no saved payment method.
-    - `->` **`PaymentMethodsScreen`**: Prompted modally for the user to add a credit card.
-    - **User Action**: Enters card details and saves.
+    - **UI**: The screen strongly encourages the user to take a new, in-app photo to receive the "Authentic" badge, but also allows them to upload from their library.
+    - `->` User takes or uploads a photo.
 
-8.  **Confirmation**:
-    - The payment is processed for the $5 event fee.
-    - `->` **`EventDetailScreen` (Upcoming State)**: The user sees the confirmed event details. The screen prominently features an "Add to Calendar" button.
-    - **User Action**: User can optionally tap "Add to Calendar" to download an `.ics` file.
+6.  **`InterestDiscoveryScreen`**: The user is introduced to the "Discover Your Interests" feature.
+
+    - **UI**: They are presented with the swipeable deck of "Possibility Cards" to build their initial `positive_interest_vector`.
+    - `->` After a set number of swipes, the user can proceed.
+
+7.  **Onboarding Complete**: The user is navigated to the main app, landing on the **`HomeTab`** in **Social Mode**.
+
+## Phase 3B: Host Onboarding Branch
+
+This flow is for users who want to create and manage events.
+
+4.  **`HostProfileSetupScreen`**: The user is prompted to create their public-facing `hostProfile`.
+
+    - **UI**: The form may differ slightly based on an initial question (e.g., "Are you hosting for a business?").
+    - **Inputs**: `host_name`, `host_bio`, and potentially `website_url` for businesses.
+    - `->` User completes the form and proceeds.
+
+5.  **`VerificationPromptScreen`**: The user is informed about the mandatory identity verification step.
+
+    - **UI**: Explains that verification via Stripe Identity is required to publish an event.
+    - **Actions**:
+      - **"Verify Now"**: Launches the verification flow immediately.
+      - **"Do this Later"**: Allows the user to skip for now and enter the app. A persistent banner will remind them to get verified.
+    - `->` User makes a selection.
+
+6.  **Onboarding Complete**: The user is navigated to the main app, landing on the **`DashboardTab`** in **Host Mode**.

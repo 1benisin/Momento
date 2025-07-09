@@ -93,12 +93,14 @@ As a capstone feature that synthesizes all of a user's activity into a compellin
 > **Future Enhancement (Phase 3):** > **Feature:** In-App Camera Requirement.
 > **Rationale:** Requiring at least one profile picture to be taken through the in-app camera (instead of just incentivizing it) would more strongly guarantee that photos are recent and unedited, further increasing platform trust.
 
-### Phone-First Authentication & US-Only Launch
+### Unified Authentication & US-Only Launch
 
-To create a seamless onboarding experience, Momento uses phone-first authentication powered by Clerk. This eliminates the need for users to remember a traditional password.
+To create a flexible and accessible onboarding experience, Momento uses a unified authentication system powered by Clerk. This allows users to sign up and log in using the method most convenient for them, while eliminating the need for a traditional password.
 
-- **US-Only for MVP:** For the initial launch, sign-up will be limited to users with a valid US phone number, a setting enforced within our Clerk configuration.
-- **OTP-Based Flow:** Both sign-up and login are handled via a secure one-time password sent to the user's phone.
+- **Sign-Up Methods**: Users can choose to sign up with:
+  - A phone number, using a secure one-time password (OTP) for verification.
+  - An email address and password.
+- **US-Only for MVP:** For the initial launch, sign-up will be limited to users with a valid US phone number if they choose that option. This is a setting enforced within our Clerk configuration.
 
 ### Handling Phone Number Recycling
 
@@ -132,16 +134,23 @@ To build a foundation of trust and authenticity, Momento will include a feature 
 
 This section details the features and flows for users who create and manage events on the Momento platform.
 
-### Host Types & Onboarding
+### The Intent-Driven Onboarding Flow
 
-Momento supports two types of hosts, each with a distinct onboarding path. The `host_type` ('user' or 'community') is set during this initial process and determines the required profile information.
+Momento's onboarding is designed to be **intent-driven**. Immediately after creating a core account, a new user is asked to choose their primary goal, which directs them to a tailored onboarding path. This ensures every user, whether a participant or a host, has a logical and streamlined first experience.
 
-- **User Hosts:** This is an existing Momento participant who wants to start hosting events.
-  - **The Entry Point:** The journey begins with a "Become a Host" Call to Action (CTA) prominently displayed on their main `ProfileTab`.
-  - **The Onboarding Flow:** This CTA launches a simple flow that first explains the benefits of hosting (e.g., "Share your passions," "Meet like-minded people") and then guides them through creating a `hostProfile`.
-  - **Smart Profile Creation:** To create a seamless experience, the user's `hostProfile` is pre-populated with their existing `socialProfile.first_name` as the default `host_name`, which they can then edit.
-  - **Unlocking Host Mode:** The moment a user successfully creates their `hostProfile`, they are officially considered a `Hybrid User`. The `ModeSwitcher` component immediately becomes visible on their `ProfileTab`, granting them access to their new hosting tools.
-- **Community Hosts:** This is a business, venue, or organization signing up for the first time. They use a separate sign-up flow requiring an email and password and must provide details like a business address and website for their `hostProfile`. They can also begin drafting events immediately after setup.
+- **The Entry Point:** The journey begins at a single `SignUpScreen` where a user can create an account with either a phone number or an email/password.
+- **The Fork in the Road:** Upon successful account creation, the user is navigated to a `RoleSelectionScreen` where they choose their initial path: "I want to attend events" or "I want to host events."
+- **Participant Onboarding:** If the user selects "attend," they are guided through the standard participant flow: creating their `socialProfile`, taking an `AuthenticPhoto`, and completing the "Discovering Your Interests" experience.
+- **Host Onboarding:** If the user selects "host," they are guided through the host setup flow, which includes creating a `hostProfile` and being prompted to start the identity verification process. This path is designed for both `User Hosts` (individuals) and `Community Hosts` (businesses).
+
+### Adding a Role Later (The Hybrid User)
+
+The system is designed for flexibility, allowing single-role users to add a second role later.
+
+- **Participant Becomes Host:** A user with only a `socialProfile` will see a "Become a Host" CTA on their `ProfileTab`. Tapping this initiates the `UserHostOnboardingFlow`, guiding them to create their `hostProfile`.
+- **Host Becomes Participant:** A user with only a `hostProfile` will see a "Join Events Socially" CTA on their `ProfileTab`. Tapping this initiates the `ParticipantOnboardingFlow`.
+
+Upon completing the second onboarding flow, the user becomes a `Hybrid User`, and the `ModeSwitcher` component appears on their `ProfileTab`, granting them access to both UI contexts.
 
 ### Switching Between Social & Host Modes
 

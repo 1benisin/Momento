@@ -177,10 +177,11 @@ To get the project set up on your local machine, follow these steps.
 
 ### Logging In During Development (Clerk Test Credentials)
 
-To sign in to the application on a simulator during development, you do not need to use a real phone number. Our authentication provider, Clerk, provides test credentials that bypass the need for SMS verification.
+To sign in to the application on a simulator during development, you do not need to use a real phone number or email. Our authentication provider, Clerk, provides test credentials that bypass the need for SMS verification.
 
 - **Test Phone Number**: Use any number in the format `+1 (XXX) 555-0100` to `+1 (XXX) 555-0199`. For example: `+12015550100`.
-- **Verification Code**: When prompted for the OTP code, use the universal code: `424242`.
+- **Verification Code (for Phone)**: When prompted for the OTP code, use the universal code: `424242`.
+- **Test Email / Password**: To test the email flow, you can create and use test accounts from the Clerk Dashboard under "Users & Organizations". These allow you to set an email and password for testing without real email verification.
 
 Using these credentials will allow you to quickly and easily test authentication-protected features of the app.
 
