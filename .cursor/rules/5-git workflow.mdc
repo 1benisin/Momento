@@ -22,7 +22,23 @@ For a story like `@/02 Social Profile Creation` which is part of epic `01`, the 
 
 `epic-01/02-social-profile-creation`
 
-**To create and switch to the new branch:**
+### Checking for Existing Branches
+
+Before creating a new branch, check if a branch for the story already exists.
+
+```bash
+git branch --list 'epic-01/02-*'
+```
+
+If a branch for your story already exists, switch to it instead of creating a new one:
+
+```bash
+git checkout epic-01/02-social-profile-creation
+```
+
+### Creating a New Branch
+
+If a branch does not exist, create and switch to it:
 
 ```bash
 git checkout -b epic-01/02-social-profile-creation
@@ -72,7 +88,7 @@ git push -u origin epic-01/02-social-profile-creation
 
 ## 4. Creating a Pull Request (PR)
 
-Once your branch is pushed, create a Pull Request on GitHub.
+Once your branch is pushed, the AI assistant will create a Pull Request on GitHub using the `gh` CLI.
 
 ### PR Title
 
@@ -82,13 +98,25 @@ The PR title should be clear and concise, similar to your primary commit message
 
 `feat(profile): Social Profile Creation`
 
-### PR Description
+### PR Body
 
-The description should provide context for the reviewer. Include:
+The PR body will be populated from a template, but should include:
 
 - **Link to the Story:** Reference the story file path (e.g., `_epics/01-foundational-user-host-lifecycle/stories/02 Social Profile Creation`).
 - **Changes Made:** A summary of what was implemented.
-- **How to Test:** Steps for the reviewer to verify the changes.
-- **Screenshots/GIFs:** If applicable, for UI changes.
+
+**CLI Command for the Assistant:**
+
+```bash
+gh pr create --title "feat(profile): Social Profile Creation" --body "Closes #issue_number. Implements the social profile creation feature as described in the story."
+```
+
+## 5. Returning to Main
+
+After creating the pull request, the assistant will switch back to the `main` branch to ensure a clean working state.
+
+```bash
+git checkout main
+```
 
 By following this process, we maintain a clean and traceable project history, making it easier for everyone to collaborate effectively.
