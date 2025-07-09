@@ -82,6 +82,12 @@ export default function SignUpScreen() {
     }
   };
 
+  const onBackPress = () => {
+    setPendingVerification(false);
+    setCode("");
+    setError(null);
+  };
+
   return (
     <View style={styles.container}>
       {!pendingVerification && (
@@ -134,6 +140,14 @@ export default function SignUpScreen() {
             )}
           </TouchableOpacity>
           {error && <Text style={styles.errorText}>{error}</Text>}
+          <TouchableOpacity
+            onPress={onBackPress}
+            style={[styles.button, styles.secondaryButton]}
+          >
+            <Text style={[styles.buttonText, styles.secondaryButtonText]}>
+              Back
+            </Text>
+          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -181,5 +195,14 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 10,
     marginBottom: 10,
+  },
+  secondaryButton: {
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: "#007BFF",
+    marginTop: 10,
+  },
+  secondaryButtonText: {
+    color: "#007BFF",
   },
 });

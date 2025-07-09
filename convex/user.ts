@@ -4,8 +4,10 @@ import {
   query,
   internalQuery,
   QueryCtx,
+  mutation,
 } from "./_generated/server";
 import { Doc, Id } from "./_generated/dataModel";
+import { UserStatuses } from "./schema";
 
 export const me = query({
   args: {},
@@ -60,44 +62,109 @@ export const store = internalMutation({
     // If it's a new user, create a new document
     // and include their phone number from the Clerk token.
     const userId = await ctx.db.insert("users", {
-      name: identity.name!,
       tokenIdentifier: identity.tokenIdentifier,
       clerkId: identity.subject,
       phone_number: identity.phoneNumber!,
+      status: UserStatuses.PENDING_ONBOARDING,
     });
 
     return userId;
   },
 });
 
-export const create = internalMutation({
+export const createUser = internalMutation({
   args: {
     clerkId: v.string(),
-    name: v.string(),
-    phone_number: v.optional(v.string()),
+    phone_number: v.string(),
     tokenIdentifier: v.string(),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("users", args);
+    await ctx.db.insert("users", {
+      clerkId: args.clerkId,
+      phone_number: args.phone_number,
+      tokenIdentifier: args.tokenIdentifier,
+      status: UserStatuses.PENDING_ONBOARDING,
+    });
   },
 });
 
-export const update = internalMutation({
+export const createSocialProfile = mutation({
   args: {
-    clerkId: v.string(),
-    name: v.optional(v.string()),
-    phone_number: v.optional(v.string()),
+    firstName: v.string(),
+    bio: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const user = await getUserByClerkId(ctx, { clerkId: args.clerkId });
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error(
+        "Called createSocialProfile without authentication present"
+      );
+    }
 
-    if (!user) {
-      throw new Error("User not found");
+    const user = await getUserByClerkId(ctx, { clerkId: identity.subject });
+
+    if (user === null) {
+      throw new Error("User not found, cannot create social profile");
     }
 
     await ctx.db.patch(user._id, {
-      name: args.name,
-      phone_number: args.phone_number,
+      socialProfile: {
+        first_name: args.firstName,
+        bio: args.bio,
+        photos: [], // Initialize with empty photos array
+      },
+    });
+  },
+});
+
+export const addProfilePhoto = mutation({
+  args: {
+    storageId: v.string(),
+    isAuthentic: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Called addProfilePhoto without authentication present");
+    }
+
+    const user = await getUserByClerkId(ctx, { clerkId: identity.subject });
+    if (user === null) {
+      throw new Error("User not found, cannot add profile photo");
+    }
+
+    if (!user.socialProfile) {
+      throw new Error("User has no social profile, cannot add photo");
+    }
+
+    const url = await ctx.storage.getUrl(args.storageId);
+    if (url === null) {
+      throw new Error("Could not get file URL for storageId");
+    }
+
+    const now = Date.now();
+    let authentic_expires_at: number | undefined = undefined;
+    if (args.isAuthentic) {
+      // 12 months in milliseconds (approximate)
+      const twelveMonths = 12 * 30 * 24 * 60 * 60 * 1000;
+      authentic_expires_at = now + twelveMonths;
+    }
+
+    const newPhoto = {
+      storageId: args.storageId,
+      url: url,
+      is_authentic: args.isAuthentic,
+      created_at: now,
+      authentic_expires_at: authentic_expires_at,
+    };
+
+    await ctx.db.patch(user._id, {
+      status: UserStatuses.ACTIVE,
+      socialProfile: {
+        ...user.socialProfile,
+        photos: [...user.socialProfile.photos, newPhoto],
+        current_photo_url: url,
+      },
     });
   },
 });

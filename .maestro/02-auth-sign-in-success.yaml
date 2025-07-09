@@ -12,14 +12,14 @@ appId: com.1benisin.Momento
       id: "app-ready"
 - tapOn:
     text: "+1..."
-- inputText: "6613338990" # <-- IMPORTANT: Replace with a real test account phone number
+- inputText: "+12015550100" # Clerk test phone number
 - tapOn: "Sign In"
 - extendedWaitUntil:
     visible: "Verification Code"
     timeout: 10000
 - tapOn:
     text: "Code..."
-- inputText: "YOUR_OTP_CODE" # <-- IMPORTANT: You will get this via SMS and have to enter it manually while the test is paused, or use a service that can read SMS.
+- inputText: "424242" # Clerk universal verification code for test numbers
 - tapOn: "Verify"
 - assertVisible: "Tab One" # Verifies that we landed on the main screen
 - assertVisible: "Sign Out"

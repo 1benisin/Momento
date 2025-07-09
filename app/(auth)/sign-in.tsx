@@ -79,7 +79,6 @@ export default function SignInScreen() {
         strategy: "phone_code",
         code,
       });
-      console.log("Sign in attempt result:", JSON.stringify(result, null, 2));
 
       const { createdSessionId } = result;
 
@@ -105,6 +104,12 @@ export default function SignInScreen() {
     setPhoneNumber("");
     setError(null);
     setAccountNotFound(false);
+  };
+
+  const onBackPress = () => {
+    setPendingVerification(false);
+    setCode("");
+    setError(null);
   };
 
   return (
@@ -183,6 +188,14 @@ export default function SignInScreen() {
             )}
           </TouchableOpacity>
           {error && <Text style={styles.errorText}>{error}</Text>}
+          <TouchableOpacity
+            onPress={onBackPress}
+            style={[styles.button, styles.secondaryButton]}
+          >
+            <Text style={[styles.buttonText, styles.secondaryButtonText]}>
+              Back
+            </Text>
+          </TouchableOpacity>
         </View>
       )}
     </View>

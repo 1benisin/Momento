@@ -175,6 +175,15 @@ To get the project set up on your local machine, follow these steps.
     npx expo start
     ```
 
+### Logging In During Development (Clerk Test Credentials)
+
+To sign in to the application on a simulator during development, you do not need to use a real phone number. Our authentication provider, Clerk, provides test credentials that bypass the need for SMS verification.
+
+- **Test Phone Number**: Use any number in the format `+1 (XXX) 555-0100` to `+1 (XXX) 555-0199`. For example: `+12015550100`.
+- **Verification Code**: When prompted for the OTP code, use the universal code: `424242`.
+
+Using these credentials will allow you to quickly and easily test authentication-protected features of the app.
+
 ## Summary
 
 This professional workflow gives you the best of all worlds:
