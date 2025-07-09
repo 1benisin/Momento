@@ -6,7 +6,6 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "ios:dev": "expo start --dev-client --ios",
     "web": "expo start --web",
     "test": "vitest",
     "test:once": "vitest run",

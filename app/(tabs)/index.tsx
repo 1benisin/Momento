@@ -3,10 +3,12 @@ import { StyleSheet } from "react-native";
 import EditScreenInfo from "@/components/EditScreenInfo";
 import { SignOutButton } from "@/components/SignOutButton";
 import { Text, View } from "@/components/Themed";
+import UserInfo from "@/components/UserInfo";
 
 export default function TabOneScreen() {
   return (
     <View style={styles.container}>
+      <UserInfo />
       <Text style={styles.title}>Tab One</Text>
       <View
         style={styles.separator}

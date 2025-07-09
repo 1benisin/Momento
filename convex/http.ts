@@ -12,6 +12,8 @@ http.route({
     const payloadString = await request.text();
     const headerPayload = request.headers;
 
+    console.log("convex/http.ts: Received Clerk webhook");
+
     try {
       const result: WebhookEvent = await ctx.runAction(internal.clerk.fulfill, {
         payload: payloadString,
@@ -22,44 +24,65 @@ http.route({
         },
       });
 
+      console.log(
+        `convex/http.ts: Webhook validated. Event type: ${result.type}`
+      );
+
       switch (result.type) {
         case "user.created": {
+          console.log("convex/http.ts: Handling 'user.created' event");
+          const eventData = result.data;
+
           const user = await ctx.runQuery(internal.user.getUser, {
-            clerkId: result.data.id,
+            clerkId: eventData.id,
           });
 
           if (user) {
-            console.log(`User ${result.data.id} already exists`);
+            console.log(
+              `convex/http.ts: User ${eventData.id} already exists, skipping creation.`
+            );
             break;
           }
 
-          await ctx.runMutation(internal.user.create, {
-            clerkId: result.data.id,
-            name: `${result.data.first_name ?? ""} ${
-              result.data.last_name ?? ""
-            }`,
-            phone_number: result.data.phone_numbers[0]?.phone_number,
-            tokenIdentifier: `${process.env.CLERK_ISSUER_URL}|${result.data.id}`,
+          const phoneNumber = eventData.phone_numbers[0]?.phone_number;
+          if (!phoneNumber) {
+            throw new Error(
+              `User ${eventData.id} created without a phone number.`
+            );
+          }
+
+          const clerkIssuerUrl = process.env.CLERK_ISSUER_URL;
+          if (!clerkIssuerUrl) {
+            throw new Error("CLERK_ISSUER_URL environment variable not set!");
+          }
+
+          const tokenIdentifier = `${clerkIssuerUrl}|${eventData.id}`;
+
+          console.log(
+            `convex/http.ts: About to create user for Clerk ID: ${eventData.id}`
+          );
+          await ctx.runMutation(internal.user.createUser, {
+            clerkId: eventData.id,
+            phone_number: phoneNumber,
+            tokenIdentifier: tokenIdentifier,
           });
+          console.log(
+            `convex/http.ts: Successfully called createUser for Clerk ID: ${eventData.id}`
+          );
           break;
         }
-        case "user.updated":
-          await ctx.runMutation(internal.user.update, {
-            clerkId: result.data.id,
-            name: `${result.data.first_name ?? ""} ${
-              result.data.last_name ?? ""
-            }`,
-            phone_number: result.data.phone_numbers[0]?.phone_number,
-          });
-          break;
-        // You can add other webhook events here, like user.updated
+        default: {
+          console.log(
+            `convex/http.ts: Received unhandled webhook event: ${result.type}`
+          );
+        }
       }
 
       return new Response(null, {
         status: 200,
       });
     } catch (err) {
-      console.error(err);
+      console.error("convex/http.ts: Webhook Error Caught:", err);
       return new Response("Webhook Error", {
         status: 400,
       });

@@ -77,6 +77,15 @@ This is the highest level of testing, simulating a complete user journey through
   - **Maestro:** A modern, simple-to-use E2E testing framework. Its declarative YAML syntax makes tests easy to write and maintain, making it the preferred choice for Momento.
 - **Role:** E2E tests provide the highest level of confidence that critical user paths are working as expected in a real-world environment. Due to their slow speed and potential for flakiness, they should be used sparingly for the most business-critical flows.
 
+#### Handling Authentication in E2E Tests
+
+A major challenge for E2E testing is handling authentication flows that require external input, like an SMS one-time password (OTP). To create fully automated and reliable tests, we leverage our authentication provider's (Clerk) built-in test mode.
+
+- **Test Phone Numbers**: Fictional phone numbers (e.g., `+1 (XXX) 555-0100` to `+1 (XXX) 555-0199`) can be used during sign-up or sign-in steps in our Maestro tests.
+- **Static Verification Code**: These test numbers can be verified with a static code: `424242`.
+
+This allows our Maestro flows (like `02-auth-sign-in-success.yaml`) to test the entire sign-in journey without requiring manual intervention or complex SMS-reading services, making our E2E suite robust and CI/CD-friendly.
+
 ---
 
 ## 3. CI/CD Pipeline with GitHub Actions

@@ -13,8 +13,10 @@ import "react-native-reanimated";
 import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
-import { ConvexReactClient, useConvexAuth } from "convex/react";
+import { ConvexReactClient, useConvexAuth, useQuery } from "convex/react";
 import { ActivityIndicator, View } from "react-native";
+import { api } from "@/convex/_generated/api";
+import { UserStatuses } from "@/convex/schema";
 
 import { useColorScheme } from "@/components/useColorScheme";
 
@@ -98,32 +100,67 @@ function RootLayoutNav() {
  * It ensures that users cannot access protected routes without being authenticated.
  */
 function InitialLayout() {
-  const { isLoading, isAuthenticated } = useConvexAuth();
+  const { isLoading: isConvexAuthLoading, isAuthenticated } = useConvexAuth();
+  const userData = useQuery(api.user.me);
   const segments = useSegments();
   const router = useRouter();
+
+  const inTabsGroup = segments[0] === "(tabs)";
+  const inOnboardingGroup = segments[0] === "(onboarding)";
+
+  // Wait until both auth and user data fetching are complete.
+  // userData === undefined means the query is still loading for the first time.
+  const isLoading = isConvexAuthLoading || userData === undefined;
 
   useEffect(() => {
     if (isLoading) return;
 
-    const inAuthGroup = segments[0] === "(auth)";
-
-    if (isAuthenticated && !inAuthGroup) {
-      router.replace("/(tabs)");
+    // If the user is authenticated
+    if (isAuthenticated) {
+      // and we have their data
+      if (userData) {
+        if (userData.status === UserStatuses.PENDING_ONBOARDING) {
+          // If they are not already in the onboarding flow, redirect them.
+          if (!inOnboardingGroup) {
+            // Check if they've set their name yet
+            if (!userData.socialProfile?.first_name) {
+              router.replace("/(onboarding)/profile-setup");
+            } else {
+              router.replace("/(onboarding)/initial-photo");
+            }
+          }
+        } else if (userData.status === UserStatuses.ACTIVE) {
+          // If they are active and not in the main app, send them there.
+          if (!inTabsGroup) {
+            router.replace("/(tabs)");
+          }
+        }
+      } else {
+        // This case handles the race condition: user is auth'd but the Convex user
+        // record hasn't been created yet. We do nothing and let the loading
+        // indicator continue until `userData` is populated.
+        // If userData remains null, something is wrong with the webhook setup.
+      }
     } else if (!isAuthenticated) {
+      // If they are not authenticated, send them to the sign-in page.
       router.replace("/sign-in");
     }
-  }, [isLoading, isAuthenticated]);
+  }, [isLoading, isAuthenticated, userData, inTabsGroup, inOnboardingGroup]);
 
   if (isLoading) {
-    return <ActivityIndicator style={{ flex: 1 }} />;
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
   }
+
   return (
-    <View style={{ flex: 1 }} testID="app-ready">
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-      </Stack>
-    </View>
+    <Stack>
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+      <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
+    </Stack>
   );
 }
