@@ -8,36 +8,42 @@ import {
   View,
   StyleSheet,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 
 export default function SignUpScreen() {
   const { isLoaded, signUp, setActive } = useSignUp();
   const router = useRouter();
-  const { phone } = useLocalSearchParams<{ phone: string }>();
 
-  const [phoneNumber, setPhoneNumber] = React.useState(phone || "");
+  const [signUpMethod, setSignUpMethod] = React.useState<"email" | "phone">(
+    "phone"
+  );
+  const [emailAddress, setEmailAddress] = React.useState("");
+  const [phoneNumber, setPhoneNumber] = React.useState("");
+
   const [pendingVerification, setPendingVerification] = React.useState(false);
   const [code, setCode] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
 
+  // --- Handlers ---
+
   const onSignUpPress = async () => {
-    if (!isLoaded || loading) {
-      return;
-    }
+    if (!isLoaded || loading) return;
     setLoading(true);
     setError(null);
 
     try {
-      // Create the user on Clerk
-      await signUp.create({
-        phoneNumber,
-      });
-
-      // Send verification code
-      await signUp.preparePhoneNumberVerification();
-
-      // Rerender to show the verification code input
+      if (signUpMethod === "email") {
+        await signUp.create({ emailAddress });
+        await signUp.prepareEmailAddressVerification({
+          strategy: "email_code",
+        });
+      } else {
+        await signUp.create({ phoneNumber });
+        await signUp.preparePhoneNumberVerification();
+      }
       setPendingVerification(true);
     } catch (err: any) {
       console.error("Error signing up:", JSON.stringify(err, null, 2));
@@ -50,26 +56,22 @@ export default function SignUpScreen() {
   };
 
   const onVerifyPress = async () => {
-    if (!isLoaded || loading) {
-      return;
-    }
+    if (!isLoaded || loading) return;
     setLoading(true);
     setError(null);
 
     try {
-      const result = await signUp.attemptPhoneNumberVerification({
-        code,
-      });
-      console.log("Sign up attempt result:", JSON.stringify(result, null, 2));
+      const verificationFunction =
+        signUpMethod === "email"
+          ? signUp.attemptEmailAddressVerification
+          : signUp.attemptPhoneNumberVerification;
 
-      const { createdSessionId } = result;
+      const result = await verificationFunction({ code });
 
-      if (createdSessionId) {
-        // If the sign-up was successful, set the active session and redirect
-        await setActive({ session: createdSessionId });
+      if (result.createdSessionId) {
+        await setActive({ session: result.createdSessionId });
         router.push("/(tabs)");
       } else {
-        // Handle cases where sign-up is not complete
         setError(
           "Could not complete sign up. Please check the code and try again."
         );
@@ -88,10 +90,39 @@ export default function SignUpScreen() {
     setError(null);
   };
 
-  return (
-    <View style={styles.container}>
-      {!pendingVerification && (
-        <View style={styles.form}>
+  // --- Render ---
+
+  const renderSignUpForm = () => (
+    <>
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[styles.tab, signUpMethod === "phone" && styles.activeTab]}
+          onPress={() => setSignUpMethod("phone")}
+        >
+          <Text style={styles.tabText}>Phone</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, signUpMethod === "email" && styles.activeTab]}
+          onPress={() => setSignUpMethod("email")}
+        >
+          <Text style={styles.tabText}>Email</Text>
+        </TouchableOpacity>
+      </View>
+
+      {signUpMethod === "email" ? (
+        <>
+          <Text style={styles.label}>Email Address</Text>
+          <TextInput
+            autoCapitalize="none"
+            placeholder="email@example.com"
+            value={emailAddress}
+            onChangeText={setEmailAddress}
+            style={styles.input}
+            keyboardType="email-address"
+          />
+        </>
+      ) : (
+        <>
           <Text style={styles.label}>Phone Number</Text>
           <TextInput
             autoCapitalize="none"
@@ -99,58 +130,73 @@ export default function SignUpScreen() {
             value={phoneNumber}
             onChangeText={setPhoneNumber}
             style={styles.input}
+            keyboardType="phone-pad"
           />
-          <TouchableOpacity
-            onPress={onSignUpPress}
-            style={styles.button}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <Text style={styles.buttonText}>Sign Up</Text>
-            )}
-          </TouchableOpacity>
-          {error && <Text style={styles.errorText}>{error}</Text>}
-          <Link href="/sign-in" asChild>
-            <TouchableOpacity style={styles.link}>
-              <Text>Already have an account? Sign in</Text>
-            </TouchableOpacity>
-          </Link>
-        </View>
+        </>
       )}
-      {pendingVerification && (
-        <View style={styles.form}>
-          <Text style={styles.label}>Verification Code</Text>
-          <TextInput
-            value={code}
-            placeholder="Code..."
-            onChangeText={setCode}
-            style={styles.input}
-          />
-          <TouchableOpacity
-            onPress={onVerifyPress}
-            style={styles.button}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <Text style={styles.buttonText}>Verify</Text>
-            )}
-          </TouchableOpacity>
-          {error && <Text style={styles.errorText}>{error}</Text>}
-          <TouchableOpacity
-            onPress={onBackPress}
-            style={[styles.button, styles.secondaryButton]}
-          >
-            <Text style={[styles.buttonText, styles.secondaryButtonText]}>
-              Back
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
-    </View>
+
+      <TouchableOpacity
+        onPress={onSignUpPress}
+        style={styles.button}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color="white" />
+        ) : (
+          <Text style={styles.buttonText}>Sign Up</Text>
+        )}
+      </TouchableOpacity>
+      {error && <Text style={styles.errorText}>{error}</Text>}
+      <Link href="/sign-in" asChild>
+        <TouchableOpacity style={styles.link}>
+          <Text>Already have an account? Sign in</Text>
+        </TouchableOpacity>
+      </Link>
+    </>
+  );
+
+  const renderVerificationForm = () => (
+    <>
+      <Text style={styles.label}>Verification Code</Text>
+      <TextInput
+        value={code}
+        placeholder="Code..."
+        onChangeText={setCode}
+        style={styles.input}
+        keyboardType="numeric"
+      />
+      <TouchableOpacity
+        onPress={onVerifyPress}
+        style={styles.button}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color="white" />
+        ) : (
+          <Text style={styles.buttonText}>Verify</Text>
+        )}
+      </TouchableOpacity>
+      {error && <Text style={styles.errorText}>{error}</Text>}
+      <TouchableOpacity
+        onPress={onBackPress}
+        style={[styles.button, styles.secondaryButton]}
+      >
+        <Text style={[styles.buttonText, styles.secondaryButtonText]}>
+          Back
+        </Text>
+      </TouchableOpacity>
+    </>
+  );
+
+  return (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
+      <View style={styles.form}>
+        {pendingVerification ? renderVerificationForm() : renderSignUpForm()}
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -175,6 +221,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     paddingHorizontal: 8,
     width: "100%",
+    borderRadius: 5,
   },
   button: {
     backgroundColor: "#007BFF",
@@ -204,5 +251,23 @@ const styles = StyleSheet.create({
   },
   secondaryButtonText: {
     color: "#007BFF",
+  },
+  tabContainer: {
+    flexDirection: "row",
+    marginBottom: 20,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: "center",
+    backgroundColor: "#f0f0f0",
+    borderBottomWidth: 2,
+    borderBottomColor: "transparent",
+  },
+  activeTab: {
+    borderBottomColor: "#007BFF",
+  },
+  tabText: {
+    fontSize: 16,
   },
 });

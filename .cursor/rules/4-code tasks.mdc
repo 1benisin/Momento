@@ -19,18 +19,44 @@ You must follow this workflow for **each main task**.
 1.  **Identify the Next Main Task**: Read the `tasks.md` file and identify the very next main task that is not marked as complete (`[ ]`).
 2.  **Confirm with User**: State the main task you are about to work on and ask the user for permission to proceed. **Do not start work until the user explicitly says "yes" or "y".**
 3.  **Implement Sub-Tasks**: Work through each sub-task listed under the main task sequentially.
+
     - For each sub-task:
+
       - State the sub-task you are currently implementing.
-      - Write or modify the code required to complete it. Refer to `plan.md` and `context.md` if needed.
-      - After implementation, immediately open `tasks.md` and mark the sub-task as complete by changing `[ ]` to `[x]`.
+      - Write or modify the code required to complete it.
+      - **Crucially**, after completing the code change for a sub-task, you **must** immediately edit the `tasks.md` file to mark that single sub-task as complete. Change `[ ]` to `[x]`.
+
+      For example, if `tasks.md` looks like this:
+
+      ```markdown
+      - [ ] 3.1: **Provider**: In `app/_layout.tsx`, ensure the root component is wrapped with the `<ClerkProvider>`.
+      - [ ] 3.2: **Loading State**: Inside the provider, use `<ClerkLoading>`.
+      - [ ] 3.3: **Auth Routing**: Wrap the main navigation inside `<ClerkLoaded>`.
+      ```
+
+      After completing sub-task 3.1, you must edit `tasks.md` so it becomes:
+
+      ```markdown
+      - [x] 3.1: **Provider**: In `app/_layout.tsx`, ensure the root component is wrapped with the `<ClerkProvider>`.
+      - [ ] 3.2: **Loading State**: Inside the provider, use `<ClerkLoading>`.
+      - [ ] 3.3: **Auth Routing**: Wrap the main navigation inside `<ClerkLoaded>`.
+      ```
+
+      Then you proceed to sub-task 3.2, and after completing it, the file should look like:
+
+      ```markdown
+      - [x] 3.1: **Provider**: In `app/_layout.tsx`, ensure the root component is wrapped with the `<ClerkProvider>`.
+      - [x] 3.2: **Loading State**: Inside the provider, use `<ClerkLoading>`.
+      - [ ] 3.3: **Auth Routing**: Wrap the main navigation inside `<ClerkLoaded>`.
+      ```
+
 4.  **Complete the Main Task**:
     - Once all sub-tasks for the main task are finished, mark the main task as complete (`[x]`) in `tasks.md`.
-    - Update the "Relevant Files" section in `tasks.md` if you created or modified any files.
 5.  **Report and Pause**: Report to the user that you have completed the main task and updated the task list. Then, **stop and wait for the user's go-ahead** before starting the next main task.
 
 ## Final Instructions for the AI
 
 - **One Main Task at a Time**: Complete all sub-tasks for one main task before moving to the next.
-- **Always Update `tasks.md`**: The task list is the source of truth for your progress. Keep it meticulously updated by marking both sub-tasks and main tasks with `[x]` upon completion.
+- **Meticulously Update `tasks.md`**: This is your most important instruction. The `tasks.md` file is the _only_ source of truth for your progress. You **must** mark each sub-task and main task with `[x]` _immediately_ upon its completion. Do not batch updates.
 - **`tasks.md` is the Only Todo List**: Do not create or maintain a separate todo list. The `tasks.md` file is the single source of truth for all tasks.
 - **User is in Control**: The user drives the pace at the level of main tasks. Your job is to execute and report back after each main task is complete.

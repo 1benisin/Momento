@@ -9,6 +9,9 @@ import {
 import { Doc, Id } from "./_generated/dataModel";
 import { UserStatuses } from "./schema";
 
+// Retrieves the database record for the currently authenticated user.
+// The name `me` is a common convention for API endpoints that return data
+// for the currently authenticated user.
 export const me = query({
   args: {},
   handler: async (ctx) => {
@@ -41,78 +44,100 @@ async function getUserByClerkId(
     .unique();
 }
 
-// Note: You might want to use a more descriptive function name
-// like `ensureUser` or `syncUserFromClerk`.
-export const store = internalMutation({
-  args: {},
-  handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Called store an user without authentication present");
-    }
-
-    // Check if we've already stored this user
-    const user = await getUserByClerkId(ctx, { clerkId: identity.subject });
-
-    if (user !== null) {
-      // If we've seen this user before, just return their ID
-      return user._id;
-    }
-
-    // If it's a new user, create a new document
-    // and include their phone number from the Clerk token.
-    const userId = await ctx.db.insert("users", {
-      tokenIdentifier: identity.tokenIdentifier,
-      clerkId: identity.subject,
-      phone_number: identity.phoneNumber!,
-      status: UserStatuses.PENDING_ONBOARDING,
-    });
-
-    return userId;
-  },
-});
-
 export const createUser = internalMutation({
   args: {
     clerkId: v.string(),
-    phone_number: v.string(),
+    phone_number: v.optional(v.string()),
+    email: v.optional(v.string()),
+    firstName: v.optional(v.string()),
+    lastName: v.optional(v.string()),
     tokenIdentifier: v.string(),
   },
   handler: async (ctx, args) => {
     await ctx.db.insert("users", {
       clerkId: args.clerkId,
       phone_number: args.phone_number,
+      email: args.email,
+      first_name: args.firstName,
+      last_name: args.lastName,
       tokenIdentifier: args.tokenIdentifier,
       status: UserStatuses.PENDING_ONBOARDING,
     });
   },
 });
 
-export const createSocialProfile = mutation({
+export const updateUser = internalMutation({
   args: {
-    firstName: v.string(),
-    bio: v.optional(v.string()),
+    clerkId: v.string(),
+    email: v.optional(v.string()),
+    phone_number: v.optional(v.string()),
+    firstName: v.optional(v.string()),
+    lastName: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error(
-        "Called createSocialProfile without authentication present"
-      );
-    }
-
-    const user = await getUserByClerkId(ctx, { clerkId: identity.subject });
+    const user = await getUserByClerkId(ctx, { clerkId: args.clerkId });
 
     if (user === null) {
-      throw new Error("User not found, cannot create social profile");
+      throw new Error("User not found, cannot update");
     }
 
     await ctx.db.patch(user._id, {
-      socialProfile: {
-        first_name: args.firstName,
-        bio: args.bio,
-        photos: [], // Initialize with empty photos array
-      },
+      email: args.email,
+      phone_number: args.phone_number,
+      first_name: args.firstName,
+      last_name: args.lastName,
+    });
+  },
+});
+
+export const deleteUser = internalMutation({
+  args: { clerkId: v.string() },
+  handler: async (ctx, args) => {
+    const user = await getUserByClerkId(ctx, { clerkId: args.clerkId });
+
+    if (user === null) {
+      console.warn("User not found, cannot delete");
+      return;
+    }
+
+    await ctx.db.delete(user._id);
+  },
+});
+
+export const pauseAccount = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Called pauseAccount without authentication present");
+    }
+
+    const user = await getUserByClerkId(ctx, { clerkId: identity.subject });
+    if (user === null) {
+      throw new Error("User not found, cannot pause account");
+    }
+
+    await ctx.db.patch(user._id, {
+      status: UserStatuses.PAUSED,
+    });
+  },
+});
+
+export const unpauseAccount = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Called unpauseAccount without authentication present");
+    }
+
+    const user = await getUserByClerkId(ctx, { clerkId: identity.subject });
+    if (user === null) {
+      throw new Error("User not found, cannot unpause account");
+    }
+
+    await ctx.db.patch(user._id, {
+      status: UserStatuses.ACTIVE,
     });
   },
 });
@@ -165,6 +190,28 @@ export const addProfilePhoto = mutation({
         photos: [...user.socialProfile.photos, newPhoto],
         current_photo_url: url,
       },
+    });
+  },
+});
+
+export const completeOnboarding = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error(
+        "Called completeOnboarding without authentication present"
+      );
+    }
+
+    const user = await getUserByClerkId(ctx, { clerkId: identity.subject });
+
+    if (user === null) {
+      throw new Error("User not found, cannot complete onboarding");
+    }
+
+    await ctx.db.patch(user._id, {
+      status: UserStatuses.ACTIVE,
     });
   },
 });

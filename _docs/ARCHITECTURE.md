@@ -90,7 +90,7 @@ This architecture solves the challenge of a user who is both a participant and a
 
 There are three primary user types:
 
-1.  **Social-Only User (`Participant`)**: The default user who attends events. Their UI is focused on discovery and connection.
+1.  **Social-Only User (`Participant`)**: A user who attends events. Their UI is focused on discovery and connection.
 2.  **Host-Only User (`Community Host`)**: A business or organization whose goal is to create and manage events. Their UI is a streamlined professional dashboard. They do not have social features like a Memory Book.
 3.  **Hybrid User (`User Host`)**: An individual who both hosts and participates in events. This user has access to both UI paradigms.
 

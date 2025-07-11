@@ -57,6 +57,38 @@ User profiles will contain three categories of information:
   - **`interested_in`**: A multiple-selection field indicating the genders they are interested in connecting with.
   - **`pronouns`**: An optional field that, if filled out, is displayed on their public profile.
 
+### User Account Management & Settings
+
+To provide a clear and robust user experience, we divide settings into two distinct areas, accessed via a menu from the custom user icon in the app header:
+
+1.  **Profile & Security (Custom Built)**: This destination is a dedicated, custom-built screen that serves as the single source of truth for core account and security management. While it gives us full native UI control, it is powered entirely by Clerk's hooks (`useUser`, etc.). Its responsibilities include:
+
+    - Updating profile information (name, etc.) via `user.update()`.
+    - Managing and verifying the user's email address and phone number.
+    - Providing a path to change passwords and manage multi-factor authentication (MFA).
+    - Viewing active sessions and signing out of other devices.
+
+### Pausing & Deleting Your Account
+
+To give users full control over their account lifecycle while encouraging user retention, Momento provides both a "pause" and a "delete" option.
+
+- **Pause Account (Hibernation Mode)**: This is a non-permanent way for a user to take a break.
+
+  - **Functionality**: When paused, a user's `status` in the database is set to `'paused'`. This makes them socially invisible. They will not receive any new invitations or notifications (except for critical security alerts), and their profile will not appear in any public discovery feeds.
+  - **User Experience**: A paused user can still log in, view their Memory Book, and exchange messages with existing connections. However, they cannot engage in any new social activities. A persistent banner with a "Reactivate Account" button will be displayed, making it easy to return.
+
+- **Delete Account (Permanent Action)**: This is a permanent, irreversible action.
+  - **The "Nudge-to-Pause" Flow**: To prevent accidental deletion and retain users, the "Delete Account" button first opens a modal that presents pausing as a preferable alternative.
+  - **Modal Content**:
+    - **Title**: "Before you go..."
+    - **Body**: Explains that deletion is permanent, while pausing is a temporary break that preserves their data and connections.
+    - **Actions**: The modal offers three clear choices: "Pause Account" (primary action), "Delete Permanently" (destructive action), and "Cancel".
+  - **Backend Process**: If the user proceeds with deletion, their user record in Clerk is deleted. A `user.deleted` webhook then triggers the deletion of their corresponding record in the Convex database.
+
+2.  **App Preferences (Managed by Momento)**: This is our fully custom-built settings screen where we house all of Momento's unique application-level preferences. This screen contextually displays settings based on the user's active mode.
+
+This hybrid approach allows us to have a fully native and branded experience while still relying on Clerk's powerful and secure backend for the complex parts of account management.
+
 ### The Interest Constellation
 
 To showcase a user's personality beyond a simple list of hobbies, profiles will feature an "Interest Constellation." This data visualization moves beyond superficial tags to show the multifaceted nature of a user's character.
@@ -93,12 +125,14 @@ As a capstone feature that synthesizes all of a user's activity into a compellin
 > **Future Enhancement (Phase 3):** > **Feature:** In-App Camera Requirement.
 > **Rationale:** Requiring at least one profile picture to be taken through the in-app camera (instead of just incentivizing it) would more strongly guarantee that photos are recent and unedited, further increasing platform trust.
 
-### Phone-First Authentication & US-Only Launch
+### Unified Authentication & US-Only Launch
 
-To create a seamless onboarding experience, Momento uses phone-first authentication powered by Clerk. This eliminates the need for users to remember a traditional password.
+To create a flexible and accessible onboarding experience, Momento uses a unified authentication system powered by Clerk. This allows users to sign up and log in using the method most convenient for them, while eliminating the need for a traditional password.
 
-- **US-Only for MVP:** For the initial launch, sign-up will be limited to users with a valid US phone number, a setting enforced within our Clerk configuration.
-- **OTP-Based Flow:** Both sign-up and login are handled via a secure one-time password sent to the user's phone.
+- **Sign-Up Methods**: Users can choose to sign up with:
+  - A phone number, using a secure one-time password (OTP) for verification.
+  - An email address and password.
+- **US-Only for MVP:** For the initial launch, sign-up will be limited to users with a valid US phone number if they choose that option. This is a setting enforced within our Clerk configuration.
 
 ### Handling Phone Number Recycling
 
@@ -132,22 +166,29 @@ To build a foundation of trust and authenticity, Momento will include a feature 
 
 This section details the features and flows for users who create and manage events on the Momento platform.
 
-### Host Types & Onboarding
+### The Intent-Driven Onboarding Flow
 
-Momento supports two types of hosts, each with a distinct onboarding path. The `host_type` ('user' or 'community') is set during this initial process and determines the required profile information.
+Momento's onboarding is designed to be **intent-driven**. Immediately after creating a core account, a new user is asked to choose their primary goal, which directs them to a tailored onboarding path. This ensures every user, whether a participant or a host, has a logical and streamlined first experience.
 
-- **User Hosts:** This is an existing Momento participant who wants to start hosting events.
-  - **The Entry Point:** The journey begins with a "Become a Host" Call to Action (CTA) prominently displayed on their main `ProfileTab`.
-  - **The Onboarding Flow:** This CTA launches a simple flow that first explains the benefits of hosting (e.g., "Share your passions," "Meet like-minded people") and then guides them through creating a `hostProfile`.
-  - **Smart Profile Creation:** To create a seamless experience, the user's `hostProfile` is pre-populated with their existing `socialProfile.first_name` as the default `host_name`, which they can then edit.
-  - **Unlocking Host Mode:** The moment a user successfully creates their `hostProfile`, they are officially considered a `Hybrid User`. The `ModeSwitcher` component immediately becomes visible on their `ProfileTab`, granting them access to their new hosting tools.
-- **Community Hosts:** This is a business, venue, or organization signing up for the first time. They use a separate sign-up flow requiring an email and password and must provide details like a business address and website for their `hostProfile`. They can also begin drafting events immediately after setup.
+- **The Entry Point:** The journey begins at a single `SignUpScreen` where a user can create an account with either a phone number or an email/password.
+- **The Fork in the Road:** Upon successful account creation, the user is navigated to a `RoleSelectionScreen` where they choose their initial path: "I want to attend events" or "I want to host events."
+- **Participant Onboarding:** If the user selects "attend," they are guided through the standard participant flow: creating their `socialProfile`, taking an `AuthenticPhoto`, and completing the "Discovering Your Interests" experience.
+- **Host Onboarding:** If the user selects "host," they are guided through the host setup flow, which includes creating a `hostProfile` and being prompted to start the identity verification process. This path is designed for both `User Hosts` (individuals) and `Community Hosts` (businesses).
+
+### Adding a Role Later (The Hybrid User)
+
+The system is designed for flexibility, allowing single-role users to add a second role later.
+
+- **Participant Becomes Host:** A user with only a `socialProfile` will see a "Become a Host" CTA on their `ProfileTab`. Tapping this initiates the `UserHostOnboardingFlow`, guiding them to create their `hostProfile`.
+- **Host Becomes Participant:** A user with only a `hostProfile` will see a "Join Events Socially" CTA on their `ProfileTab`. Tapping this initiates the `ParticipantOnboardingFlow`.
+
+Upon completing the second onboarding flow, the user becomes a `Hybrid User`, and the `ModeSwitcher` component appears on their `ProfileTab`, granting them access to both UI contexts.
 
 ### Switching Between Social & Host Modes
 
 For users who are both participants and hosts (`Hybrid Users`), the application provides a `ModeSwitcher` to ensure the interface remains clean and contextually relevant. This control prevents UI clutter by presenting only the tools needed for the user's current goal.
 
-- **The Control:** A `ModeSwitcher` component is displayed on the `ProfileTab` for any user who has both a `socialProfile` and a `hostProfile`.
+- **The Control:** A `ModeSwitcher` component is displayed prominently within our custom **"App Preferences"** screen.
 - **The Mechanism:** When a user toggles between "Social Mode" and "Host Mode," the app updates the `users.active_role` field in the database to either `'social'` or `'host'`. This choice is persisted across sessions.
 - **The Impact:** The value of `active_role` acts as a global state that dictates the entire navigation structure. It determines which version of the main tab bar is rendered, ensuring that a user in "Host Mode" sees their hosting dashboard, event management tools, and host inbox, while a user in "Social Mode" sees their invitations, Memory Book, and social discovery feeds. This separation creates a focused and intuitive experience for users who wear multiple hats in the Momento ecosystem.
 
@@ -347,6 +388,9 @@ To ensure accurate attendance data and help users who forget, the app will send 
 
 > **Future Enhancement (Phase 2):** > **Feature:** Geofenced Check-in Reminders.
 > **Rationale:** A geofenced reminder would provide a more magical, context-aware experience than the time-based one. By triggering the check-in prompt the moment a user arrives in the event's vicinity, we reduce friction and improve the accuracy of arrival data.
+
+> **Future Enhancement (Phase 2):** > **Feature:** Reverification for Sensitive Actions.
+> **Rationale:** To enhance security for critical user actions, we can leverage Clerk's `useReverification()` hook. This would prompt a user to re-authenticate (e.g., with their password or a biometric scan) before performing a sensitive operation like deleting their account or changing their primary email address. This adds a professional layer of security and user trust with minimal implementation effort.
 
 ## 9. Post-Event Interaction
 

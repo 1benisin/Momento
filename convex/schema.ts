@@ -4,25 +4,29 @@ import { v } from "convex/values";
 export const UserStatuses = {
   PENDING_ONBOARDING: "pending_onboarding",
   ACTIVE: "active",
+  PAUSED: "paused",
 } as const;
 
 export type UserStatus = (typeof UserStatuses)[keyof typeof UserStatuses];
 
 export const userStatusValidator = v.union(
   v.literal(UserStatuses.PENDING_ONBOARDING),
-  v.literal(UserStatuses.ACTIVE)
+  v.literal(UserStatuses.ACTIVE),
+  v.literal(UserStatuses.PAUSED)
 );
 
 export default defineSchema({
   users: defineTable({
     tokenIdentifier: v.string(),
     clerkId: v.string(),
-    phone_number: v.string(),
+    phone_number: v.optional(v.string()),
+    email: v.optional(v.string()),
+    first_name: v.optional(v.string()),
+    last_name: v.optional(v.string()),
     status: userStatusValidator,
 
     socialProfile: v.optional(
       v.object({
-        first_name: v.string(),
         bio: v.optional(v.string()),
         photos: v.array(
           v.object({

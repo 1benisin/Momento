@@ -41,6 +41,7 @@ What truly sets Momento apart is the intelligence and thoughtfulness behind our 
 - **The Social Graph:** We don't just match individuals to events; we curate balanced _groups_ with high social and romantic chemistry. Our algorithm ensures that every invitee has a high potential for connection within the group, so no one feels like a social "dead-end."
 - **The Memory Book:** To foster lasting relationships, the app features a "Memory Book." This private, organized record of every person a user has met at events allows for post-event connection, private notes, and signals to our backend for future matching.
 - **Dynamic Duos:** We directly address the anxiety of attending events alone with our "Dynamic Duos" feature, which allows two friends to signal their intent to be invited to their next event together as a pair.
+- **User-Centric Lifecycle:** To respect user autonomy and improve retention, users can choose to "pause" their account—making them socially invisible while preserving their data and connections—as a non-permanent alternative to deletion.
 
 ## Monetization: The "Cost of a Handshake"
 
@@ -57,7 +58,7 @@ Our technology stack is chosen to support a modern, cross-platform, and real-tim
 - **Navigation:** Expo Router
 - **Styling:** NativeWind
 - **Backend:** Convex
-- **Authentication:** Clerk (using `@clerk/clerk-expo` and `convex/react-clerk`)
+- **Authentication:** Clerk (using `@clerk/clerk-expo` and `convex/react-clerk`, with a fully custom UI built using Clerk's hooks for all authentication and account management flows)
 - **Payments:** Stripe (using `@stripe/stripe-react-native` on the client and `stripe-node` on the server)
 - **Verification:** Stripe Identity
 - **Transactional Email:** Postmark

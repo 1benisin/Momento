@@ -19,6 +19,10 @@ const config: ExpoConfig = {
     bundleIdentifier: "com.1benisin.Momento",
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
+      NSCameraUsageDescription:
+        "This app uses the camera to allow you to take profile photos and share moments with others.",
+      NSPhotoLibraryUsageDescription:
+        "This app uses the photo library to allow you to select a profile photo and share moments with others.",
     },
   },
   android: {

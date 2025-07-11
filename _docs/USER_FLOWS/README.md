@@ -8,8 +8,8 @@ This document serves as an index for the detailed user flow documents within the
 
 - [01: New User Onboarding](./01_new_user_onboarding.md)
 - [02: Non-US User (Waitlist)](./02_non_us_user_onboarding.md)
-- [03: Handling a Recycled Phone Number](./03_recycled_phone_number.md)
-- [04: Account Recovery](./04_account_recovery.md)
+- [03: Handling a Recycled Phone Number](./03_recycled_phone_number.md) (deprecated)
+- [04: Account Recovery](./04_account_recovery.md) (deprecated)
 
 ### Social User Experience
 
