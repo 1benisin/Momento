@@ -134,11 +134,7 @@ function InitialLayout() {
       if (userData) {
         if (userData.status === UserStatuses.PENDING_ONBOARDING) {
           if (!inOnboardingGroup) {
-            if (!userData.first_name) {
-              router.replace("/(onboarding)/profile-setup");
-            } else {
-              router.replace("/(onboarding)/initial-photo");
-            }
+            router.replace("/(onboarding)/role-selection");
           }
         } else if (userData.status === UserStatuses.ACTIVE) {
           if (!inTabsGroup) {
@@ -160,12 +156,30 @@ function InitialLayout() {
     inTabsGroup,
   ]);
 
+  const loadingView = (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <ActivityIndicator size="large" />
+    </View>
+  );
+
   if (isLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
+    return loadingView;
+  }
+
+  // If we are not in the correct route group, the useEffect above is triggering a
+  // redirect. We return the loading view to prevent a flash of the wrong screen.
+  if (isSignedIn) {
+    if (
+      (userData?.status === UserStatuses.PENDING_ONBOARDING &&
+        !inOnboardingGroup) ||
+      (userData?.status === UserStatuses.ACTIVE && !inTabsGroup)
+    ) {
+      return loadingView;
+    }
+  } else {
+    if (!inAuthGroup) {
+      return loadingView;
+    }
   }
 
   return (
