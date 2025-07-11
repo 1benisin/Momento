@@ -4,8 +4,8 @@ import { Link, Tabs, useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 
 import Colors from "@/constants/Colors";
-import { useColorScheme } from "@/components/useColorScheme";
-import { useClientOnlyValue } from "@/components/useClientOnlyValue";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { useClientOnlyValue } from "@/hooks/useClientOnlyValue";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { UserStatuses } from "@/convex/schema";
@@ -41,18 +41,6 @@ export default function TabLayout() {
               paddingRight: 15,
             }}
           >
-            <Link href="/modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={25}
-                    color={Colors[colorScheme ?? "light"].text}
-                    style={{ opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
             <View>
               <Pressable onPress={() => router.push("/account")}>
                 {({ pressed }) => (

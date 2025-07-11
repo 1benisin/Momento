@@ -15,8 +15,6 @@ import {
   useAuth,
   ClerkLoading,
   ClerkLoaded,
-  SignedIn,
-  SignedOut,
 } from "@clerk/clerk-expo";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
@@ -24,8 +22,7 @@ import { ConvexReactClient, useQuery } from "convex/react";
 import { ActivityIndicator, View } from "react-native";
 import { api } from "@/convex/_generated/api";
 import { UserStatuses } from "@/convex/schema";
-
-import { useColorScheme } from "@/components/useColorScheme";
+import { useColorScheme } from "@/hooks/useColorScheme";
 
 export {
   // Catch any errors thrown by the Layout component.

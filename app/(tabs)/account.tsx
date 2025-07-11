@@ -16,6 +16,7 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { SignOutButton } from "@/components/SignOutButton";
 import { UserStatuses } from "@/convex/schema";
+import ContactMethodManager from "@/components/ContactMethodManager";
 
 const AccountScreen = () => {
   const { user, isLoaded } = useUser();
@@ -184,6 +185,11 @@ const AccountScreen = () => {
         )}
       </View>
 
+      <View style={styles.contactMethodsContainer}>
+        <ContactMethodManager methodType="email" />
+        <ContactMethodManager methodType="phone" />
+      </View>
+
       <View style={styles.buttonContainer}>
         {isEditing ? (
           <>
@@ -264,33 +270,50 @@ const AccountScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    backgroundColor: "#fff",
     flexGrow: 1,
+    alignItems: "center",
+    backgroundColor: "#fff",
+    paddingVertical: 20,
+  },
+  contactMethodsContainer: {
+    width: "80%",
+    marginTop: 20,
+    gap: 20,
   },
   pausedBanner: {
-    backgroundColor: "#FFFBEA",
-    borderColor: "#FACC15",
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 20,
+    width: "100%",
+    backgroundColor: "orange",
+    padding: 10,
     alignItems: "center",
+    marginBottom: 20,
   },
   pausedBannerText: {
-    color: "#B45309",
-    fontWeight: "500",
-    textAlign: "center",
+    color: "white",
+    fontWeight: "bold",
   },
   profileContainer: {
     alignItems: "center",
-    marginBottom: 30,
+    marginBottom: 20,
   },
   profileImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    marginBottom: 20,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 10,
+  },
+  editNameContainer: {
+    flexDirection: "row",
+    gap: 10,
+    alignItems: "center",
+  },
+  nameInput: {
+    borderBottomWidth: 1,
+    borderColor: "#ccc",
+    padding: 8,
+    flex: 1,
+    textAlign: "center",
+    fontSize: 24,
+    fontWeight: "bold",
   },
   name: {
     fontSize: 24,
@@ -299,77 +322,74 @@ const styles = StyleSheet.create({
   email: {
     fontSize: 16,
     color: "#666",
-    marginTop: 5,
+    marginTop: 4,
   },
   phone: {
     fontSize: 16,
     color: "#666",
-    marginTop: 5,
+    marginTop: 4,
   },
   statusText: {
     fontSize: 16,
-    color: "#666",
-    marginTop: 10,
-    fontWeight: "bold",
-  },
-  editNameContainer: {
-    flexDirection: "row",
-    gap: 10,
-  },
-  nameInput: {
-    flex: 1,
-  },
-  input: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    width: "100%",
-    marginBottom: 10,
+    color: "#333",
+    marginTop: 8,
+    fontStyle: "italic",
   },
   buttonContainer: {
-    width: "100%",
-    gap: 10,
+    width: "80%",
   },
   button: {
-    backgroundColor: "#007BFF",
+    backgroundColor: "#007AFF",
     padding: 15,
-    borderRadius: 5,
+    borderRadius: 10,
     alignItems: "center",
+    marginBottom: 10,
   },
   buttonText: {
     color: "white",
     fontWeight: "bold",
+    fontSize: 16,
   },
   secondaryButton: {
-    backgroundColor: "transparent",
+    backgroundColor: "white",
     borderWidth: 1,
-    borderColor: "#007BFF",
+    borderColor: "#007AFF",
   },
   secondaryButtonText: {
-    color: "#007BFF",
+    color: "#007AFF",
   },
   dangerZone: {
-    marginTop: 40,
+    marginTop: 30,
     borderTopWidth: 1,
     borderTopColor: "#eee",
+    width: "80%",
     paddingTop: 20,
+    alignItems: "center",
   },
   dangerZoneText: {
-    textAlign: "center",
-    color: "#B45309",
-    marginBottom: 10,
+    fontSize: 18,
     fontWeight: "bold",
-  },
-  dangerButton: {
-    backgroundColor: "red",
+    color: "#D93F33",
+    marginBottom: 10,
   },
   warningButton: {
-    backgroundColor: "#FACC15",
+    backgroundColor: "#E59400",
+    borderColor: "#E59400",
   },
   warningButtonText: {
-    color: "#422006",
+    color: "#fff",
+  },
+  dangerButton: {
+    backgroundColor: "#D93F33",
+    borderColor: "#D93F33",
+  },
+  input: {
+    width: "80%",
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    marginBottom: 10,
   },
 });
 

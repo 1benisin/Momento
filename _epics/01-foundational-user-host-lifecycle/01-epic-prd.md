@@ -70,7 +70,7 @@ This section breaks the epic into concrete, implementable stories. Completed sto
   - **Goal**: Implement US-only, phone-based authentication using One-Time Passwords (OTP) sent via SMS.
 - **Story 01-02: Initial Social Profile Creation (Completed)**
   - **Goal**: Allow new users to create a basic social profile with their name and a profile photo immediately after successful phone authentication.
-- **Story 01-03: Add Email Authentication**
+- **Story 01-03: Add Email Authentication (Completed)**
   - **Goal**: Enhance the existing authentication system to allow users to sign up and log in with an email and password, creating a unified auth experience.
 - **Story 01-04: Implement Post-Signup Role Selection**
   - **Goal**: Create the `RoleSelectionScreen` to be shown after sign-up. Reroute the completed social profile flow to become one of the branches selectable from this screen.
