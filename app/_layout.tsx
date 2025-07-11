@@ -23,6 +23,7 @@ import { ActivityIndicator, View } from "react-native";
 import { api } from "@/convex/_generated/api";
 import { UserStatuses } from "@/convex/schema";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { MenuProvider } from "react-native-popup-menu";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -89,16 +90,18 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <ClerkLoading>
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
-          <ActivityIndicator size="large" />
-        </View>
-      </ClerkLoading>
-      <ClerkLoaded>
-        <InitialLayout />
-      </ClerkLoaded>
+      <MenuProvider>
+        <ClerkLoading>
+          <View
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          >
+            <ActivityIndicator size="large" />
+          </View>
+        </ClerkLoading>
+        <ClerkLoaded>
+          <InitialLayout />
+        </ClerkLoaded>
+      </MenuProvider>
     </ThemeProvider>
   );
 }

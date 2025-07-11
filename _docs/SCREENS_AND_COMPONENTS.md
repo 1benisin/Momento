@@ -37,8 +37,8 @@ This flow is now managed by Clerk, which handles user sessions and the complexit
 - **`SplashScreen`**: Initial launch screen.
 - **`AuthScreen`**: A simple entry screen with "Log In" and "Sign Up" buttons. It might also include a "Contact Support" link.
 - **`(auth)` Route Group Screens**: These screens live in the `app/(auth)/` directory and are wrapped in a layout that redirects already authenticated users to the core app.
-  - **`SignInScreen`**: For returning users. It contains UI for entering a phone number (for OTP) or an email and password. This entire state machine is managed by Clerk's `useSignIn()` hook.
-  - **`SignUpScreen`**: For new users. Similar to the sign-in screen, this uses the `useSignUp()` hook to manage the process of creating a new user account with either a phone number and OTP verification or an email and password.
+  - **`SignInScreen`**: For returning users. It contains UI for entering a phone number or an email address to receive a one-time verification code. This entire state machine is managed by Clerk's `useSignIn()` hook.
+  - **`SignUpScreen`**: For new users. Similar to the sign-in screen, this uses the `useSignUp()` hook to manage the process of creating a new user account with either a phone number or an email address and verifying with a one-time code.
 - **Post-Authentication & Intent-Driven Onboarding Flow**: Once a user is authenticated via Clerk, they are directed to choose their path.
   - **`RoleSelectionScreen`**: A new, mandatory screen shown immediately after a user's first successful sign-up. It asks the user to choose their primary goal: "I want to attend events" or "I want to host events". Their choice determines which onboarding flow they enter.
   - **`ClerkLoading/ClerkLoaded`**: To prevent a "flash" of the wrong screen when the app first loads, the root layout will use Clerk's control components. It will show a loading indicator via `<ClerkLoading>` while Clerk initializes, and then render the main content inside `<ClerkLoaded>` for a smooth transition.

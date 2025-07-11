@@ -20,7 +20,6 @@ export default function SignInScreen() {
     "phone"
   );
   const [emailAddress, setEmailAddress] = React.useState("");
-  const [password, setPassword] = React.useState("");
   const [phoneNumber, setPhoneNumber] = React.useState("");
 
   const [pendingVerification, setPendingVerification] = React.useState(false);
@@ -36,41 +35,48 @@ export default function SignInScreen() {
     setError(null);
 
     try {
-      if (signInMethod === "email") {
-        const result = await signIn.create({
-          identifier: emailAddress,
-          password,
-        });
-        if (result.createdSessionId) {
-          await setActive({ session: result.createdSessionId });
-          router.push("/(tabs)");
-        } else {
-          // This can happen if the user has 2FA enabled, for example.
-          // For this story, we'll treat it as an error.
-          setError("Sign in failed. Please check your credentials.");
-        }
-      } else {
-        const { supportedFirstFactors } = await signIn.create({
-          identifier: phoneNumber,
-        });
+      const identifier = signInMethod === "email" ? emailAddress : phoneNumber;
+      const { supportedFirstFactors } = await signIn.create({ identifier });
 
-        if (supportedFirstFactors?.some((f) => f.strategy === "phone_code")) {
-          const firstPhoneFactor: any = supportedFirstFactors.find(
-            (factor: any) => factor.strategy === "phone_code"
-          );
-          const { phoneNumberId } = firstPhoneFactor;
+      const firstFactor: any = supportedFirstFactors?.find((f) => {
+        return signInMethod === "email"
+          ? f.strategy === "email_code"
+          : f.strategy === "phone_code";
+      });
+
+      if (firstFactor) {
+        if (signInMethod === "email") {
+          const { emailAddressId } = firstFactor;
+          await signIn.prepareFirstFactor({
+            strategy: "email_code",
+            emailAddressId,
+          });
+        } else {
+          const { phoneNumberId } = firstFactor;
           await signIn.prepareFirstFactor({
             strategy: "phone_code",
             phoneNumberId,
           });
-          setPendingVerification(true);
         }
+        setPendingVerification(true);
+      } else {
+        // This can happen if the user's primary contact method in Clerk
+        // does not match the selected sign-in method.
+        setError(
+          `This account does not have a verified ${signInMethod}. Please try another method.`
+        );
       }
     } catch (err: any) {
       console.error("Error signing in:", JSON.stringify(err, null, 2));
-      setError(
-        err.errors?.[0]?.longMessage || "An error occurred during sign in."
-      );
+      const defaultMessage = "An error occurred during sign in.";
+      // Customize error for "not found" which is common
+      if (err.errors?.[0]?.code === "form_identifier_not_found") {
+        setError(
+          `We couldn't find an account with that ${signInMethod}. Please sign up.`
+        );
+      } else {
+        setError(err.errors?.[0]?.longMessage || defaultMessage);
+      }
     } finally {
       setLoading(false);
     }
@@ -82,10 +88,8 @@ export default function SignInScreen() {
     setError(null);
 
     try {
-      const result = await signIn.attemptFirstFactor({
-        strategy: "phone_code",
-        code,
-      });
+      const strategy = signInMethod === "email" ? "email_code" : "phone_code";
+      const result = await signIn.attemptFirstFactor({ strategy, code });
 
       if (result.createdSessionId) {
         await setActive({ session: result.createdSessionId });
@@ -103,39 +107,110 @@ export default function SignInScreen() {
     }
   };
 
+  const onBackPress = () => {
+    setPendingVerification(false);
+    setCode("");
+    setError(null);
+  };
+
   // --- Render ---
 
-  if (pendingVerification) {
-    return (
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.container}
-      >
-        <View style={styles.form}>
-          <Text style={styles.label}>Verification Code</Text>
+  const renderSignInForm = () => (
+    <>
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[styles.tab, signInMethod === "phone" && styles.activeTab]}
+          onPress={() => setSignInMethod("phone")}
+        >
+          <Text style={styles.tabText}>Phone</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, signInMethod === "email" && styles.activeTab]}
+          onPress={() => setSignInMethod("email")}
+        >
+          <Text style={styles.tabText}>Email</Text>
+        </TouchableOpacity>
+      </View>
+
+      {signInMethod === "phone" ? (
+        <>
+          <Text style={styles.label}>Phone Number</Text>
           <TextInput
-            value={code}
-            placeholder="Code..."
-            onChangeText={setCode}
+            autoCapitalize="none"
+            placeholder="+1..."
+            value={phoneNumber}
+            onChangeText={setPhoneNumber}
             style={styles.input}
-            keyboardType="numeric"
+            keyboardType="phone-pad"
           />
-          <TouchableOpacity
-            onPress={onVerifyPress}
-            style={styles.button}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              <Text style={styles.buttonText}>Verify</Text>
-            )}
-          </TouchableOpacity>
-          {error && <Text style={styles.errorText}>{error}</Text>}
-        </View>
-      </KeyboardAvoidingView>
-    );
-  }
+        </>
+      ) : (
+        <>
+          <Text style={styles.label}>Email Address</Text>
+          <TextInput
+            autoCapitalize="none"
+            placeholder="email@example.com"
+            value={emailAddress}
+            onChangeText={setEmailAddress}
+            style={styles.input}
+            keyboardType="email-address"
+          />
+        </>
+      )}
+
+      <TouchableOpacity
+        onPress={onSignInPress}
+        style={styles.button}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color="white" />
+        ) : (
+          <Text style={styles.buttonText}>Sign In</Text>
+        )}
+      </TouchableOpacity>
+      {error && <Text style={styles.errorText}>{error}</Text>}
+
+      <Link href="/sign-up" asChild>
+        <TouchableOpacity style={styles.link}>
+          <Text>Don't have an account? Sign up</Text>
+        </TouchableOpacity>
+      </Link>
+    </>
+  );
+
+  const renderVerificationForm = () => (
+    <>
+      <Text style={styles.label}>Verification Code</Text>
+      <TextInput
+        value={code}
+        placeholder="Code..."
+        onChangeText={setCode}
+        style={styles.input}
+        keyboardType="numeric"
+      />
+      <TouchableOpacity
+        onPress={onVerifyPress}
+        style={styles.button}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color="white" />
+        ) : (
+          <Text style={styles.buttonText}>Verify</Text>
+        )}
+      </TouchableOpacity>
+      {error && <Text style={styles.errorText}>{error}</Text>}
+      <TouchableOpacity
+        onPress={onBackPress}
+        style={[styles.button, styles.secondaryButton]}
+      >
+        <Text style={[styles.buttonText, styles.secondaryButtonText]}>
+          Back
+        </Text>
+      </TouchableOpacity>
+    </>
+  );
 
   return (
     <KeyboardAvoidingView
@@ -143,82 +218,7 @@ export default function SignInScreen() {
       style={styles.container}
     >
       <View style={styles.form}>
-        <View style={styles.tabContainer}>
-          <TouchableOpacity
-            style={[styles.tab, signInMethod === "phone" && styles.activeTab]}
-            onPress={() => setSignInMethod("phone")}
-          >
-            <Text style={styles.tabText}>Phone</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tab, signInMethod === "email" && styles.activeTab]}
-            onPress={() => setSignInMethod("email")}
-          >
-            <Text style={styles.tabText}>Email</Text>
-          </TouchableOpacity>
-        </View>
-
-        {signInMethod === "phone" ? (
-          <>
-            <Text style={styles.label}>Phone Number</Text>
-            <TextInput
-              autoCapitalize="none"
-              placeholder="+1..."
-              value={phoneNumber}
-              onChangeText={setPhoneNumber}
-              style={styles.input}
-              keyboardType="phone-pad"
-            />
-          </>
-        ) : (
-          <>
-            <Text style={styles.label}>Email Address</Text>
-            <TextInput
-              autoCapitalize="none"
-              placeholder="email@example.com"
-              value={emailAddress}
-              onChangeText={setEmailAddress}
-              style={styles.input}
-              keyboardType="email-address"
-            />
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              placeholder="Password"
-              value={password}
-              onChangeText={setPassword}
-              style={styles.input}
-              secureTextEntry
-            />
-          </>
-        )}
-
-        <TouchableOpacity
-          onPress={onSignInPress}
-          style={styles.button}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <Text style={styles.buttonText}>Sign In</Text>
-          )}
-        </TouchableOpacity>
-        {error && <Text style={styles.errorText}>{error}</Text>}
-
-        <View style={styles.linkRow}>
-          <Link href="/sign-up" asChild>
-            <TouchableOpacity style={styles.link}>
-              <Text>Don't have an account? Sign up</Text>
-            </TouchableOpacity>
-          </Link>
-          {signInMethod === "email" && (
-            <Link href="./forgot-password" asChild>
-              <TouchableOpacity style={styles.link}>
-                <Text>Forgot password?</Text>
-              </TouchableOpacity>
-            </Link>
-          )}
-        </View>
+        {pendingVerification ? renderVerificationForm() : renderSignInForm()}
       </View>
     </KeyboardAvoidingView>
   );
@@ -261,16 +261,20 @@ const styles = StyleSheet.create({
     marginTop: 15,
     alignItems: "center",
   },
-  linkRow: {
-    marginTop: 10,
-    flexDirection: "row",
-    justifyContent: "space-around",
-  },
   errorText: {
     color: "red",
     textAlign: "center",
     marginTop: 10,
     marginBottom: 10,
+  },
+  secondaryButton: {
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: "#007BFF",
+    marginTop: 10,
+  },
+  secondaryButtonText: {
+    color: "#007BFF",
   },
   tabContainer: {
     flexDirection: "row",

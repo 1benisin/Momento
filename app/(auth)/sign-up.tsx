@@ -20,7 +20,6 @@ export default function SignUpScreen() {
     "phone"
   );
   const [emailAddress, setEmailAddress] = React.useState("");
-  const [password, setPassword] = React.useState("");
   const [phoneNumber, setPhoneNumber] = React.useState("");
 
   const [pendingVerification, setPendingVerification] = React.useState(false);
@@ -37,7 +36,7 @@ export default function SignUpScreen() {
 
     try {
       if (signUpMethod === "email") {
-        await signUp.create({ emailAddress, password });
+        await signUp.create({ emailAddress });
         await signUp.prepareEmailAddressVerification({
           strategy: "email_code",
         });
@@ -121,14 +120,6 @@ export default function SignUpScreen() {
             style={styles.input}
             keyboardType="email-address"
           />
-          <Text style={styles.label}>Password</Text>
-          <TextInput
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            style={styles.input}
-            secureTextEntry
-          />
         </>
       ) : (
         <>
@@ -152,7 +143,7 @@ export default function SignUpScreen() {
         {loading ? (
           <ActivityIndicator color="white" />
         ) : (
-          <Text style={styles.buttonText}>Continue</Text>
+          <Text style={styles.buttonText}>Sign Up</Text>
         )}
       </TouchableOpacity>
       {error && <Text style={styles.errorText}>{error}</Text>}

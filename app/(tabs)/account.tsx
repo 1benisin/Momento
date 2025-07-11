@@ -91,12 +91,12 @@ const AccountScreen = () => {
     );
   };
 
-  const onReactivateAccount = async () => {
+  const onUnpauseAccount = async () => {
     try {
       await unpauseAccount();
     } catch (error) {
-      console.error("Error reactivating account:", error);
-      Alert.alert("Error", "Could not reactivate your account.");
+      console.error("Error unpausing account:", error);
+      Alert.alert("Error", "Could not unpause your account.");
     }
   };
 
@@ -225,36 +225,17 @@ const AccountScreen = () => {
             App Settings
           </Text>
         </Pressable>
-        <Pressable
-          onPress={() => router.push("/account/change-password")}
-          style={[styles.button, styles.secondaryButton]}
-        >
-          <Text style={[styles.buttonText, styles.secondaryButtonText]}>
-            Change Password
-          </Text>
-        </Pressable>
-        <Pressable
-          onPress={() => router.push("/account/two-factor-auth")}
-          style={[styles.button, styles.secondaryButton]}
-          disabled={user.twoFactorEnabled}
-        >
-          <Text style={[styles.buttonText, styles.secondaryButtonText]}>
-            {user.twoFactorEnabled
-              ? "Two-Factor Authentication Enabled"
-              : "Set Up Two-Factor Authentication"}
-          </Text>
-        </Pressable>
         <SignOutButton />
       </View>
 
       <View style={styles.dangerZone}>
         <Text style={styles.dangerZoneText}>Danger Zone</Text>
         <Pressable
-          onPress={isPaused ? onReactivateAccount : onPauseAccount}
+          onPress={isPaused ? onUnpauseAccount : onPauseAccount}
           style={[styles.button, styles.warningButton, { marginBottom: 10 }]}
         >
           <Text style={[styles.buttonText, styles.warningButtonText]}>
-            {isPaused ? "Reactivate Account" : "Pause Account"}
+            {isPaused ? "Unpause Account" : "Pause Account"}
           </Text>
         </Pressable>
         <Pressable
