@@ -66,19 +66,19 @@ This PRD concerns the primary epic. Future or related epics can be listed here f
 
 This section breaks the epic into concrete, implementable stories. Completed stories are preserved to reflect work done, and new stories outline the remaining tasks to fulfill the epic's updated goals.
 
-- **Story 01-01: Phone Authentication Setup (Completed)**
+- **Story 01: Phone Authentication Setup (Completed)**
   - **Goal**: Implement US-only, phone-based authentication using One-Time Passwords (OTP) sent via SMS.
-- **Story 01-02: Initial Social Profile Creation (Completed)**
+- **Story 02: Initial Social Profile Creation (Completed)**
   - **Goal**: Allow new users to create a basic social profile with their name and a profile photo immediately after successful phone authentication.
-- **Story 01-03: Add Email Authentication (Completed)**
+- **Story 03: Add Email Authentication (Completed)**
   - **Goal**: Enhance the existing authentication system to allow users to sign up and log in with an email and password, creating a unified auth experience.
-- **Story 01-04: Implement Post-Signup Role Selection**
+- **Story 04: Implement Post-Signup Role Selection**
   - **Goal**: Create the `RoleSelectionScreen` to be shown after sign-up. Reroute the completed social profile flow to become one of the branches selectable from this screen.
-- **Story 01-05: Build Host Onboarding Flow**
+- **Story 05: Build Host Onboarding Flow**
   - **Goal**: Build the sequence of screens for the new host track, including host profile creation (`HostProfileSetupScreen`) and a prompt to begin identity verification.
-- **Story 01-06: Host Verification with Stripe Identity**
+- **Story 06: Host Verification with Stripe Identity**
   - **Goal**: Integrate Stripe Identity to verify hosts and enforce this check on the backend before an event can be published.
-- **Story 01-07: Hybrid User Mode-Switching**
+- **Story 07: Hybrid User Mode-Switching**
   - **Goal**: Implement a UI control and the corresponding backend logic for users who have both social and host roles to switch between the two contexts. This also includes the "add-a-role" flows for existing users.
 
 ## Strategic Context & Core Documents
