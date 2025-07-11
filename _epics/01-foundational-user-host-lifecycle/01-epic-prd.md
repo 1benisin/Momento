@@ -72,7 +72,7 @@ This section breaks the epic into concrete, implementable stories. Completed sto
   - **Goal**: Allow new users to create a basic social profile with their name and a profile photo immediately after successful phone authentication.
 - **Story 03: Add Email Authentication (Completed)**
   - **Goal**: Enhance the existing authentication system to allow users to sign up and log in with an email and password, creating a unified auth experience.
-- **Story 04: Implement Post-Signup Role Selection**
+- **Story 04: Implement Post-Signup Role Selection (Completed)**
   - **Goal**: Create the `RoleSelectionScreen` to be shown after sign-up. Reroute the completed social profile flow to become one of the branches selectable from this screen.
 - **Story 05: Build Host Onboarding Flow**
   - **Goal**: Build the sequence of screens for the new host track, including host profile creation (`HostProfileSetupScreen`) and a prompt to begin identity verification.
