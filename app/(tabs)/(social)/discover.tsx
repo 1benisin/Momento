@@ -5,7 +5,7 @@ import { SignOutButton } from "@/components/SignOutButton";
 import { Text, View } from "@/components/Themed";
 import UserInfo from "@/components/UserInfo";
 
-export default function TabOneScreen() {
+export default function DiscoverScreen() {
   return (
     <View style={styles.container}>
       <UserInfo />

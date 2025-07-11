@@ -68,10 +68,11 @@ export default function SignUpScreen() {
 
       const result = await verificationFunction({ code });
 
-      if (result.createdSessionId) {
+      if (result.status === "complete") {
         await setActive({ session: result.createdSessionId });
-        router.push("/(tabs)");
       } else {
+        // See https://clerk.com/docs/custom-flows/error-handling
+        // for more info on error handling
         setError(
           "Could not complete sign up. Please check the code and try again."
         );

@@ -10,8 +10,8 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useMutation } from "convex/react";
-import ImageUploader from "../../components/ImageUploader";
-import { api } from "../../convex/_generated/api";
+import ImageUploader from "../../../components/ImageUploader";
+import { api } from "../../../convex/_generated/api";
 
 export default function InitialPhotoScreen() {
   const router = useRouter();
@@ -36,7 +36,8 @@ export default function InitialPhotoScreen() {
     setIsSubmitting(true);
     try {
       await addProfilePhoto({ storageId, isAuthentic: false });
-      router.replace("/");
+      // The root layout will now handle the navigation after the
+      // user's status is updated by the addProfilePhoto mutation.
     } catch (error) {
       console.error("Failed to save profile photo:", error);
       Alert.alert(

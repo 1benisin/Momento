@@ -6,7 +6,7 @@ export default function RoleSelectionScreen() {
   const router = useRouter();
 
   const handleAttend = () => {
-    router.push("/(onboarding)/profile-setup");
+    router.push("/(onboarding)/(social)/profile-setup");
   };
 
   const handleHost = () => {
