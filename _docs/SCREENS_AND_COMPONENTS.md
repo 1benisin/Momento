@@ -80,14 +80,10 @@ _This tab bar represents the primary navigation. Its layout and functionality ar
 
 _This is the view for `Social-Only` and `Hybrid` users who are in "Social Mode." It is focused on participation and connection._
 
-- **`HomeTab`**: The main dashboard. Displays upcoming events and pending invitations.
-- **`EventsTab`**: Hub for all event-related activities, including "Invitations," "Confirmed," and "Past" events.
-- **`DiscoveryTab`**: A main tab with two modes for discovering new things.
-  - **Interests Mode**: The "Help us Discover your Interests" flow, with a swipeable deck of past events.
-  - **People Mode**: The "Help us Discover your Type" flow, with a swipeable deck of user profiles.
-- **`MemoryBookTab`**: Gallery of "Face Cards" for every person met.
-- **`MessagesTab`**: List of all 1-on-1 conversations with other participants.
-- **`ProfileTab`**: The user's own `Social Profile`. This is the entry point for `Settings` and the `UserHostOnboardingFlow` (via a "Become a Host" CTA). It contains the **`ModeSwitcher`** component for `Hybrid Users`.
+- **`Discover`**: The main discovery hub (points to `index.tsx`).
+- **`Events`**: Hub for all event-related activities, including "Invitations," "Confirmed," and "Past" events.
+- **`Memory Book`**: Gallery of "Face Cards" for every person met.
+- **`Social Profile`**: The user's own `Social Profile`. This is the entry point for `Settings` and the `UserHostOnboardingFlow` (via a "Become a Host" CTA). It contains the **`ModeSwitcher`** component for `Hybrid Users`.
 
 #### Host Mode Navigation
 
@@ -96,7 +92,7 @@ _This is the view for `Host-Only` and `Hybrid` users who are in "Host Mode." It 
 - **`DashboardTab`**: Key metrics at a glance: revenue, ratings, upcoming event headcounts.
 - **`EventsTab`**: Manage all created events (drafts, upcoming, past). Entry point to the `CreateEventFlow`.
 - **`InboxTab`**: A dedicated inbox for messages from attendees of the host's events.
-- **`ProfileTab`**: Manage the public `Host Profile`, brand photos, payout settings, etc. Contains the **`ModeSwitcher`** for `Hybrid Users`.
+- **`HostProfileTab`**: Manage the public `Host Profile`, brand photos, payout settings, etc. Contains the **`ModeSwitcher`** for `Hybrid Users`.
 
 ### 4. Invitation & Event Details
 
