@@ -7,7 +7,7 @@ import {
   mutation,
 } from "./_generated/server";
 import { Doc, Id } from "./_generated/dataModel";
-import { UserStatuses } from "./schema";
+import { UserStatuses, UserRoles } from "./schema";
 
 // Retrieves the database record for the currently authenticated user.
 // The name `me` is a common convention for API endpoints that return data
@@ -212,6 +212,36 @@ export const completeOnboarding = mutation({
 
     await ctx.db.patch(user._id, {
       status: UserStatuses.ACTIVE,
+    });
+  },
+});
+
+export const createHostProfile = mutation({
+  args: {
+    host_name: v.string(),
+    host_bio: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error(
+        "Called createHostProfile without authentication present"
+      );
+    }
+
+    const user = await getUserByClerkId(ctx, { clerkId: identity.subject });
+    if (user === null) {
+      throw new Error("User not found, cannot create host profile");
+    }
+
+    await ctx.db.patch(user._id, {
+      active_role: UserRoles.HOST,
+      hostProfile: {
+        host_name: args.host_name,
+        host_bio: args.host_bio,
+        // TODO: Allow for 'community' host_type creation
+        host_type: "user",
+      },
     });
   },
 });

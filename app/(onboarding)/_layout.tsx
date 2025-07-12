@@ -17,6 +17,14 @@ export default function OnboardingLayout() {
         name="(social)/initial-photo"
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+        name="(host)/host-profile-setup"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="(host)/verification-prompt"
+        options={{ headerShown: false }}
+      />
     </Stack>
   );
 }

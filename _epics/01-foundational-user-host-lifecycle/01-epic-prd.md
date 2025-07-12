@@ -151,8 +151,14 @@ The core of this epic revolves around the `users` collection in Convex. The user
     // clerkId, phone_number, etc. from original schema
     email: v.optional(v.string()), // For email/password auth
     is_verified: v.boolean(), // Becomes true after Stripe Identity check
-    status: v.string(), // 'active', 'suspended', 'verification_pending', etc.
-    active_role: v.string(), // 'social' or 'host', controlled by ModeSwitcher
+    status: v.union(
+      v.literal("pending_onboarding"),
+      v.literal("active"),
+      v.literal("paused")
+    ),
+    active_role: v.optional(
+      v.union(v.literal("social"), v.literal("host"))
+    ), // controlled by ModeSwitcher
 
     socialProfile: v.optional(v.object({
       first_name: v.string(),

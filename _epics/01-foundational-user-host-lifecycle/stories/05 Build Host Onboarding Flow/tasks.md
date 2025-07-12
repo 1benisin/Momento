@@ -24,7 +24,7 @@
   - [ ] 1.5 Inside the mutation, use `ctx.auth.getUserIdentity()` to get the current user's Clerk ID.
   - [ ] 1.6 Query the `users` table using the `by_clerkId` index to find the user's document.
   - [ ] 1.7 If the user is found, use `ctx.db.patch(user._id, { ... })` to update their document.
-  - [ ] 1.8 In the patched data, set `active_role: 'host'`.
+  - [ ] 1.8 In the patched data, set `active_role: 'host'`, ensuring you use the `UserRoles` enum from the schema for type safety.
   - [ ] 1.9 In the patched data, set the `hostProfile` object with `{ host_name, host_bio, host_type: 'user' }`.
   - [ ] 1.10 Add a comment above the `host_type` line: `// TODO: Allow for 'community' host_type creation`.
 
