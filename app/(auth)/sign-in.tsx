@@ -91,10 +91,10 @@ export default function SignInScreen() {
       const strategy = signInMethod === "email" ? "email_code" : "phone_code";
       const result = await signIn.attemptFirstFactor({ strategy, code });
 
-      if (result.createdSessionId) {
+      if (result.status === "complete") {
         await setActive({ session: result.createdSessionId });
-        router.push("/(tabs)");
       } else {
+        // Handle other cases like MFA required
         setError(
           "Could not complete sign in. Please check the code and try again."
         );

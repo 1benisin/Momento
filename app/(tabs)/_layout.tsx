@@ -25,6 +25,14 @@ function TabBarIcon(props: {
   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
+/**
+ * This is the main tab navigator for the application. It is displayed only when
+ * the user is authenticated and has completed the onboarding flow.
+ *
+ * It includes all the primary screens a user interacts with, such as discovering events
+ * and managing their profile. It also contains the main user menu for accessing account
+ * settings and signing out.
+ */
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const router = useRouter();
@@ -36,7 +44,6 @@ export default function TabLayout() {
   const onSignOutPress = async () => {
     try {
       await signOut();
-      router.replace("/sign-in");
     } catch (err) {
       console.error("Error signing out:", err);
     }
@@ -100,9 +107,6 @@ export default function TabLayout() {
                 <MenuOption onSelect={() => router.push("/settings")}>
                   <Text style={styles.menuItemText}>Settings</Text>
                 </MenuOption>
-                <MenuOption onSelect={() => router.push("/social-profile")}>
-                  <Text style={styles.menuItemText}>Social Profile</Text>
-                </MenuOption>
                 <View style={styles.separator} />
                 <MenuOption onSelect={onSignOutPress}>
                   <Text style={[styles.menuItemText, { color: "red" }]}>
@@ -116,7 +120,7 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="(social)/discover"
         options={{
           title: "Discover",
           tabBarIcon: ({ color }) => (
@@ -125,7 +129,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="events"
+        name="(social)/events"
         options={{
           title: "Events",
           tabBarIcon: ({ color }) => (
@@ -134,14 +138,14 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="memory-book"
+        name="(social)/memory-book"
         options={{
           title: "Memory Book",
           tabBarIcon: ({ color }) => <TabBarIcon name="book" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="social-profile"
+        name="(social)/social-profile"
         options={{
           title: "Social Profile",
           tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,

@@ -6,14 +6,11 @@ export default function RoleSelectionScreen() {
   const router = useRouter();
 
   const handleAttend = () => {
-    router.push("/(onboarding)/profile-setup");
+    router.push("/(onboarding)/(social)/profile-setup");
   };
 
   const handleHost = () => {
-    Alert.alert(
-      "Coming Soon!",
-      "The ability to host events is coming soon. Please select 'Attend Events' to continue."
-    );
+    router.push("./(host)/host-profile-setup");
   };
 
   return (
@@ -31,17 +28,11 @@ export default function RoleSelectionScreen() {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={[styles.card, styles.disabledCard]}
-        onPress={handleHost}
-      >
+      <TouchableOpacity style={styles.card} onPress={handleHost}>
         <Text style={styles.cardTitle}>Host Events</Text>
         <Text style={styles.cardDescription}>
           Create your own events and build a community.
         </Text>
-        <View style={styles.comingSoonBadge}>
-          <Text style={styles.comingSoonText}>Coming Soon</Text>
-        </View>
       </TouchableOpacity>
     </View>
   );

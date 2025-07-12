@@ -72,7 +72,7 @@ This section breaks the epic into concrete, implementable stories. Completed sto
   - **Goal**: Allow new users to create a basic social profile with their name and a profile photo immediately after successful phone authentication.
 - **Story 03: Add Email Authentication (Completed)**
   - **Goal**: Enhance the existing authentication system to allow users to sign up and log in with an email and password, creating a unified auth experience.
-- **Story 04: Implement Post-Signup Role Selection**
+- **Story 04: Implement Post-Signup Role Selection (Completed)**
   - **Goal**: Create the `RoleSelectionScreen` to be shown after sign-up. Reroute the completed social profile flow to become one of the branches selectable from this screen.
 - **Story 05: Build Host Onboarding Flow**
   - **Goal**: Build the sequence of screens for the new host track, including host profile creation (`HostProfileSetupScreen`) and a prompt to begin identity verification.
@@ -151,8 +151,14 @@ The core of this epic revolves around the `users` collection in Convex. The user
     // clerkId, phone_number, etc. from original schema
     email: v.optional(v.string()), // For email/password auth
     is_verified: v.boolean(), // Becomes true after Stripe Identity check
-    status: v.string(), // 'active', 'suspended', 'verification_pending', etc.
-    active_role: v.string(), // 'social' or 'host', controlled by ModeSwitcher
+    status: v.union(
+      v.literal("pending_onboarding"),
+      v.literal("active"),
+      v.literal("paused")
+    ),
+    active_role: v.optional(
+      v.union(v.literal("social"), v.literal("host"))
+    ), // controlled by ModeSwitcher
 
     socialProfile: v.optional(v.object({
       first_name: v.string(),
