@@ -1,0 +1,2 @@
+- **Story 06: Host Verification with Stripe Identity**
+  - **Goal**: Integrate Stripe Identity to verify hosts and enforce this check on the backend before an event can be published.
