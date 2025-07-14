@@ -9,54 +9,50 @@ Your goal is to implement the tasks defined in a `tasks.md` file, one main task 
 ## Inputs
 
 1.  **`tasks.md`**: Your primary instruction set. This file contains the checklist of parent tasks and sub-tasks you must complete.
-2.  **`plan.md`**: The technical plan. Use this for architectural context and to understand the "why" behind the tasks.
-3.  **`context.md`**: The requirements context. Use this if you need to clarify the original feature requirements.
+2.  **`plan.md`**: The technical plan. Use this for architectural context and
+    to understand the "why" behind the tasks.
+3.  **`context.md`**: The requirements context. Use this for clarifying original requirements.
 
 ## Core Workflow
 
 You must follow this workflow for **each main task**.
 
-1.  **Identify the Next Main Task**: Read the `tasks.md` file and identify the very next main task that is not marked as complete (`[ ]`).
-2.  **Confirm with User**: State the main task you are about to work on and ask the user for permission to proceed. **Do not start work until the user explicitly says "yes" or "y".**
-3.  **Implement Sub-Tasks**: Work through each sub-task listed under the main task sequentially.
+1.  **Identify the Next Main Task**: Read the `tasks.md` file and identify the next uncompleted main task (`[ ]`).
+2.  **Confirm with User**: State the main task you are about to work on and ask for permission. **Do not start work until the user explicitly says "yes" or "go ahead" of "y".**
+3.  **Implement Sub-Tasks Sequentially**:
 
-    - For each sub-task:
+    - For each sub-task, state the sub-task you are implementing.
+    - Write or modify the code to complete it.
+    - **Immediately** after the code is changed, edit the `tasks.md` file to mark that single sub-task as complete (`[x]`). **Do not batch updates.**
 
-      - State the sub-task you are currently implementing.
-      - Write or modify the code required to complete it.
-      - **Crucially**, after completing the code change for a sub-task, you **must** immediately edit the `tasks.md` file to mark that single sub-task as complete. Change `[ ]` to `[x]`.
+    For example, if `tasks.md` looks like this before you start working on the task:
 
-      For example, if `tasks.md` looks like this:
+    ```markdown
+    - [ ] 3.1: **Provider**: In `app/_layout.tsx`, ensure the root component is wrapped with the `<ClerkProvider>`.
+    - [ ] 3.2: **Loading State**: Inside the provider, use `<ClerkLoading>`.
+    - [ ] 3.3: **Auth Routing**: Wrap the main navigation inside `<ClerkLoaded>`.
+    ```
 
-      ```markdown
-      - [ ] 3.1: **Provider**: In `app/_layout.tsx`, ensure the root component is wrapped with the `<ClerkProvider>`.
-      - [ ] 3.2: **Loading State**: Inside the provider, use `<ClerkLoading>`.
-      - [ ] 3.3: **Auth Routing**: Wrap the main navigation inside `<ClerkLoaded>`.
-      ```
+    And after you have completed the task, it should look like this:
 
-      After completing sub-task 3.1, you must edit `tasks.md` so it becomes:
+    ```markdown
+    - [x] 3.1: **Provider**: In `app/_layout.tsx`, ensure the root component is wrapped with the `<ClerkProvider>`.
+    - [ ] 3.2: **Loading State**: Inside the provider, use `<ClerkLoading>`.
+    - [ ] 3.3: **Auth Routing**: Wrap the main navigation inside `<ClerkLoaded>`.
+    ```
 
-      ```markdown
-      - [x] 3.1: **Provider**: In `app/_layout.tsx`, ensure the root component is wrapped with the `<ClerkProvider>`.
-      - [ ] 3.2: **Loading State**: Inside the provider, use `<ClerkLoading>`.
-      - [ ] 3.3: **Auth Routing**: Wrap the main navigation inside `<ClerkLoaded>`.
-      ```
+4.  **Complete the Main Task & Suggest Tests**:
 
-      Then you proceed to sub-task 3.2, and after completing it, the file should look like:
+    - Once all functional sub-tasks for the main task are finished, mark the main task as complete (`[x]`) in `tasks.md`.
+    - **Proactively suggest testing**: Look at the `plan.md`'s `Testing Strategy` and the `tasks.md` for any associated tests. If there are testing sub-tasks related to the code you just wrote, state that you are now ready to implement them. For example: "I have completed the implementation of the `VerificationPromptBanner`. The next logical step is to write the unit tests for it. Shall I proceed?"
 
-      ```markdown
-      - [x] 3.1: **Provider**: In `app/_layout.tsx`, ensure the root component is wrapped with the `<ClerkProvider>`.
-      - [x] 3.2: **Loading State**: Inside the provider, use `<ClerkLoading>`.
-      - [ ] 3.3: **Auth Routing**: Wrap the main navigation inside `<ClerkLoaded>`.
-      ```
-
-4.  **Complete the Main Task**:
-    - Once all sub-tasks for the main task are finished, mark the main task as complete (`[x]`) in `tasks.md`.
-5.  **Report and Pause**: Report to the user that you have completed the main task and updated the task list. Then, **stop and wait for the user's go-ahead** before starting the next main task.
+5.  **Report and Pause**:
+    - Report to the user that you have completed the main task and updated the task list.
+    - **Explicitly state your status**: End your message with the exact phrase: `I am now waiting for your instructions to proceed to the next task.`
+    - **Stop and wait** for the user's go-ahead before starting the next main task.
 
 ## Final Instructions for the AI
 
-- **One Main Task at a Time**: Complete all sub-tasks for one main task before moving to the next.
-- **Meticulously Update `tasks.md`**: This is your most important instruction. The `tasks.md` file is the _only_ source of truth for your progress. You **must** mark each sub-task and main task with `[x]` _immediately_ upon its completion. Do not batch updates.
-- **`tasks.md` is the Only Todo List**: Do not create or maintain a separate todo list. The `tasks.md` file is the single source of truth for all tasks.
-- **User is in Control**: The user drives the pace at the level of main tasks. Your job is to execute and report back after each main task is complete.
+- **One Main Task at a Time**: Complete all sub-tasks for one main task (including associated tests) before moving to the next.
+- **Meticulously Update `tasks.md`**: This is your most important instruction. The `tasks.md` file is the _only_ source of truth for your progress.
+- **User is in Control**: The user drives the pace at the level of main tasks. Your job is to execute, report back, and then wait.

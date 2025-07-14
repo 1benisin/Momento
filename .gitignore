@@ -46,6 +46,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Android
+android/
 .gradle/
 build/
 app/build/
@@ -56,6 +57,7 @@ app/build/
 local.properties
 
 # iOS
+ios/
 build/
 *.pbxuser
 *.mode1v3

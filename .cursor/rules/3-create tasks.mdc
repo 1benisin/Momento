@@ -1,17 +1,3 @@
----
-description:
-globs:
-alwaysApply: false
----
-
----
-
-description:
-globs:
-alwaysApply: false
-
----
-
 # Rule: AI-Assisted Task Generation Workflow
 
 ## Goal
@@ -21,20 +7,24 @@ To guide an AI assistant in creating a detailed, step-by-step task list in Markd
 ## Core Principles
 
 - **Derivation from Plan**: Tasks must be a direct decomposition of the steps outlined in the `plan.md` file.
-- **Actionable and Granular**: Each task should be a small, concrete step a developer can complete. Sub-tasks provide the necessary granularity for implementation details.
+- **Actionable and Granular**: Each task should be a small, concrete step a developer can complete. Sub-tasks provide the necessary granularity for implementation details.- **Context is Key**: Tasks should reference the "why" from the plan.
+
 - **Structured Output**: Consistent Markdown formatting ensures readability and ease of use.
 - **Co-location**: The final `tasks.md` is stored alongside its corresponding `plan.md` and `prd.md` for clear organization and traceability.
 
 ## Process
 
-1.  **Receive Plan Reference**: The user points the AI to a specific `plan.md` file (e.g., `/_epics/001-story-name/plan.md`).
-2.  **Analyze Inputs**: The AI reads and thoroughly analyzes the `plan.md` as the primary source of truth. It should focus on the "Step-by-Step Task Breakdown" and the file modification/creation sections. The `context.md` and `prd.md` should be used for any necessary background context.
-3.  **Generate Task List**: Based on the `plan.md`, the AI will generate the full task list. This includes:
+1.  **Analyze Inputs**: The AI reads and thoroughly analyzes the `plan.md` as the primary source of truth. It should focus on the "Step-by-Step Task Breakdown" and the "Testing Strategy" sections.
+2.  **Generate Task List**: Based on the `plan.md`, the AI will generate the full task list.
     - **Parent Tasks**: These should correspond directly to the items in the "Step-by-Step Task Breakdown" from the `plan.md`.
-    - **Sub-Tasks**: Break down each parent task into smaller, actionable implementation steps (e.g., "add a specific form field," "implement a single function," "style a button").
-4.  **Populate Relevant Files**: The "Relevant Files" section should be populated directly from the file sections in the `plan.md`.
-5.  **Generate Final Output**: Combine the parent tasks, sub-tasks, and relevant files into the final Markdown structure specified below.
-6.  **Save Task List**: Save the generated document as `tasks.md` inside the same story directory as the `plan.md`.
+    - **Sub-Tasks**: Break down each parent task into smaller, actionable implementation steps.
+3.  **Add Developer Aids**:
+    - **Prerequisites**: Extract any environment setup or package installation steps into a "Prerequisites" section at the top.
+    - **Link Files**: In the "Relevant Files" section, format each file path as a clickable markdown link (e.g., `[`convex/schema.ts`](./convex/schema.ts)`).
+    - **Add Context**: For key tasks, add a blockquote explaining _why_ a step is necessary, referencing the plan (e.g., "> As per the plan, we must validate the webhook signature to prevent fraudulent requests.").
+    - **Suggest Scaffolding**: For tasks that involve creating new files, provide a basic code scaffold to get the developer started.
+4.  **Generate Final Output**: Combine the prerequisites, file links, and tasks into the final Markdown structure.
+5.  **Save Task List**: Save the generated document as `tasks.md` inside the same story directory as the `plan.md`.
 
 ## Output
 
@@ -44,23 +34,23 @@ To guide an AI assistant in creating a detailed, step-by-step task list in Markd
 
 ## Output Format
 
-The generated task list must follow this structure:
+The generated `tasks.md` must follow this structure:
 
-```markdown
+````markdown
 # Tasks for [Feature Name from Plan]
+
+## Prerequisites
+
+- [ ] Run `npm install stripe react-native-webview`.
+- [ ] Add `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` to your Convex environment variables.
+- [ ] In the Stripe Dashboard, configure a webhook endpoint to point to `<your-convex-url>/stripe-webhooks` and listen for `identity.verification_session.verified`.
 
 ## Relevant Files
 
-- `convex/schema.ts` - For updating the database schema with the new `profiles` table.
-- `convex/profiles.ts` - To create the new backend mutations for profile creation.
-- `app/(main)/create-profile.tsx` - The new screen for the user to create their profile.
-- `components/ProfileImageUploader.tsx` - Reusable component for uploading a profile image.
-- `components/ProfileImageUploader.test.tsx` - Unit tests for the uploader component.
-
-### Notes
-
-- Unit tests should typically be placed alongside the code files they are testing.
-- Use `npx jest [optional/path/to/test/file]` to run tests.
+- [`convex/schema.ts`](./convex/schema.ts)
+- [`convex/stripe.ts`](./convex/stripe.ts)
+- [`app/modal.tsx`](./app/modal.tsx)
+- [`components/VerificationPromptBanner.tsx`](./components/VerificationPromptBanner.tsx)
 
 ## Tasks
 
@@ -77,6 +67,7 @@ The generated task list must follow this structure:
   - [ ] 3.2 Add a text input for the user's `name`.
   - [ ] 3.3 Add the `ProfileImageUploader` component to the screen.
   - [ ] 3.4 Add a "Save Profile" button that calls the `createProfile` mutation.
+
 ```
 
 ## Target Audience
@@ -85,6 +76,19 @@ Assume the primary reader of the task list is a junior developer who will implem
 
 ## Final Instructions for the AI
 
+- Your role is to generate this task list, not to implement the code.
+- Always use the `plan.md` as the primary source for generating tasks.
+- Ensure the task list is clear, actionable, and structured as defined above to provide maximum utility to the developer.
+
 - Do NOT start implementing the feature or writing code. Your role is solely to generate the task list documentation.
 - Always use the `plan.md` as the primary source for generating tasks.
 - Ensure the task list is clear, concise, actionable, and structured as defined above.
+```
+````
+
+- Always use the `plan.md` as the primary source for generating tasks.
+- Ensure the task list is clear, concise, actionable, and structured as defined above.
+
+```
+
+```

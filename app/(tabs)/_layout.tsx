@@ -1,7 +1,7 @@
 import React from "react";
 import { FontAwesome } from "@expo/vector-icons";
-import { Link, Tabs, useRouter } from "expo-router";
-import { Pressable, View, Text, StyleSheet } from "react-native";
+import { Tabs, useRouter } from "expo-router";
+import { View, StyleSheet, ActivityIndicator } from "react-native";
 import {
   Menu,
   MenuOptions,
@@ -14,10 +14,10 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { useClientOnlyValue } from "@/hooks/useClientOnlyValue";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { UserStatuses } from "@/convex/schema";
+import { UserRole, AccountStatuses } from "@/convex/schema";
 import { useAuth } from "@clerk/clerk-expo";
+import { Text } from "@/components/Themed";
 
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
   color: string;
@@ -25,21 +25,75 @@ function TabBarIcon(props: {
   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
-/**
- * This is the main tab navigator for the application. It is displayed only when
- * the user is authenticated and has completed the onboarding flow.
- *
- * It includes all the primary screens a user interacts with, such as discovering events
- * and managing their profile. It also contains the main user menu for accessing account
- * settings and signing out.
- */
+const allTabs: {
+  name: string;
+  title: string;
+  icon: React.ComponentProps<typeof FontAwesome>["name"];
+  role: UserRole;
+}[] = [
+  // Social Tabs
+  {
+    name: "(social)/discover",
+    title: "Discover",
+    icon: "compass",
+    role: "social",
+  },
+  {
+    name: "(social)/events",
+    title: "Events",
+    icon: "calendar",
+    role: "social",
+  },
+  {
+    name: "(social)/memory-book",
+    title: "Memory Book",
+    icon: "book",
+    role: "social",
+  },
+  {
+    name: "(social)/social-profile",
+    title: "Profile",
+    icon: "user",
+    role: "social",
+  },
+  // Host Tabs
+  {
+    name: "(host)/dashboard",
+    title: "Dashboard",
+    icon: "tachometer",
+    role: "host",
+  },
+  { name: "(host)/events", title: "Events", icon: "calendar", role: "host" },
+  { name: "(host)/inbox", title: "Inbox", icon: "inbox", role: "host" },
+  { name: "(host)/host-profile", title: "Profile", icon: "user", role: "host" },
+];
+
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const router = useRouter();
-  const convexUser = useQuery(api.user.me);
+  const user = useQuery(api.user.me);
   const { signOut } = useAuth();
 
-  const isPaused = convexUser?.status === UserStatuses.PAUSED;
+  if (user === undefined) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
+
+  const isHybridUser = !!user?.socialProfile && !!user?.hostProfile;
+  let effectiveRole: UserRole | null = null;
+
+  if (isHybridUser) {
+    effectiveRole = user?.active_role || "social";
+  } else if (user?.socialProfile) {
+    effectiveRole = "social";
+  } else if (user?.hostProfile) {
+    effectiveRole = "host";
+  }
+
+  const isPaused = user?.accountStatus === AccountStatuses.PAUSED;
 
   const onSignOutPress = async () => {
     try {
@@ -49,25 +103,30 @@ export default function TabLayout() {
     }
   };
 
+  if (!effectiveRole) {
+    // This can happen if user has no profile yet (still in onboarding)
+    // or if there is an issue with the user document.
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator />
+        <Text>
+          'No role found (both "Social" and "Host" profiles are missing). Please
+          contact support.'
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
         headerShown: useClientOnlyValue(false, true),
         headerRight: () => (
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 15,
-              paddingRight: 15,
-            }}
-          >
+          <View style={styles.headerRightContainer}>
             <Menu>
               <MenuTrigger>
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <View style={styles.menuTrigger}>
                   <FontAwesome
                     name="user-circle"
                     size={25}
@@ -78,20 +137,12 @@ export default function TabLayout() {
                       name="exclamation-triangle"
                       size={14}
                       color="gold"
-                      style={{ position: "absolute", right: -2, top: -2 }}
+                      style={styles.pausedIcon}
                     />
                   )}
                 </View>
               </MenuTrigger>
-              <MenuOptions
-                customStyles={{
-                  optionsContainer: {
-                    borderRadius: 10,
-                    marginTop: 30,
-                    width: 160,
-                  },
-                }}
-              >
+              <MenuOptions customStyles={menuOptionsStyles}>
                 <MenuOption onSelect={() => router.push("/account")}>
                   <View style={styles.accountMenuOption}>
                     <Text style={styles.menuItemTextNaked}>Account</Text>
@@ -119,45 +170,49 @@ export default function TabLayout() {
         ),
       }}
     >
-      <Tabs.Screen
-        name="(social)/discover"
-        options={{
-          title: "Discover",
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="compass" color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="(social)/events"
-        options={{
-          title: "Events",
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="calendar" color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="(social)/memory-book"
-        options={{
-          title: "Memory Book",
-          tabBarIcon: ({ color }) => <TabBarIcon name="book" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="(social)/social-profile"
-        options={{
-          title: "Social Profile",
-          tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
-        }}
-      />
+      {allTabs.map((tab) => (
+        <Tabs.Screen
+          key={tab.name}
+          name={tab.name as any}
+          options={{
+            title: tab.title,
+            tabBarIcon: ({ color }) => (
+              <TabBarIcon name={tab.icon} color={color} />
+            ),
+            href: effectiveRole === tab.role ? undefined : null,
+          }}
+        />
+      ))}
       <Tabs.Screen name="account" options={{ href: null }} />
       <Tabs.Screen name="settings" options={{ href: null }} />
     </Tabs>
   );
 }
 
+const menuOptionsStyles = {
+  optionsContainer: {
+    borderRadius: 10,
+    marginTop: 30,
+    width: 160,
+  },
+};
+
 const styles = StyleSheet.create({
+  headerRightContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 15,
+    paddingRight: 15,
+  },
+  menuTrigger: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  pausedIcon: {
+    position: "absolute",
+    right: -2,
+    top: -2,
+  },
   accountMenuOption: {
     flexDirection: "row",
     justifyContent: "space-between",

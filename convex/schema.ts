@@ -1,18 +1,17 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
-export const UserStatuses = {
-  PENDING_ONBOARDING: "pending_onboarding",
+export const AccountStatuses = {
   ACTIVE: "active",
   PAUSED: "paused",
 } as const;
 
-export type UserStatus = (typeof UserStatuses)[keyof typeof UserStatuses];
+export type AccountStatus =
+  (typeof AccountStatuses)[keyof typeof AccountStatuses];
 
-export const userStatusValidator = v.union(
-  v.literal(UserStatuses.PENDING_ONBOARDING),
-  v.literal(UserStatuses.ACTIVE),
-  v.literal(UserStatuses.PAUSED)
+export const accountStatusValidator = v.union(
+  v.literal(AccountStatuses.ACTIVE),
+  v.literal(AccountStatuses.PAUSED)
 );
 
 export const UserRoles = {
@@ -35,7 +34,7 @@ export default defineSchema({
     email: v.optional(v.string()),
     first_name: v.optional(v.string()),
     last_name: v.optional(v.string()),
-    status: userStatusValidator,
+    accountStatus: accountStatusValidator,
     active_role: v.optional(userRoleValidator), // 'social' or 'host'
 
     hostProfile: v.optional(
