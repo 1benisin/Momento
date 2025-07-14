@@ -1,31 +1,25 @@
 import { useRouter } from "expo-router";
 import React from "react";
-import { View, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { Text } from "@/components/Themed";
-import { useMutation } from "convex/react";
-import { api } from "../../../convex/_generated/api";
 
 export default function VerificationPromptScreen() {
   const router = useRouter();
-  const completeOnboarding = useMutation(api.user.completeOnboarding);
 
-  const handleVerifyNow = async () => {
+  const handleVerifyNow = () => {
     // For now, just complete onboarding and let the root layout redirect.
-    await handleCompleteOnboarding();
+    handleCompleteOnboarding();
   };
 
-  const handleDoThisLater = async () => {
-    await handleCompleteOnboarding();
+  const handleDoThisLater = () => {
+    handleCompleteOnboarding();
   };
 
-  const handleCompleteOnboarding = async () => {
-    try {
-      await completeOnboarding();
-      // The root layout will handle navigation once the user status is updated.
-    } catch (error) {
-      console.error("Failed to complete onboarding:", error);
-      Alert.alert("Error", "Could not complete onboarding. Please try again.");
-    }
+  const handleCompleteOnboarding = () => {
+    // The user has a host profile now, so we can send them to the host-side
+    // of the app. We use `replace` to prevent them from navigating back
+    // to the onboarding flow.
+    router.replace("/(tabs)/(host)/dashboard");
   };
 
   return (

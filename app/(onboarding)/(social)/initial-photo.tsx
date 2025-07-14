@@ -11,6 +11,8 @@ import { useRouter } from "expo-router";
 import { useMutation } from "convex/react";
 import ImageUploader from "../../../components/ImageUploader";
 import { api } from "../../../convex/_generated/api";
+import { devLog } from "@/utils/devLog";
+import { Id } from "@/convex/_generated/dataModel";
 
 export default function InitialPhotoScreen() {
   const router = useRouter();
@@ -20,6 +22,11 @@ export default function InitialPhotoScreen() {
 
   const handleUploadSuccess = (newStorageId: string) => {
     setStorageId(newStorageId);
+  };
+
+  const handleContinue = () => {
+    devLog("[InitialPhotoScreen] Navigating to social discover");
+    router.replace("/(tabs)/(social)/discover");
   };
 
   const onSave = async () => {
@@ -32,16 +39,34 @@ export default function InitialPhotoScreen() {
     }
     setIsSubmitting(true);
     try {
+      devLog("[InitialPhotoScreen] Calling createSocialProfile with photo");
       await createSocialProfile({
-        initialPhoto: { storageId, isAuthentic: false },
+        initialPhoto: {
+          storageId: storageId as Id<"_storage">,
+          isAuthentic: false,
+        },
       });
-      router.replace("/(tabs)/(social)/discover");
+      handleContinue();
     } catch (error) {
       console.error("Failed to create social profile:", error);
       Alert.alert(
         "Save Failed",
         "Could not save your profile. Please try again."
       );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const onSkip = async () => {
+    setIsSubmitting(true);
+    try {
+      devLog("[InitialPhotoScreen] Calling createSocialProfile without photo");
+      await createSocialProfile({}); // Call with empty object
+      handleContinue();
+    } catch (error) {
+      console.error("Failed to create social profile on skip:", error);
+      Alert.alert("Skip Failed", "Could not skip this step. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -62,6 +87,14 @@ export default function InitialPhotoScreen() {
           onPress={onSave}
           disabled={!storageId || isSubmitting}
         />
+        <View style={{ marginVertical: 8 }}>
+          <Button
+            title="Skip for now"
+            onPress={onSkip}
+            color="grey"
+            disabled={isSubmitting}
+          />
+        </View>
       </View>
     </SafeAreaView>
   );

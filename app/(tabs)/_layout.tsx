@@ -17,6 +17,7 @@ import { api } from "@/convex/_generated/api";
 import { UserRole, AccountStatuses } from "@/convex/schema";
 import { useAuth } from "@clerk/clerk-expo";
 import { Text } from "@/components/Themed";
+import { devLog } from "@/utils/devLog";
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
@@ -75,9 +76,13 @@ export default function TabLayout() {
   const { signOut } = useAuth();
 
   if (user === undefined) {
+    devLog("[TabLayout] user is undefined, showing loading spinner");
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator />
+        <Text style={{ marginTop: 16, color: "gray" }}>
+          tabs loadingView (user undefined)
+        </Text>
       </View>
     );
   }
@@ -87,28 +92,39 @@ export default function TabLayout() {
 
   if (isHybridUser) {
     effectiveRole = user?.active_role || "social";
+    devLog("[TabLayout] Hybrid user detected. effectiveRole:", effectiveRole);
   } else if (user?.socialProfile) {
     effectiveRole = "social";
+    devLog("[TabLayout] Social profile detected. effectiveRole: social");
   } else if (user?.hostProfile) {
     effectiveRole = "host";
+    devLog("[TabLayout] Host profile detected. effectiveRole: host");
   }
 
   const isPaused = user?.accountStatus === AccountStatuses.PAUSED;
 
   const onSignOutPress = async () => {
     try {
+      devLog("[TabLayout] Signing out");
       await signOut();
     } catch (err) {
+      devLog("[TabLayout] Error signing out:", err);
       console.error("Error signing out:", err);
     }
   };
 
   if (!effectiveRole) {
+    devLog(
+      "[TabLayout] No effectiveRole found. Both profiles missing or user doc issue."
+    );
     // This can happen if user has no profile yet (still in onboarding)
     // or if there is an issue with the user document.
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator />
+        <Text style={{ marginTop: 16, color: "gray" }}>
+          tabs loadingView (no effectiveRole)
+        </Text>
         <Text>
           'No role found (both "Social" and "Host" profiles are missing). Please
           contact support.'
@@ -116,6 +132,13 @@ export default function TabLayout() {
       </View>
     );
   }
+
+  devLog(
+    "[TabLayout] Rendering tabs for role:",
+    effectiveRole,
+    "isPaused:",
+    isPaused
+  );
 
   return (
     <Tabs

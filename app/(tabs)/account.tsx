@@ -15,7 +15,7 @@ import { useRouter } from "expo-router";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { SignOutButton } from "@/components/SignOutButton";
-import { UserStatuses } from "@/convex/schema";
+import { AccountStatuses } from "@/convex/schema";
 import ContactMethodManager from "@/components/ContactMethodManager";
 
 const AccountScreen = () => {
@@ -129,7 +129,7 @@ const AccountScreen = () => {
   };
 
   const isLoading = !isLoaded || convexUser === undefined;
-  const isPaused = convexUser?.status === UserStatuses.PAUSED;
+  const isPaused = convexUser?.accountStatus === AccountStatuses.PAUSED;
 
   if (isLoading || !user) {
     return (
@@ -176,11 +176,11 @@ const AccountScreen = () => {
           {user.primaryEmailAddress?.emailAddress}
         </Text>
         <Text style={styles.phone}>{user.primaryPhoneNumber?.phoneNumber}</Text>
-        {convexUser?.status && (
+        {convexUser?.accountStatus && (
           <Text style={styles.statusText}>
             Status:{" "}
-            {convexUser.status.charAt(0).toUpperCase() +
-              convexUser.status.slice(1)}
+            {convexUser.accountStatus.charAt(0).toUpperCase() +
+              convexUser.accountStatus.slice(1)}
           </Text>
         )}
       </View>

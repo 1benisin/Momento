@@ -26,8 +26,10 @@ export default function HostProfileSetupScreen() {
     setIsLoading(true);
     try {
       await createHostProfile({
-        host_name: hostName,
-        host_bio: hostBio,
+        hostProfile: {
+          host_name: hostName,
+          host_bio: hostBio,
+        },
       });
       router.push("./verification-prompt");
     } catch (error) {

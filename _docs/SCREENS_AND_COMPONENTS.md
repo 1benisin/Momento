@@ -269,3 +269,14 @@ This section catalogs the reusable UI elements that form the building blocks of 
 - **`AvailabilityGrid`**: A 7x2 grid for setting detailed availability preferences for each day and night of the week. It directly manipulates the structured `availability_preferences` object in the user's data model.
 
 - **`AIHypeManModal` (Future)**: A modal that can be triggered before an event to build a user's confidence with personalized conversation starters and reminders of their positive qualities, as described in the marketing strategy.
+
+---
+
+## Post-Event Interaction (MVP)
+
+- **1-on-1 Messaging:** After an event, participants can message other attendees individually through the app. Group chat, kudos, and other advanced post-event features are out of scope for MVP.
+- **Messaging UI:** A simple, secure chat interface is provided for post-event 1-on-1 messaging. Only attendees of the same event can message each other. Block/report functionality must be available.
+
+## The Arrival Experience: The Signal (Clarification)
+
+- The Deck of Cards UI is available as soon as any attendee arrives and checks in. It displays the host card and all checked-in attendees. Attendees who have not arrived are not shown until they check in. The UI updates in real time as new attendees arrive.
