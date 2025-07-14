@@ -109,6 +109,10 @@ export default function TabLayout() {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator />
+        <Text>
+          'No role found (both "Social" and "Host" profiles are missing). Please
+          contact support.'
+        </Text>
       </View>
     );
   }

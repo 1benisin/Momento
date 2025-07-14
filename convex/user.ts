@@ -9,10 +9,8 @@ import {
 import { Doc } from "./_generated/dataModel";
 import {
   AccountStatuses,
-  OnboardingStates,
   UserRoles,
   userRoleValidator,
-  onboardingStateValidator,
   UserRole,
 } from "./schema";
 
@@ -80,7 +78,6 @@ export const getOrCreateUser = mutation({
       first_name: identity.givenName,
       last_name: identity.familyName,
       accountStatus: AccountStatuses.ACTIVE,
-      onboardingState: OnboardingStates.NEEDS_ROLE_SELECTION,
     });
 
     return newUser;
@@ -137,7 +134,6 @@ export const createUser = internalMutation({
       last_name: args.lastName,
       tokenIdentifier: args.tokenIdentifier,
       accountStatus: AccountStatuses.ACTIVE,
-      onboardingState: OnboardingStates.NEEDS_ROLE_SELECTION,
     });
   },
 });
@@ -236,57 +232,6 @@ export const unpauseAccount = mutation({
 });
 
 /**
- * Updates the user's current position in the onboarding flow.
- */
-export const updateOnboardingState = mutation({
-  args: {
-    onboardingState: onboardingStateValidator,
-  },
-  handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error(
-        "Called updateOnboardingState without authentication present"
-      );
-    }
-
-    const user = await getUserByClerkId(ctx, { clerkId: identity.subject });
-    if (user === null) {
-      throw new Error("User not found, cannot update onboarding state");
-    }
-
-    await ctx.db.patch(user._id, {
-      onboardingState: args.onboardingState,
-    });
-  },
-});
-
-/**
- * Sets the active role for a hybrid user (one who is both a host and participant).
- * This controls which UI/UX is presented to the user.
- */
-export const setActiveRole = mutation({
-  args: {
-    role: userRoleValidator,
-  },
-  handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error("Called setActiveRole without authentication present");
-    }
-
-    const user = await getUserByClerkId(ctx, { clerkId: identity.subject });
-    if (user === null) {
-      throw new Error("User not found, cannot set active role");
-    }
-
-    await ctx.db.patch(user._id, {
-      active_role: args.role,
-    });
-  },
-});
-
-/**
  * Adds a new photo to a user's social profile.
  * It also calculates the expiration date for the 'Authentic' badge if applicable.
  */
@@ -332,7 +277,6 @@ export const addProfilePhoto = mutation({
     };
 
     await ctx.db.patch(user._id, {
-      onboardingState: OnboardingStates.COMPLETED,
       socialProfile: {
         ...user.socialProfile,
         photos: [...user.socialProfile.photos, newPhoto],
@@ -374,7 +318,6 @@ export const createHostProfile = mutation({
     }
 
     await ctx.db.patch(user._id, {
-      onboardingState: OnboardingStates.COMPLETED,
       active_role,
       hostProfile: {
         ...args.hostProfile,
@@ -431,13 +374,37 @@ export const createSocialProfile = mutation({
     };
 
     await ctx.db.patch(user._id, {
-      onboardingState: OnboardingStates.COMPLETED,
       active_role: UserRoles.SOCIAL,
       socialProfile: {
         bio: args.bio,
         photos: [newPhoto],
         current_photo_url: url,
       },
+    });
+  },
+});
+
+/**
+ * Sets the active role for a hybrid user (one who is both a host and participant).
+ * This controls which UI/UX is presented to the user.
+ */
+export const setActiveRole = mutation({
+  args: {
+    role: userRoleValidator,
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Called setActiveRole without authentication present");
+    }
+
+    const user = await getUserByClerkId(ctx, { clerkId: identity.subject });
+    if (user === null) {
+      throw new Error("User not found, cannot set active role");
+    }
+
+    await ctx.db.patch(user._id, {
+      active_role: args.role,
     });
   },
 });

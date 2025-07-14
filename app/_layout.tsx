@@ -34,7 +34,6 @@ import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { ConvexReactClient, useQuery, useMutation } from "convex/react";
 import { ActivityIndicator, View } from "react-native";
 import { api } from "@/convex/_generated/api";
-import { OnboardingStates } from "@/convex/schema";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { MenuProvider } from "react-native-popup-menu";
 
@@ -159,7 +158,7 @@ function InitialLayout() {
   useEffect(() => {
     if (isLoading) return;
 
-    // If the user is not signed in and not in the auth group, press them into the auth flow.
+    // The user is not signed in and not in the auth group, press them into the auth flow.
     if (!isSignedIn) {
       if (!inAuthGroup) {
         router.replace("/(auth)/sign-in");
@@ -175,30 +174,24 @@ function InitialLayout() {
 
     // Main logic for authenticated users based on onboarding state
     if (userData) {
-      const { onboardingState, active_role } = userData;
-      if (onboardingState !== OnboardingStates.COMPLETED) {
-        // User is not fully onboarded, ensure they are in the correct onboarding screen.
-        switch (onboardingState) {
-          case OnboardingStates.NEEDS_ROLE_SELECTION:
-            if (segments[1] !== "role-selection")
-              router.replace("/(onboarding)/role-selection");
-            break;
-          case OnboardingStates.NEEDS_SOCIAL_PROFILE:
-            if (segments[2] !== "profile-setup")
-              router.replace("/(onboarding)/(social)/profile-setup");
-            break;
-          case OnboardingStates.NEEDS_HOST_PROFILE:
-            if (segments[2] !== "host-profile-setup")
-              router.replace("/(onboarding)/(host)/host-profile-setup");
-            break;
+      const { socialProfile, hostProfile } = userData;
+
+      // If the user is not fully onboarded, ensure they are in the onboarding flow.
+      // The dedicated (onboarding) layout is now responsible for routing to the
+      // correct screen within that flow.
+      if (!socialProfile || !hostProfile) {
+        if (!inOnboardingGroup) {
+          router.replace("/(onboarding)/role-selection");
         }
+        // Key Fix: Once we're in the onboarding flow, stop all routing logic
+        // in this root layout to prevent conflicts.
+        return;
       } else {
         // User is fully onboarded. Ensure they are in the tabs group.
         if (!inTabsGroup) {
-          const dashboard =
-            active_role === "host"
-              ? "/(tabs)/(host)/dashboard"
-              : "/(tabs)/(social)/discover";
+          const dashboard = hostProfile
+            ? "/(tabs)/(host)/dashboard"
+            : "/(tabs)/(social)/discover";
           router.replace(dashboard);
         }
       }
@@ -225,9 +218,8 @@ function InitialLayout() {
 
   // This logic prevents rendering a screen that is about to be redirected.
   if (isSignedIn && userData) {
-    const isCompleted = userData.onboardingState === OnboardingStates.COMPLETED;
-    if (isCompleted && !inTabsGroup) return loadingView;
-    if (!isCompleted && !inOnboardingGroup) return loadingView;
+    const { socialProfile, hostProfile } = userData;
+    if (!socialProfile || !hostProfile) return loadingView;
   }
   if (!isSignedIn && !inAuthGroup) {
     return loadingView;

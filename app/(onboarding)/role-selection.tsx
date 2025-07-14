@@ -9,11 +9,9 @@ import {
 } from "react-native";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { OnboardingStates } from "@/convex/schema";
 
 export default function RoleSelectionScreen() {
   const router = useRouter();
-  const updateOnboardingState = useMutation(api.user.updateOnboardingState);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSelection = async (role: "social" | "host") => {
@@ -22,14 +20,8 @@ export default function RoleSelectionScreen() {
 
     try {
       if (role === "social") {
-        await updateOnboardingState({
-          onboardingState: OnboardingStates.NEEDS_SOCIAL_PROFILE,
-        });
         router.push("/(onboarding)/(social)/profile-setup");
       } else {
-        await updateOnboardingState({
-          onboardingState: OnboardingStates.NEEDS_HOST_PROFILE,
-        });
         router.push("/(onboarding)/(host)/host-profile-setup");
       }
     } catch (error) {

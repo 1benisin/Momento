@@ -14,23 +14,6 @@ export const accountStatusValidator = v.union(
   v.literal(AccountStatuses.PAUSED)
 );
 
-export const OnboardingStates = {
-  NEEDS_ROLE_SELECTION: "needs_role_selection",
-  NEEDS_SOCIAL_PROFILE: "needs_social_profile",
-  NEEDS_HOST_PROFILE: "needs_host_profile",
-  COMPLETED: "completed",
-} as const;
-
-export type OnboardingState =
-  (typeof OnboardingStates)[keyof typeof OnboardingStates];
-
-export const onboardingStateValidator = v.union(
-  v.literal(OnboardingStates.NEEDS_ROLE_SELECTION),
-  v.literal(OnboardingStates.NEEDS_SOCIAL_PROFILE),
-  v.literal(OnboardingStates.NEEDS_HOST_PROFILE),
-  v.literal(OnboardingStates.COMPLETED)
-);
-
 export const UserRoles = {
   SOCIAL: "social",
   HOST: "host",
@@ -52,7 +35,6 @@ export default defineSchema({
     first_name: v.optional(v.string()),
     last_name: v.optional(v.string()),
     accountStatus: accountStatusValidator,
-    onboardingState: onboardingStateValidator,
     active_role: v.optional(userRoleValidator), // 'social' or 'host'
 
     hostProfile: v.optional(
