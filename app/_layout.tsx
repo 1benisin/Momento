@@ -32,10 +32,11 @@ import {
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { ConvexReactClient, useQuery, useMutation } from "convex/react";
-import { ActivityIndicator, View } from "react-native";
+import { ActivityIndicator, View, Text } from "react-native";
 import { api } from "@/convex/_generated/api";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { MenuProvider } from "react-native-popup-menu";
+import { devLog } from "@/utils/devLog";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -147,27 +148,43 @@ function InitialLayout() {
   const isLoading = !isLoaded || (isSignedIn && userData === undefined);
 
   useEffect(() => {
+    devLog("[InitialLayout] Segments:", segments.join("/"));
+    devLog("[InitialLayout] Group states:", {
+      inAuthGroup,
+      inOnboardingGroup,
+      inTabsGroup,
+    });
     // Store the user in the database as soon as they are signed in.
     // This is idempotent and will only create a new user if one doesn't
     // already exist.
     if (isSignedIn) {
+      devLog("[InitialLayout] Signed in, calling getOrCreateUser");
       getOrCreateUser({});
     }
   }, [isSignedIn, getOrCreateUser]);
 
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading) {
+      devLog("[InitialLayout] isLoading is true, waiting for data...");
+      return;
+    }
 
     // The user is not signed in and not in the auth group, press them into the auth flow.
     if (!isSignedIn) {
       if (!inAuthGroup) {
+        devLog("[InitialLayout] Not signed in, redirecting to /auth/sign-in");
         router.replace("/(auth)/sign-in");
+      } else {
+        devLog("[InitialLayout] Not signed in, already in auth group");
       }
       return;
     }
 
     // If the user IS signed in, they should NOT be in the auth flow.
     if (inAuthGroup) {
+      devLog(
+        "[InitialLayout] Signed in, but in auth group. Redirecting to /tabs/(social)/discover"
+      );
       router.replace("/(tabs)/(social)/discover"); // Default route for signed-in users
       return;
     }
@@ -176,55 +193,87 @@ function InitialLayout() {
     if (userData) {
       const { socialProfile, hostProfile } = userData;
 
-      // If the user is not fully onboarded, ensure they are in the onboarding flow.
-      // The dedicated (onboarding) layout is now responsible for routing to the
-      // correct screen within that flow.
-      if (!socialProfile || !hostProfile) {
+      // Only force onboarding if both profiles are missing
+      if (!socialProfile && !hostProfile) {
         if (!inOnboardingGroup) {
+          devLog(
+            "[InitialLayout] Signed in, missing both socialProfile and hostProfile, redirecting to onboarding"
+          );
           router.replace("/(onboarding)/role-selection");
+        } else {
+          devLog(
+            "[InitialLayout] Signed in, missing both socialProfile and hostProfile, already in onboarding group"
+          );
         }
         // Key Fix: Once we're in the onboarding flow, stop all routing logic
         // in this root layout to prevent conflicts.
         return;
       } else {
-        // User is fully onboarded. Ensure they are in the tabs group.
-        if (!inTabsGroup) {
+        // User has at least one profile.
+        // If they are not in tabs and not in onboarding, then direct them to tabs.
+        // This allows them to enter the onboarding flow to create a second profile.
+        if (!inTabsGroup && !inOnboardingGroup) {
           const dashboard = hostProfile
             ? "/(tabs)/(host)/dashboard"
             : "/(tabs)/(social)/discover";
+          devLog(
+            "[InitialLayout] Signed in, has profile, not in tabs/onboarding, redirecting to",
+            dashboard
+          );
           router.replace(dashboard);
+        } else {
+          devLog(
+            "[InitialLayout] Signed in, has profile, in tabs or onboarding. No redirect."
+          );
         }
       }
+    } else {
+      devLog("[InitialLayout] Signed in, but userData is null");
     }
   }, [isLoading, isSignedIn, userData, segments, router]);
 
-  const loadingView = (
+  const loadingView = (msg: string) => (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <ActivityIndicator size="large" />
+      <Text style={{ marginTop: 16, color: "gray" }}>{msg}</Text>
     </View>
   );
 
   // While the useEffect is determining the correct route, we show a loading indicator
   // to prevent a "flash" of the wrong screen.
   if (isLoading) {
-    return loadingView;
+    devLog("[InitialLayout] Rendering loadingView (isLoading)");
+    return loadingView("loadingView (isLoading)");
   }
 
   // If the user is signed in but their record hasn't been created yet
   // (e.g., the `store` mutation is in flight), show a loading screen.
   if (isSignedIn && userData === null) {
-    return loadingView;
+    devLog(
+      "[InitialLayout] Rendering loadingView (signed in, userData is null)"
+    );
+    return loadingView("loadingView (signed in, userData is null)");
   }
 
   // This logic prevents rendering a screen that is about to be redirected.
   if (isSignedIn && userData) {
     const { socialProfile, hostProfile } = userData;
-    if (!socialProfile || !hostProfile) return loadingView;
+    // Only show loading if both are missing and we are not in the onboarding flow yet.
+    if (!socialProfile && !hostProfile && !inOnboardingGroup) {
+      devLog(
+        "[InitialLayout] Rendering loadingView (signed in, missing both profile fields, not yet in onboarding group)"
+      );
+      return loadingView("Redirecting to onboarding...");
+    }
   }
   if (!isSignedIn && !inAuthGroup) {
-    return loadingView;
+    devLog(
+      "[InitialLayout] Rendering loadingView (not signed in, not in auth group)"
+    );
+    return loadingView("loadingView (not signed in, not in auth group)");
   }
 
+  devLog("[InitialLayout] Rendering Stack (main navigation)");
   return (
     <Stack>
       {/* These are the three main navigators of the app. The `InitialLayout`

@@ -335,10 +335,12 @@ export const createHostProfile = mutation({
 export const createSocialProfile = mutation({
   args: {
     bio: v.optional(v.string()),
-    initialPhoto: v.object({
-      storageId: v.id("_storage"),
-      isAuthentic: v.boolean(),
-    }),
+    initialPhoto: v.optional(
+      v.object({
+        storageId: v.id("_storage"),
+        isAuthentic: v.boolean(),
+      })
+    ),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -353,32 +355,43 @@ export const createSocialProfile = mutation({
       throw new Error("User not found, cannot create social profile");
     }
 
-    const url = await ctx.storage.getUrl(args.initialPhoto.storageId);
-    if (url === null) {
-      throw new Error("Could not get file URL for storageId");
-    }
+    let photoData:
+      | {
+          photos: NonNullable<Doc<"users">["socialProfile"]>["photos"];
+          current_photo_url: string;
+        }
+      | undefined = undefined;
 
-    const now = Date.now();
-    let authentic_expires_at: number | undefined = undefined;
-    if (args.initialPhoto.isAuthentic) {
-      const twelveMonths = 12 * 30 * 24 * 60 * 60 * 1000;
-      authentic_expires_at = now + twelveMonths;
+    if (args.initialPhoto) {
+      const url = await ctx.storage.getUrl(args.initialPhoto.storageId);
+      if (url === null) {
+        throw new Error("Could not get file URL for storageId");
+      }
+      const now = Date.now();
+      let authentic_expires_at: number | undefined = undefined;
+      if (args.initialPhoto.isAuthentic) {
+        const twelveMonths = 12 * 30 * 24 * 60 * 60 * 1000;
+        authentic_expires_at = now + twelveMonths;
+      }
+      const newPhoto = {
+        storageId: args.initialPhoto.storageId,
+        url: url,
+        is_authentic: args.initialPhoto.isAuthentic,
+        created_at: now,
+        authentic_expires_at: authentic_expires_at,
+      };
+      photoData = {
+        photos: [newPhoto],
+        current_photo_url: url,
+      };
     }
-
-    const newPhoto = {
-      storageId: args.initialPhoto.storageId,
-      url: url,
-      is_authentic: args.initialPhoto.isAuthentic,
-      created_at: now,
-      authentic_expires_at: authentic_expires_at,
-    };
 
     await ctx.db.patch(user._id, {
       active_role: UserRoles.SOCIAL,
       socialProfile: {
         bio: args.bio,
-        photos: [newPhoto],
-        current_photo_url: url,
+        photos: photoData?.photos ?? [],
+        current_photo_url: photoData?.current_photo_url,
       },
     });
   },

@@ -1,8 +1,7 @@
-import { Stack, useRouter, useSegments } from "expo-router";
+import { Stack } from "expo-router";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { useEffect } from "react";
-import { ActivityIndicator, View } from "react-native";
+import { ActivityIndicator, View, Text } from "react-native";
 
 /**
  * This component contains the core routing logic for the onboarding flow.
@@ -11,14 +10,14 @@ import { ActivityIndicator, View } from "react-native";
  */
 function OnboardingFlow() {
   const userData = useQuery(api.user.me);
-  const segments = useSegments();
-  const router = useRouter();
-
   // Only show loading spinner while user data is loading
   if (!userData) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" />
+        <Text style={{ marginTop: 16, color: "gray" }}>
+          onboarding loadingView (waiting for userData)
+        </Text>
       </View>
     );
   }
