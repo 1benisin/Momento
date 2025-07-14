@@ -31,10 +31,10 @@ import {
 } from "@clerk/clerk-expo";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
-import { ConvexReactClient, useQuery } from "convex/react";
+import { ConvexReactClient, useQuery, useMutation } from "convex/react";
 import { ActivityIndicator, View } from "react-native";
 import { api } from "@/convex/_generated/api";
-import { UserStatuses } from "@/convex/schema";
+import { OnboardingStates } from "@/convex/schema";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { MenuProvider } from "react-native-popup-menu";
 
@@ -136,6 +136,7 @@ function RootLayoutNav() {
 function InitialLayout() {
   const { isLoaded, isSignedIn } = useAuth();
   const userData = useQuery(api.user.me);
+  const getOrCreateUser = useMutation(api.user.getOrCreateUser);
   const segments = useSegments();
   const router = useRouter();
 
@@ -147,11 +148,18 @@ function InitialLayout() {
   const isLoading = !isLoaded || (isSignedIn && userData === undefined);
 
   useEffect(() => {
-    // Wait until all authentication and user data is loaded before making routing decisions.
+    // Store the user in the database as soon as they are signed in.
+    // This is idempotent and will only create a new user if one doesn't
+    // already exist.
+    if (isSignedIn) {
+      getOrCreateUser({});
+    }
+  }, [isSignedIn, getOrCreateUser]);
+
+  useEffect(() => {
     if (isLoading) return;
 
-    // If the user is not signed in, ensure they are in the auth flow.
-    // Otherwise, redirect them to the sign-in page.
+    // If the user is not signed in and not in the auth group, press them into the auth flow.
     if (!isSignedIn) {
       if (!inAuthGroup) {
         router.replace("/(auth)/sign-in");
@@ -160,42 +168,42 @@ function InitialLayout() {
     }
 
     // If the user IS signed in, they should NOT be in the auth flow.
-    // This handles the edge case where the user presses the back button from the main app
-    // or if they are somehow navigated to a sign-in screen while already authenticated.
     if (inAuthGroup) {
-      router.replace("/(tabs)/(social)/discover");
+      router.replace("/(tabs)/(social)/discover"); // Default route for signed-in users
       return;
     }
 
-    // Main logic for authenticated users
+    // Main logic for authenticated users based on onboarding state
     if (userData) {
-      // If onboarding is not complete, ensure they are in the onboarding flow.
-      if (userData.status === UserStatuses.PENDING_ONBOARDING) {
-        if (!inOnboardingGroup) {
-          router.replace("/(onboarding)/role-selection");
+      const { onboardingState, active_role } = userData;
+      if (onboardingState !== OnboardingStates.COMPLETED) {
+        // User is not fully onboarded, ensure they are in the correct onboarding screen.
+        switch (onboardingState) {
+          case OnboardingStates.NEEDS_ROLE_SELECTION:
+            if (segments[1] !== "role-selection")
+              router.replace("/(onboarding)/role-selection");
+            break;
+          case OnboardingStates.NEEDS_SOCIAL_PROFILE:
+            if (segments[2] !== "profile-setup")
+              router.replace("/(onboarding)/(social)/profile-setup");
+            break;
+          case OnboardingStates.NEEDS_HOST_PROFILE:
+            if (segments[2] !== "host-profile-setup")
+              router.replace("/(onboarding)/(host)/host-profile-setup");
+            break;
         }
-        // If the user is fully onboarded and active, ensure they are in the main tabs flow.
-      } else if (userData.status === UserStatuses.ACTIVE) {
+      } else {
+        // User is fully onboarded. Ensure they are in the tabs group.
         if (!inTabsGroup) {
-          // Direct the user to the correct dashboard based on their active role.
-          if ((userData as any).active_role === "host") {
-            // @ts-ignore - Host dashboard route exists but may not be in the generated type
-            router.replace("/(tabs)/(host)/dashboard");
-          } else {
-            router.replace("/(tabs)/(social)/discover");
-          }
+          const dashboard =
+            active_role === "host"
+              ? "/(tabs)/(host)/dashboard"
+              : "/(tabs)/(social)/discover";
+          router.replace(dashboard);
         }
       }
     }
-  }, [
-    isLoading,
-    isSignedIn,
-    userData,
-    inAuthGroup,
-    inOnboardingGroup,
-    inTabsGroup,
-    router,
-  ]);
+  }, [isLoading, isSignedIn, userData, segments, router]);
 
   const loadingView = (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -203,27 +211,26 @@ function InitialLayout() {
     </View>
   );
 
-  // While the useEffect is determining the correct route, we show a loading indicator.
-  // This prevents a "flash" of the wrong screen while the redirect is happening.
+  // While the useEffect is determining the correct route, we show a loading indicator
+  // to prevent a "flash" of the wrong screen.
   if (isLoading) {
     return loadingView;
   }
 
-  // This logic ensures that we don't render a screen that is about to be redirected from.
-  // For example, if a signed-in user lands on an auth screen, we show the loading view
-  // while the `useEffect` navigates them away.
-  if (isSignedIn) {
-    if (
-      (userData?.status === UserStatuses.PENDING_ONBOARDING &&
-        !inOnboardingGroup) ||
-      (userData?.status === UserStatuses.ACTIVE && !inTabsGroup)
-    ) {
-      return loadingView;
-    }
-  } else {
-    if (!inAuthGroup) {
-      return loadingView;
-    }
+  // If the user is signed in but their record hasn't been created yet
+  // (e.g., the `store` mutation is in flight), show a loading screen.
+  if (isSignedIn && userData === null) {
+    return loadingView;
+  }
+
+  // This logic prevents rendering a screen that is about to be redirected.
+  if (isSignedIn && userData) {
+    const isCompleted = userData.onboardingState === OnboardingStates.COMPLETED;
+    if (isCompleted && !inTabsGroup) return loadingView;
+    if (!isCompleted && !inOnboardingGroup) return loadingView;
+  }
+  if (!isSignedIn && !inAuthGroup) {
+    return loadingView;
   }
 
   return (

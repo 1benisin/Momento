@@ -6,7 +6,6 @@ import {
   Button,
   Alert,
   SafeAreaView,
-  TouchableOpacity,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useMutation } from "convex/react";
@@ -15,11 +14,9 @@ import { api } from "../../../convex/_generated/api";
 
 export default function InitialPhotoScreen() {
   const router = useRouter();
-  const addProfilePhoto = useMutation(api.user.addProfilePhoto);
-  const completeOnboarding = useMutation(api.user.completeOnboarding);
+  const createSocialProfile = useMutation(api.user.createSocialProfile);
   const [storageId, setStorageId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSkipping, setIsSkipping] = useState(false);
 
   const handleUploadSuccess = (newStorageId: string) => {
     setStorageId(newStorageId);
@@ -35,31 +32,18 @@ export default function InitialPhotoScreen() {
     }
     setIsSubmitting(true);
     try {
-      await addProfilePhoto({ storageId, isAuthentic: false });
-      // The root layout will now handle the navigation after the
-      // user's status is updated by the addProfilePhoto mutation.
+      await createSocialProfile({
+        initialPhoto: { storageId, isAuthentic: false },
+      });
+      router.replace("/(tabs)/(social)/discover");
     } catch (error) {
-      console.error("Failed to save profile photo:", error);
+      console.error("Failed to create social profile:", error);
       Alert.alert(
         "Save Failed",
-        "Could not save your photo. Please try again."
+        "Could not save your profile. Please try again."
       );
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  const onSkip = async () => {
-    setIsSkipping(true);
-    try {
-      await completeOnboarding();
-      // Let the root layout handle the navigation
-      // router.replace("/");
-    } catch (error) {
-      console.error("Failed to skip onboarding step:", error);
-      Alert.alert("Error", "Could not complete onboarding. Please try again.");
-    } finally {
-      setIsSkipping(false);
     }
   };
 
@@ -76,17 +60,8 @@ export default function InitialPhotoScreen() {
         <Button
           title={isSubmitting ? "Saving..." : "Save and Finish"}
           onPress={onSave}
-          disabled={!storageId || isSubmitting || isSkipping}
+          disabled={!storageId || isSubmitting}
         />
-        <TouchableOpacity
-          onPress={onSkip}
-          disabled={isSubmitting || isSkipping}
-          style={styles.skipButton}
-        >
-          <Text style={styles.skipButtonText}>
-            {isSkipping ? "Skipping..." : "Skip for now"}
-          </Text>
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -115,13 +90,5 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: "100%",
     marginTop: 20,
-  },
-  skipButton: {
-    marginTop: 15,
-    alignItems: "center",
-  },
-  skipButtonText: {
-    color: "#007BFF",
-    fontSize: 16,
   },
 });

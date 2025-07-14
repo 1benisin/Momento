@@ -1,16 +1,43 @@
 import { useRouter } from "expo-router";
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { OnboardingStates } from "@/convex/schema";
 
 export default function RoleSelectionScreen() {
   const router = useRouter();
+  const updateOnboardingState = useMutation(api.user.updateOnboardingState);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleAttend = () => {
-    router.push("/(onboarding)/(social)/profile-setup");
-  };
+  const handleSelection = async (role: "social" | "host") => {
+    if (isLoading) return;
+    setIsLoading(true);
 
-  const handleHost = () => {
-    router.push("./(host)/host-profile-setup");
+    try {
+      if (role === "social") {
+        await updateOnboardingState({
+          onboardingState: OnboardingStates.NEEDS_SOCIAL_PROFILE,
+        });
+        router.push("/(onboarding)/(social)/profile-setup");
+      } else {
+        await updateOnboardingState({
+          onboardingState: OnboardingStates.NEEDS_HOST_PROFILE,
+        });
+        router.push("/(onboarding)/(host)/host-profile-setup");
+      }
+    } catch (error) {
+      console.error("Failed to update onboarding state:", error);
+      // Optionally, show an alert to the user
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -21,18 +48,27 @@ export default function RoleSelectionScreen() {
         other role later.
       </Text>
 
-      <TouchableOpacity style={styles.card} onPress={handleAttend}>
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => handleSelection("social")}
+        disabled={isLoading}
+      >
         <Text style={styles.cardTitle}>Attend Events</Text>
         <Text style={styles.cardDescription}>
           Join unique experiences and connect with new people.
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.card} onPress={handleHost}>
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => handleSelection("host")}
+        disabled={isLoading}
+      >
         <Text style={styles.cardTitle}>Host Events</Text>
         <Text style={styles.cardDescription}>
           Create your own events and build a community.
         </Text>
+        {isLoading && <ActivityIndicator style={{ marginTop: 10 }} />}
       </TouchableOpacity>
     </View>
   );
