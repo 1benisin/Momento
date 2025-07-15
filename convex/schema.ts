@@ -91,16 +91,23 @@ export default defineSchema({
     age_min: v.optional(v.number()),
     age_max: v.optional(v.number()),
     arrival_signpost: v.optional(v.string()),
-    confirmation_fee: v.number(),
-    estimated_event_cost: v.any(), // JSON object
+    estimated_event_cost: v.array(
+      v.object({
+        amount: v.number(), // dollar amount
+        description: v.string(),
+      })
+    ),
     itinerary: v.array(
       v.object({
-        location_id: v.id("locations"),
-        order: v.number(),
-        title: v.string(),
-        description: v.string(),
         start_time: v.number(),
-        end_time: v.number(),
+        location: v.object({
+          name: v.string(),
+          address: v.optional(v.string()),
+          latitude: v.number(),
+          longitude: v.number(),
+          google_place_id: v.optional(v.string()),
+        }),
+        description: v.string(),
       })
     ),
     collaborators: v.optional(

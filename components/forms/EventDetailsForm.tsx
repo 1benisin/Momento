@@ -34,10 +34,15 @@ const EventDetailsForm: React.FC<EventDetailsFormProps> = ({
       <Text style={styles.label}>Min. Attendees</Text>
       <TextInput
         style={styles.input}
-        value={event.min_attendees?.toString()}
-        onChangeText={(text) =>
-          setEvent({ ...event, min_attendees: parseInt(text) || 0 })
+        value={
+          event.min_attendees && event.min_attendees >= 4
+            ? event.min_attendees.toString()
+            : "4"
         }
+        onChangeText={(text) => {
+          const value = Math.max(4, parseInt(text) || 0);
+          setEvent({ ...event, min_attendees: value });
+        }}
         keyboardType="numeric"
       />
 
@@ -51,32 +56,65 @@ const EventDetailsForm: React.FC<EventDetailsFormProps> = ({
         keyboardType="numeric"
       />
 
-      <Text style={styles.label}>Confirmation Fee (in cents)</Text>
-      <TextInput
-        style={styles.input}
-        value={event.confirmation_fee?.toString()}
-        onChangeText={(text) =>
-          setEvent({ ...event, confirmation_fee: parseInt(text) || 0 })
-        }
-        keyboardType="numeric"
-        placeholder="e.g., 500 for $5.00"
-      />
-
-      {/* A proper input for estimated_event_cost (JSON) would be more complex.
-          For now, we'll use a simple text input for a description of the cost. */}
-      <Text style={styles.label}>Estimated Event Cost</Text>
-      <TextInput
-        style={styles.input}
-        value={
-          typeof event.estimated_event_cost === "string"
-            ? event.estimated_event_cost
-            : ""
-        }
-        onChangeText={(text) =>
-          setEvent({ ...event, estimated_event_cost: text })
-        }
-        placeholder="e.g., Approx. $20 for food and drinks"
-      />
+      {/* Estimated Event Cost: Array of { amount, description } */}
+      <Text style={styles.label}>Estimated Event Costs</Text>
+      {(event.estimated_event_cost ?? []).length > 0 ? (
+        (event.estimated_event_cost ?? []).map((item, idx) => (
+          <View key={idx} style={styles.costItemRow}>
+            <TextInput
+              style={[styles.input, { flex: 1, marginRight: 5 }]}
+              value={item.amount?.toString() || ""}
+              onChangeText={(text) => {
+                const updated = [...(event.estimated_event_cost ?? [])];
+                updated[idx] = {
+                  ...updated[idx],
+                  amount: parseFloat(text) || 0,
+                };
+                setEvent({ ...event, estimated_event_cost: updated });
+              }}
+              keyboardType="numeric"
+              placeholder="$ Amount"
+            />
+            <TextInput
+              style={[styles.input, { flex: 2, marginRight: 5 }]}
+              value={item.description || ""}
+              onChangeText={(text) => {
+                const updated = [...(event.estimated_event_cost ?? [])];
+                updated[idx] = { ...updated[idx], description: text };
+                setEvent({ ...event, estimated_event_cost: updated });
+              }}
+              placeholder="Description"
+            />
+            <Text
+              style={styles.removeBtn}
+              onPress={() => {
+                const updated = (event.estimated_event_cost ?? []).filter(
+                  (_, i) => i !== idx
+                );
+                setEvent({ ...event, estimated_event_cost: updated });
+              }}
+            >
+              Remove
+            </Text>
+          </View>
+        ))
+      ) : (
+        <Text style={{ color: "#888", marginBottom: 5 }}>
+          No cost items added.
+        </Text>
+      )}
+      <Text
+        style={styles.addBtn}
+        onPress={() => {
+          const updated = Array.isArray(event.estimated_event_cost)
+            ? [...event.estimated_event_cost]
+            : [];
+          updated.push({ amount: 0, description: "" });
+          setEvent({ ...event, estimated_event_cost: updated });
+        }}
+      >
+        + Add Cost Item
+      </Text>
     </View>
   );
 };
@@ -98,6 +136,23 @@ const styles = StyleSheet.create({
   textArea: {
     height: 100,
     textAlignVertical: "top",
+  },
+  costItemRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 5,
+  },
+  addBtn: {
+    color: "#007AFF",
+    marginTop: 10,
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  removeBtn: {
+    color: "#FF3B30",
+    marginLeft: 5,
+    fontWeight: "bold",
+    fontSize: 14,
   },
 });
 

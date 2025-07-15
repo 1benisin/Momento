@@ -14,27 +14,23 @@ export const createOrUpdateDraft = mutation({
     age_min: v.optional(v.number()),
     age_max: v.optional(v.number()),
     arrival_signpost: v.optional(v.string()),
-    confirmation_fee: v.number(),
-    estimated_event_cost: v.any(),
+    estimated_event_cost: v.array(
+      v.object({
+        amount: v.number(),
+        description: v.string(),
+      })
+    ),
     itinerary: v.array(
       v.object({
-        // Accept either a full location object for creation,
-        // or just an ID for an existing one.
-        location: v.optional(
-          v.object({
-            name: v.string(),
-            address: v.optional(v.string()),
-            latitude: v.number(),
-            longitude: v.number(),
-            google_place_id: v.optional(v.string()),
-          })
-        ),
-        location_id: v.optional(v.id("locations")),
-        order: v.number(),
-        title: v.string(),
-        description: v.string(),
         start_time: v.number(),
-        end_time: v.number(),
+        location: v.object({
+          name: v.string(),
+          address: v.optional(v.string()),
+          latitude: v.number(),
+          longitude: v.number(),
+          google_place_id: v.optional(v.string()),
+        }),
+        description: v.string(),
       })
     ),
   },
@@ -42,6 +38,10 @@ export const createOrUpdateDraft = mutation({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error("Called createOrUpdateDraft without authentication.");
+    }
+
+    if (args.min_attendees < 4) {
+      throw new Error("min_attendees must be at least 4.");
     }
 
     const user = await ctx.db
@@ -55,36 +55,19 @@ export const createOrUpdateDraft = mutation({
       throw new Error("User not found.");
     }
 
-    // Process itinerary items to get or create location IDs
-    const processedItinerary: Doc<"events">["itinerary"] = await Promise.all(
+    // Process itinerary items to get or create location objects
+    const processedItinerary = await Promise.all(
       args.itinerary.map(async (item) => {
-        if (item.location) {
-          // If a full location object is passed, create or get it.
-          const locationId = await ctx.runMutation(
-            api.locations.getOrCreateLocation,
-            item.location
-          );
-          return {
-            location_id: locationId,
-            order: item.order,
-            title: item.title,
-            description: item.description,
-            start_time: item.start_time,
-            end_time: item.end_time,
-          };
-        } else if (item.location_id) {
-          // If only an ID is passed, use it.
-          return {
-            location_id: item.location_id,
-            order: item.order,
-            title: item.title,
-            description: item.description,
-            start_time: item.start_time,
-            end_time: item.end_time,
-          };
-        }
-        // This case should not happen if the form is working correctly.
-        throw new Error("Itinerary item is missing location information.");
+        // Always create or get the location
+        const locationId = await ctx.runMutation(
+          api.locations.getOrCreateLocation,
+          item.location
+        );
+        return {
+          start_time: item.start_time,
+          location: item.location,
+          description: item.description,
+        };
       })
     );
 
@@ -97,7 +80,6 @@ export const createOrUpdateDraft = mutation({
       age_min: args.age_min,
       age_max: args.age_max,
       arrival_signpost: args.arrival_signpost,
-      confirmation_fee: args.confirmation_fee,
       estimated_event_cost: args.estimated_event_cost,
       status: "draft",
       itinerary: processedItinerary,

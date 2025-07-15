@@ -17,34 +17,15 @@ const EventPublishForm: React.FC<EventPublishFormProps> = ({ event }) => {
 
   const handleSaveDraft = async () => {
     try {
-      // Create a clean payload for the backend
-      const payload = {
+      await createOrUpdateDraft({
         ...event,
-        itinerary: event.itinerary?.map((item) => {
-          if (item.location) {
-            // New item with a location object
-            return {
-              order: item.order,
-              title: item.title,
-              description: item.description,
-              start_time: item.start_time,
-              end_time: item.end_time,
-              location: item.location,
-            };
-          } else {
-            // Existing item with a location_id
-            return {
-              order: item.order,
-              title: item.title,
-              description: item.description,
-              start_time: item.start_time,
-              end_time: item.end_time,
-              location_id: item.location_id,
-            };
-          }
-        }),
-      };
-      await createOrUpdateDraft(payload as any);
+        title: event.title ?? "",
+        description: event.description ?? "",
+        min_attendees: event.min_attendees ?? 4,
+        max_attendees: event.max_attendees ?? 4,
+        estimated_event_cost: event.estimated_event_cost ?? [],
+        itinerary: event.itinerary ?? [],
+      });
       Alert.alert("Success", "Draft saved successfully!");
       router.back();
     } catch (error) {

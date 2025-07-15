@@ -22,10 +22,9 @@ const CreateEventScreen = () => {
   const [event, setEvent] = useState<FrontendEvent>({
     title: "",
     description: "",
-    min_attendees: 2,
+    min_attendees: 4,
     max_attendees: 10,
-    confirmation_fee: 500, // Default to $5.00 in cents
-    estimated_event_cost: {},
+    estimated_event_cost: [],
     itinerary: [],
   });
 
@@ -39,25 +38,16 @@ const CreateEventScreen = () => {
     return <ActivityIndicator style={styles.centered} />;
   }
 
-  const renderStep = () => {
-    switch (step) {
-      case 1:
-        return <EventDetailsForm event={event} setEvent={setEvent} />;
-      case 2:
-        return <EventItineraryForm event={event} setEvent={setEvent} />;
-      case 3:
-        return <EventPublishForm event={event} />;
-      default:
-        return null;
-    }
-  };
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
         {eventId ? "Edit Event" : "Create Event"} - Step {step} of 3
       </Text>
-      {renderStep()}
+
+      {step === 1 && <EventDetailsForm event={event} setEvent={setEvent} />}
+      {step === 2 && <EventItineraryForm event={event} setEvent={setEvent} />}
+      {step === 3 && <EventPublishForm event={event} />}
+
       <View style={styles.navigation}>
         {step > 1 && (
           <Button title="Previous" onPress={() => setStep(step - 1)} />
