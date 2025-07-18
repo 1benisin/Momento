@@ -1,6 +1,15 @@
 # Momento
 
-Momento is a social app designed to help people meet more organically through curated, small-group experiences. It's a smarter, lower-pressure way to meet potential romantic partners, with the wonderful side effect of making friends along the way.
+## Investor Pitch
+
+**What do we do?**
+Momento is a social app that helps people form real connections through curated, small-group experiences—think of it as a smarter, lower-pressure alternative to dating and meetup apps.
+
+**Why do we do it?**
+Modern social and dating apps leave people feeling isolated, overwhelmed by endless swiping, and frustrated by superficial interactions. We believe genuine relationships happen best in the real world, over shared experiences.
+
+**What’s our great idea?**
+Momento uses AI-powered matching to invite users to exclusive, in-person events tailored to their interests and personalities. By charging a small confirmation fee, we ensure commitment and create a reliable, high-quality community. After each event, users can connect, share memories, and build lasting relationships—all within the app.
 
 ## About The App
 

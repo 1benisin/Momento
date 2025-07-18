@@ -22,7 +22,10 @@ export const createOrUpdateDraft = mutation({
     ),
     itinerary: v.array(
       v.object({
+        order: v.number(),
+        title: v.string(),
         start_time: v.number(),
+        end_time: v.optional(v.number()),
         location: v.object({
           name: v.string(),
           address: v.optional(v.string()),
@@ -58,15 +61,18 @@ export const createOrUpdateDraft = mutation({
     // Process itinerary items to get or create location objects
     const processedItinerary = await Promise.all(
       args.itinerary.map(async (item) => {
-        // Always create or get the location
         const locationId = await ctx.runMutation(
           api.locations.getOrCreateLocation,
           item.location
         );
+        // Return the object structured for the database schema
         return {
+          order: item.order,
+          title: item.title,
           start_time: item.start_time,
-          location: item.location,
+          end_time: item.end_time,
           description: item.description,
+          location_id: locationId,
         };
       })
     );
@@ -82,7 +88,7 @@ export const createOrUpdateDraft = mutation({
       arrival_signpost: args.arrival_signpost,
       estimated_event_cost: args.estimated_event_cost,
       status: "draft",
-      itinerary: processedItinerary,
+      itinerary: processedItinerary as unknown as Doc<"events">["itinerary"],
     };
 
     if (args.id) {

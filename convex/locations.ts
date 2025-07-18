@@ -21,19 +21,38 @@ export const getOrCreateLocation = mutation({
     google_place_id: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    // Check if a location with the same Google Place ID or coordinates already exists.
-    const existingLocation = await ctx.db
+    // 1. Prioritize lookup by Google Place ID for accuracy
+    if (args.google_place_id) {
+      const existingByGoogleId = await ctx.db
+        .query("locations")
+        .withIndex("by_google_place_id", (q) =>
+          q.eq("google_place_id", args.google_place_id)
+        )
+        .first();
+      if (existingByGoogleId) {
+        return existingByGoogleId._id;
+      }
+    }
+
+    // 2. Fallback to lookup by coordinates for pinned locations or missing Google IDs
+    const existingByCoords = await ctx.db
       .query("locations")
       .withIndex("by_position", (q) =>
         q.eq("latitude", args.latitude).eq("longitude", args.longitude)
       )
       .first();
 
-    if (existingLocation) {
-      return existingLocation._id;
+    if (existingByCoords) {
+      // If found by coords, and we have a google_place_id, patch it in for future lookups
+      if (args.google_place_id && !existingByCoords.google_place_id) {
+        await ctx.db.patch(existingByCoords._id, {
+          google_place_id: args.google_place_id,
+        });
+      }
+      return existingByCoords._id;
     }
 
-    // If no existing location is found, create a new one.
+    // 3. If no existing location is found by either method, create a new one.
     const locationId = await ctx.db.insert("locations", {
       name: args.name,
       address: args.address,

@@ -78,7 +78,9 @@ export default defineSchema({
     latitude: v.number(),
     longitude: v.number(),
     google_place_id: v.optional(v.string()),
-  }).index("by_position", ["latitude", "longitude"]),
+  })
+    .index("by_position", ["latitude", "longitude"])
+    .index("by_google_place_id", ["google_place_id"]),
 
   events: defineTable({
     hostId: v.id("users"),

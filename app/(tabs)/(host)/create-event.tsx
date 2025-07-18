@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, ActivityIndicator, Button } from "react-native";
+import {
+  StyleSheet,
+  ActivityIndicator,
+  Button,
+  ScrollView,
+} from "react-native";
 import { Text, View } from "@/components/Themed";
 import { useLocalSearchParams } from "expo-router";
 import { useQuery } from "convex/react";
@@ -40,14 +45,19 @@ const CreateEventScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>
-        {eventId ? "Edit Event" : "Create Event"} - Step {step} of 3
-      </Text>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: 32 }}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Text style={styles.title}>
+          {eventId ? "Edit Event" : "Create Event"} - Step {step} of 3
+        </Text>
 
-      {step === 1 && <EventDetailsForm event={event} setEvent={setEvent} />}
-      {step === 2 && <EventItineraryForm event={event} setEvent={setEvent} />}
-      {step === 3 && <EventPublishForm event={event} />}
-
+        {step === 1 && <EventDetailsForm event={event} setEvent={setEvent} />}
+        {step === 2 && <EventItineraryForm event={event} setEvent={setEvent} />}
+        {step === 3 && <EventPublishForm event={event} />}
+      </ScrollView>
       <View style={styles.navigation}>
         {step > 1 && (
           <Button title="Previous" onPress={() => setStep(step - 1)} />
