@@ -233,13 +233,6 @@ _Can we create lasting connections that keep users engaged with the platform lon
 - **Interactive Elements**: Tap to explore interest details
 - **Visual Appeal**: Beautiful, engaging visualization
 
-##### Event DNA
-
-- **Curated Gallery**: Showcase 3-5 favorite past events
-- **Social Proof**: Demonstrate interests through actions
-- **Profile Enhancement**: Transform profile into living testament
-- **Verification**: Authentic representation of user interests
-
 ##### Kudos Showcase
 
 - **Peer Validation**: Display top kudos received

@@ -22,7 +22,7 @@ Detailed documentation of all core features including user profiles, monetizatio
 
 ### [User Personas & Target Audience](./user-personas.md)
 
-Comprehensive user personas for the three key roles in the Momento ecosystem: participants, user hosts, and community hosts, with detailed behavioral patterns and pain points.
+Comprehensive user personas for the four key roles in the Momento ecosystem: participants, user hosts, community hosts, and professional hosts, with detailed behavioral patterns and pain points.
 
 ### [User Flows & Journey Maps](./user-flows.md)
 
@@ -144,6 +144,10 @@ Detailed documentation of the core matching algorithm logic, social chemistry sc
 
 Detailed product roadmap including feature priorities, development phases, and strategic planning.
 
+### [Professional Host Features Roadmap](./business/professional-host-roadmap.md)
+
+Comprehensive implementation roadmap for professional host features, including technical specifications, timelines, and success metrics.
+
 ## Development
 
 Documents within the `development/` directory:
@@ -198,6 +202,6 @@ Mood boards, inspiration sources, and visual references that inform the design d
 
 ---
 
-**Last Updated:** 2024-12-19
+**Last Updated:** 2024-12-19 (Updated with Professional Host persona)
 
 This index is automatically maintained to ensure all documentation is properly cataloged and accessible.

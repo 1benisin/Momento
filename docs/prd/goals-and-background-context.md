@@ -11,12 +11,13 @@
 
 ## Background Context
 
-Momento addresses the growing disconnect between digital connectivity and genuine human relationships. Modern social and dating apps have created user fatigue through endless swiping and superficial interactions, while traditional event platforms lack the curation and commitment mechanisms needed for meaningful experiences. The platform combines intelligent AI matching with real-world facilitation, using a $5 confirmation fee as a commitment signal that significantly reduces no-shows compared to free events. This model serves three distinct user types: participants seeking authentic connections, individual hosts wanting to share their passions, and community hosts (businesses) looking to drive foot traffic and build community.
+Momento addresses the growing disconnect between digital connectivity and genuine human relationships. Modern social and dating apps have created user fatigue through endless swiping and superficial interactions, while traditional event platforms lack the curation and commitment mechanisms needed for meaningful experiences. The platform combines intelligent AI matching with real-world facilitation, using a $5 confirmation fee as a commitment signal that significantly reduces no-shows compared to free events. This model serves four distinct user types: participants seeking authentic connections, individual hosts wanting to share their passions, community hosts (businesses) looking to drive foot traffic and build community, and professional hosts using event hosting as a primary income source.
 
 ## Change Log
 
-| Date       | Version | Description          | Author    |
-| ---------- | ------- | -------------------- | --------- |
-| 2024-12-19 | 1.0     | Initial PRD creation | John (PM) |
+| Date       | Version | Description                     | Author    |
+| ---------- | ------- | ------------------------------- | --------- |
+| 2024-12-19 | 1.0     | Initial PRD creation            | John (PM) |
+| 2024-12-19 | 1.1     | Added Professional Host persona | John (PM) |
 
 ---

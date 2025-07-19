@@ -35,11 +35,11 @@ This document defines the user experience goals, information architecture, user 
 - **Efficiency of use:** Power users can navigate between modes and manage events with minimal friction
 - **Error prevention:** Clear validation and confirmation for destructive actions like event cancellation
 - **Memorability:** Infrequent users can return without relearning core navigation patterns
-- **Delight:** Every interaction feels like an adventure, not a survey
+- **Delight:** Every interaction feels like an adventure, not an interview
 
 #### Design Principles
 
-1. **"This is an Adventure, Not a Survey"** - Every interaction should feel exciting and meaningful
+1. **"This is an Adventure, Not an Interview"** - Every interaction should feel exciting and meaningful
 2. **Quality Over Quantity** - Immediate communication of premium, curated experiences
 3. **Progressive Disclosure** - Show only what's needed, when it's needed
 4. **Consistent Patterns** - Use familiar UI patterns throughout the application
@@ -271,7 +271,7 @@ graph TD
 
 **Variants:** Primary (gold background), Secondary (gold border), Tertiary (text only), Destructive (red)
 
-**States:** Default, Hover, Active, Disabled, Loading
+**States:** Default, Press, Active, Disabled, Loading
 
 **Usage Guidelines:** Use primary for main actions, secondary for alternatives, tertiary for subtle actions
 
@@ -281,7 +281,7 @@ graph TD
 
 **Variants:** Event Card, Profile Card, Invitation Card, Content Card
 
-**States:** Default, Hover, Selected, Disabled
+**States:** Default, Press, Selected, Disabled
 
 **Usage Guidelines:** All cards use gold borders and dark backgrounds for premium feel
 
@@ -380,48 +380,50 @@ graph TD
 
 ### Testing Strategy
 
-- Automated testing with axe DevTools and Lighthouse
-- Manual testing with screen readers (NVDA, VoiceOver)
-- Color contrast testing with WebAIM Contrast Checker
-- Keyboard navigation testing across all user flows
+- **Automated Testing**: React Native Testing Library for component tests, Maestro for E2E testing
+- **Accessibility Testing**: React Native Accessibility Inspector, manual testing with VoiceOver (iOS) and TalkBack (Android)
+- **Color Contrast Testing**: Built-in accessibility tools and manual verification on devices
+- **Touch Target Testing**: Verify minimum 44px touch targets across all interactive elements
+- **Cross-Platform Testing**: Test on both iOS and Android devices/simulators
+- **Performance Testing**: React Native Performance Monitor for performance monitoring
 
-## Responsiveness Strategy
+## Mobile-First Design Strategy
 
-### Breakpoints
+### Device Support
 
-| Breakpoint | Min Width | Max Width | Target Devices              |
-| ---------- | --------- | --------- | --------------------------- |
-| Mobile     | 320px     | 767px     | iPhone, Android phones      |
-| Tablet     | 768px     | 1023px    | iPad, Android tablets       |
-| Desktop    | 1024px    | 1439px    | Laptops, small desktops     |
-| Wide       | 1440px    | -         | Large monitors, 4K displays |
+| Device Type  | Screen Sizes  | Target Devices                                 |
+| ------------ | ------------- | ---------------------------------------------- |
+| Phones       | 320px - 428px | iPhone SE, iPhone 12-15 series, Android phones |
+| Large Phones | 428px - 768px | iPhone Pro Max, Samsung Galaxy S series        |
+| Tablets      | 768px+        | iPad, Android tablets                          |
 
 ### Adaptation Patterns
 
-**Layout Changes:** Single column on mobile, multi-column on larger screens
+**Layout Changes:** Single column layout optimized for touch interaction
 
-**Navigation Changes:** Bottom tab bar on mobile, side navigation on desktop
+**Navigation Changes:** Bottom tab bar navigation with gesture support
 
-**Content Priority:** Essential content first on mobile, progressive enhancement on larger screens
+**Content Priority:** Essential content first, progressive loading for media and details
 
-**Interaction Changes:** Touch gestures on mobile, hover states on desktop
+**Interaction Changes:** Touch-optimized interactions with haptic feedback
 
 ## Animation & Micro-interactions
 
 ### Motion Principles
 
 - **Purposeful Motion:** Every animation serves a clear purpose
-- **Performance First:** 60fps animations, respect user motion preferences
-- **Accessible:** Support for reduced motion settings
+- **Performance First:** 60fps animations using React Native Reanimated, respect user motion preferences
+- **Accessible:** Support for reduced motion settings via AccessibilityInfo
 - **Brand Consistent:** Animations reflect the premium, sophisticated aesthetic
 
-### Key Animations
+### Key Animations (React Native Reanimated)
 
-- **Card Transitions:** Smooth 300ms ease-out transitions for card interactions
-- **Loading States:** Skeleton screens with subtle pulse animations
-- **Page Transitions:** 400ms ease-in-out transitions between screens
-- **Button Interactions:** 150ms ease-out for hover and active states
-- **Modal Animations:** 250ms ease-out for modal open/close
+- **Card Transitions:** Smooth 300ms ease-out transitions using `withSpring` or `withTiming`
+- **Loading States:** Skeleton screens with subtle pulse animations using `withRepeat`
+- **Page Transitions:** 400ms ease-in-out transitions between screens using `withTiming`
+- **Button Interactions:** 150ms ease-out for press states using `withSpring`
+- **Modal Animations:** 250ms ease-out for modal open/close using `withTiming`
+- **Gesture Animations:** Interactive animations using `useAnimatedGestureHandler`
 
 ## Performance Considerations
 

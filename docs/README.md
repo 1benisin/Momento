@@ -6,7 +6,7 @@ Welcome to the Momento documentation! This is your comprehensive guide to unders
 
 Momento is a social platform built to foster genuine human connection. Our mission is to move beyond the world of superficial swiping and endless, low-quality messaging. We believe that connection happens best in the real world, over shared experiences. By curating small, invite-only group events, we create the ideal conditions for genuine relationships—both platonic and romantic—to emerge organically.
 
-Our guiding philosophy is that this should be an **adventure, not a survey**. Every interaction with Momento is designed to be an exciting step towards a new experience, not a chore.
+Our guiding philosophy is that this should be an **adventure, not an interview**. Every interaction with Momento is designed to be an exciting step towards a new experience, not a chore.
 
 ## 🚀 Quick Start
 
@@ -86,11 +86,12 @@ Momento's core solution is the **curated event**. Each week, our system invites 
 
 ## 👥 Target Audience
 
-We serve three key roles within the Momento ecosystem:
+We serve four key roles within the Momento ecosystem:
 
 1. **The Participant ("Alex, the Newcomer"):** The core user looking to attend events, meet like-minded people, and find genuine connections in a low-pressure setting.
 2. **The User Host ("David, the Curator"):** An individual user passionate about creating and hosting unique events for others.
 3. **The Community Host ("The Juniper Cafe"):** A local business using Momento to drive foot traffic and build community.
+4. **The Professional Host ("Sarah, the Entrepreneur"):** Entrepreneurs and freelancers hosting events as a primary or significant income source, generating $50-100/hour through consistent event hosting.
 
 ## 🔧 Technology Stack
 
@@ -125,4 +126,4 @@ For information on how to contribute to the project, see [Development Setup](./d
 
 ---
 
-**Last Updated:** 2024-12-19
+**Last Updated:** 2024-12-19 (Updated with Professional Host persona)

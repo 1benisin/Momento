@@ -8,6 +8,7 @@ This document defines the key user roles within the Momento ecosystem through de
 - [1. The Participant: "Alex, the Newcomer"](#1-the-participant-alex-the-newcomer)
 - [2. The User Host: "David, the Curator"](#2-the-user-host-david-the-curator)
 - [3. The Community Host: "The Juniper Cafe"](#3-the-community-host-the-juniper-cafe)
+- [4. The Professional Host: "Sarah, the Entrepreneur"](#4-the-professional-host-sarah-the-entrepreneur)
 - [Persona Relationships](#persona-relationships)
 - [Design Implications](#design-implications)
 
@@ -15,13 +16,14 @@ This document defines the key user roles within the Momento ecosystem through de
 
 ## Overview
 
-The Momento ecosystem is comprised of three key roles. An individual account can potentially hold multiple roles, creating a dynamic and interconnected community. These personas guide our product development and ensure we're building features that serve real user needs.
+The Momento ecosystem is comprised of four key roles. An individual account can potentially hold multiple roles, creating a dynamic and interconnected community. These personas guide our product development and ensure we're building features that serve real user needs.
 
 ### Key Roles
 
 1. **Participant** - Core users attending events and seeking connections
-2. **User Host** - Individual users creating and hosting unique experiences
+2. **User Host** - Individual users creating and hosting unique experiences for passion and community
 3. **Community Host** - Local businesses using Momento to build community and drive traffic
+4. **Professional Host** - Entrepreneurs and freelancers hosting events as a primary or significant income source
 
 ---
 
@@ -360,6 +362,238 @@ The Juniper Cafe is a beloved local coffee shop with a beautiful, well-designed 
 
 ---
 
+## 4. The Professional Host: "Sarah, the Entrepreneur"
+
+### Basic Information
+
+- **Role:** `Professional Host`
+- **Age:** 32 years old
+- **Occupation:** Freelance Experience Designer & Entrepreneur
+- **Location:** Urban area with diverse population and strong event culture
+- **Personality:** Driven, strategic, quality-focused, business-minded
+
+### Background Story
+
+Sarah is a freelance experience designer who has turned her passion for creating memorable events into a profitable business. She hosts 2-4 hour events 5 days a week, generating $50-100 per hour through carefully crafted experiences. Her events range from creative workshops to networking mixers, all designed to provide genuine value while building her reputation as a premier event host.
+
+### Goals & Motivations
+
+#### Primary Goals
+
+- **Financial Independence**: Generate $50-100/hour through consistent event hosting
+- **Business Growth**: Scale her event hosting business to full-time income
+- **Quality Reputation**: Build a reputation for hosting exceptional, highly-rated events
+- **Customer Satisfaction**: Create experiences that exceed participant expectations
+
+#### Secondary Goals
+
+- **Network Building**: Develop relationships with participants who become repeat customers
+- **Skill Development**: Continuously improve her event design and hosting abilities
+- **Market Expansion**: Explore new event types and target audiences
+- **Brand Recognition**: Establish herself as a go-to host for quality experiences
+
+### Pain Points & Frustrations
+
+#### Revenue Consistency
+
+- **Problem**: Difficulty maintaining consistent $50-100/hour income across all events
+- **Impact**: Income fluctuations make business planning challenging
+- **Current Solutions**: Diversifies event types and optimizes pricing strategies
+
+#### Customer Acquisition
+
+- **Problem**: Finding reliable, high-quality participants for frequent events
+- **Impact**: Some events don't reach optimal attendance or participant quality
+- **Current Solutions**: Relies on Momento's curation and matching algorithm
+
+#### Event Optimization
+
+- **Problem**: Need to identify which event formats perform best and why
+- **Impact**: Wastes time and resources on underperforming event types
+- **Current Solutions**: Tracks performance manually across platforms
+
+#### Time Management
+
+- **Problem**: Balancing event planning, execution, and business development
+- **Impact**: Often feels overwhelmed by administrative tasks
+- **Current Solutions**: Uses templates and automation where possible
+
+### How Momento Serves Sarah
+
+#### Reliable Customer Flow
+
+- **Solution**: Momento's $5 confirmation fee ensures committed, quality participants
+- **Benefit**: Reduces no-shows and provides consistent, engaged audiences
+- **Implementation**: Payment processing and commitment mechanism
+
+#### Event Performance Tracking
+
+- **Solution**: Enhanced host dashboard with detailed analytics and insights
+- **Benefit**: Identify successful event patterns and optimize for better performance
+- **Implementation**: Basic and advanced dashboard views with performance metrics
+
+#### Recurring Event Templates
+
+- **Solution**: Save and duplicate successful event formats for efficiency
+- **Benefit**: Reduces planning time while maintaining quality standards
+- **Implementation**: Template management system for event creation
+
+#### Quality Control
+
+- **Solution**: Track ratings and feedback for each event instance
+- **Benefit**: Use historical performance in matching algorithm for better results
+- **Implementation**: Event success tracking and algorithm weighting
+
+#### Calendar Integration
+
+- **Solution**: Sync with external calendars and manage availability efficiently
+- **Benefit**: Streamlines scheduling and reduces administrative overhead
+- **Implementation**: Calendar integration and availability management
+
+### Behavioral Patterns
+
+#### Business Approach
+
+- **Data-Driven**: Analyzes event performance to optimize future events
+- **Quality-Focused**: Prioritizes participant satisfaction over quantity
+- **Efficiency-Oriented**: Uses templates and automation to maximize productivity
+- **Customer-Centric**: Adapts events based on participant feedback and preferences
+
+#### Event Strategy
+
+- **Format Optimization**: Identifies and replicates successful event patterns
+- **Pricing Strategy**: Sets event costs to achieve $50-100/hour income targets
+- **Frequency Management**: Hosts 5 days/week with 2-4 hour events
+- **Quality Standards**: Maintains high ratings through consistent execution
+
+#### Communication Style
+
+- **Professional**: Clear, informative, and business-focused communication
+- **Responsive**: Quick responses to participant questions and concerns
+- **Proactive**: Anticipates participant needs and provides helpful information
+- **Brand-Consistent**: Maintains professional image across all interactions
+
+#### Event Philosophy
+
+- **Value-First**: Focuses on delivering genuine value to participants
+- **Scalable**: Creates event formats that can be consistently replicated
+- **Feedback-Driven**: Continuously improves based on participant feedback
+- **Community-Building**: Fosters connections among participants for repeat business
+
+---
+
+## 4. The Professional Host: "Sarah, the Entrepreneur"
+
+### Basic Information
+
+- **Role:** `Professional Host`
+- **Age:** 30 years old
+- **Occupation:** Digital Marketing Consultant
+- **Location:** Tech hub with a vibrant startup scene
+- **Personality:** Passionate, driven, detail-oriented, strategic
+
+### Background Story
+
+Sarah is a successful digital marketing consultant who loves hosting events to network with other professionals and showcase her expertise. She's built a strong personal brand and enjoys the challenge of planning and executing high-quality events that attract her target audience.
+
+### Goals & Motivations
+
+#### Primary Goals
+
+- **Grow Business**: Host events to attract potential clients and expand her network
+- **Brand Awareness**: Establish herself as a thought leader in her industry
+- **Networking**: Meet other professionals who can provide valuable connections
+- **Skill Development**: Improve her event planning and execution skills
+
+#### Secondary Goals
+
+- **Income**: Host events as a significant source of income
+- **Legacy**: Create a portfolio of successful events that she can showcase
+- **Community**: Build a community of professionals who appreciate her events
+
+### Pain Points & Frustrations
+
+#### Event Planning Complexity
+
+- **Problem**: Managing multiple event platforms and integrations
+- **Impact**: Spends too much time on logistics and not enough on strategy
+- **Current Solutions**: Uses Momento for its simplicity and reliability
+
+#### Audience Acquisition
+
+- **Problem**: Difficulty finding the right audience for her specific events
+- **Impact**: Events often have low attendance or don't align with her target market
+- **Current Solutions**: Relies on Momento's targeting and audience building features
+
+#### Time Management
+
+- **Problem**: Balancing her own business and hosting responsibilities
+- **Impact**: Often feels overwhelmed by the amount of work required
+- **Current Solutions**: Uses Momento's automation and scheduling features
+
+#### Budget Constraints
+
+- **Problem**: Limited budget for event production and marketing
+- **Impact**: Often has to compromise on quality or scale
+- **Current Solutions**: Focuses on maximizing ROI and audience quality
+
+### How Momento Serves Sarah
+
+#### Seamless Integration
+
+- **Solution**: Momento's platform seamlessly integrates with her existing business tools
+- **Benefit**: Eliminates the need to switch between platforms for event planning
+- **Implementation**: Calendar sync, payment processing, and audience targeting
+
+#### Audience Building
+
+- **Solution**: Momento's advanced targeting and audience building features
+- **Benefit**: Helps Sarah find the right audience for her events
+- **Implementation**: Location-based matching, interest alignment, and audience segmentation
+
+#### Event Execution
+
+- **Solution**: Momento's platform handles all event logistics and coordination
+- **Benefit**: Allows Sarah to focus on strategy and execution
+- **Implementation**: Automated notifications, calendar sync, and audience management
+
+#### Brand Building
+
+- **Solution**: Public host profile with ratings and reviews
+- **Benefit**: Showcase success and attract more professional attendees
+- **Implementation**: `Host Profile` with aggregated feedback and testimonials
+
+#### Community Integration
+
+- **Solution**: Regular events create a community of professionals
+- **Benefit**: Helps Sarah build a network of valuable connections
+- **Implementation**: Recurring event opportunities and community features
+
+### Behavioral Patterns
+
+#### Planning Style
+
+- **Detail Orientation**: Loves creating comprehensive, well-thought-out experiences
+- **Research Approach**: Thorough background research and preparation
+- **Flexibility**: Adapts plans based on group dynamics and feedback
+- **Innovation**: Constantly looking for new ways to enhance experiences
+
+#### Communication Preferences
+
+- **Style**: Warm, enthusiastic, and informative
+- **Frequency**: Regular updates and clear communication
+- **Channels**: Prefers in-app messaging for event coordination
+- **Tone**: Encouraging and inclusive
+
+#### Event Philosophy
+
+- **Size**: Prefers intimate groups (6-12 people)
+- **Duration**: 2-4 hour events with clear structure
+- **Location**: Mix of indoor and outdoor venues
+- **Cost**: Keeps costs low, focuses on experience over luxury
+
+---
+
 ## Persona Relationships
 
 ### Interaction Patterns
@@ -385,6 +619,20 @@ The Juniper Cafe is a beloved local coffee shop with a beautiful, well-designed 
 - **Trust Building**: Through successful collaborations and mutual benefit
 - **Long-term**: Ongoing partnerships and co-hosted events
 
+#### Participant ↔ Professional Host
+
+- **Primary Relationship**: High-quality event experiences and networking opportunities
+- **Communication**: Pre-event coordination, post-event feedback and follow-up
+- **Trust Building**: Through consistent quality and professional service
+- **Long-term**: Repeat attendance and word-of-mouth referrals
+
+#### Professional Host ↔ Community Host
+
+- **Primary Relationship**: Venue partnerships for professional events
+- **Communication**: Venue booking, event planning, business collaboration
+- **Trust Building**: Through successful business partnerships and mutual growth
+- **Long-term**: Ongoing venue relationships and collaborative events
+
 ### Hybrid Users
 
 #### Participant + User Host
@@ -400,6 +648,20 @@ The Juniper Cafe is a beloved local coffee shop with a beautiful, well-designed 
 - **Benefits**: Deeper understanding of customer needs and community dynamics
 - **Challenges**: Managing business and personal social interactions
 - **Implementation**: Separate profiles for business and personal use
+
+#### Participant + Professional Host
+
+- **Profile**: Professional host who also attends events as a participant
+- **Benefits**: Understands both hosting and participant perspectives
+- **Challenges**: Balancing hosting responsibilities with personal enjoyment
+- **Implementation**: Mode switching between social and host interfaces
+
+#### User Host + Professional Host
+
+- **Profile**: Passion-driven host who also operates as a business
+- **Benefits**: Combines passion with business acumen for optimal events
+- **Challenges**: Balancing passion projects with income-generating events
+- **Implementation**: Enhanced dashboard with both passion and business metrics
 
 ---
 
@@ -428,6 +690,14 @@ The Juniper Cafe is a beloved local coffee shop with a beautiful, well-designed 
 - **Customer Insights**: Data on attendee demographics and preferences
 - **Branding**: Opportunities to showcase business identity and values
 
+#### For Professional Hosts (Sarah)
+
+- **Enhanced Dashboard**: Basic view for all hosts, advanced view with detailed analytics
+- **Event Templates**: Save and duplicate successful event formats for efficiency
+- **Performance Tracking**: Detailed insights into event success and participant satisfaction
+- **Calendar Integration**: Sync with external calendars and manage availability
+- **Quality Metrics**: Track ratings and feedback to optimize event performance
+
 ### Feature Priorities
 
 #### High Priority (All Personas)
@@ -443,6 +713,7 @@ The Juniper Cafe is a beloved local coffee shop with a beautiful, well-designed 
 - **Social Features**: Memory book, kudos, social sharing
 - **Customization**: Profile personalization and event customization
 - **Integration**: Calendar sync, social media integration
+- **Professional Host Features**: Enhanced dashboard, event templates, performance tracking
 
 #### Lower Priority
 
@@ -467,6 +738,13 @@ The Juniper Cafe is a beloved local coffee shop with a beautiful, well-designed 
 - **Growth**: Repeat hosting, expanding event types
 - **Community**: Attendee feedback, word-of-mouth referrals
 
+#### Professional Host Success
+
+- **Revenue Generation**: Average income per hour, consistent earnings
+- **Event Performance**: Success rate of event formats, participant retention
+- **Quality Standards**: High ratings maintained across multiple events
+- **Business Growth**: Scaling event frequency and types successfully
+
 #### Platform Success
 
 - **Growth**: User acquisition, retention, engagement
@@ -476,4 +754,4 @@ The Juniper Cafe is a beloved local coffee shop with a beautiful, well-designed 
 
 ---
 
-**Last Updated:** 2024-12-19
+**Last Updated:** 2024-12-19 (Updated with Professional Host persona)

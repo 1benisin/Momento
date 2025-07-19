@@ -4,7 +4,7 @@ Welcome to the Momento design system documentation! This collection provides com
 
 ## Design Philosophy
 
-Momento's design aesthetic draws inspiration from a unique blend of sources, aiming for a style that feels like an **"esoteric-tarot meets Art Deco mash-up."** Our core philosophy is that **this is an adventure, not a survey** - every interaction should feel exciting and meaningful.
+Momento's design aesthetic draws inspiration from a unique blend of sources, aiming for a style that feels like an **"esoteric-tarot meets Art Deco mash-up."** Our core philosophy is that **this is an adventure, not an interview** - every interaction should feel exciting and meaningful.
 
 ## Design Documentation
 

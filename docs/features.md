@@ -19,6 +19,7 @@ This document outlines the core features of the Momento application, organized b
 - [13. Interest Discovery](#13-interest-discovery)
 - [14. Type Discovery](#14-type-discovery)
 - [15. Notifications](#15-notifications)
+- [16. Professional Host Features](#16-professional-host-features)
 
 ---
 
@@ -64,13 +65,18 @@ Settings are divided into two distinct areas:
 - **Functionality**: Sets user's `status` to `'paused'`, making them socially invisible
 - **User Experience**: Can still log in, view Memory Book, exchange messages with existing connections
 - **Limitations**: Cannot engage in new social activities
-- **Reactivation**: Persistent banner with "Reactivate Account" button
+- **Reactivation**: Persistent banner with "Reactivate Account" button on pages with limited functionality from pause status and on the "Profile" screen and in the App Preferences / Settings screen
 
 #### Delete Account (Permanent Action)
 
 - **Nudge-to-Pause Flow**: "Delete Account" button opens modal presenting pausing as preferable alternative
 - **Modal Content**: "Before you go..." with three choices: "Pause Account" (primary), "Delete Permanently" (destructive), "Cancel"
-- **Backend Process**: Deletes user record in Clerk, triggers webhook to delete Convex database record
+- **Backend Process**:
+  - Deletes user record in Clerk (hard delete)
+  - Triggers webhook to soft delete Convex database record
+  - Anonymizes personal data while preserving platform integrity
+  - Maintains referential integrity for events, connections, and social features
+  - Other users see "User has deactivated their account" instead of broken references
 
 ### Advanced Profile Features
 
@@ -87,13 +93,6 @@ Settings are divided into two distinct areas:
 - **How it Works**: After events, attendees give anonymous, private "kudos" to each other
 - **Visualization**: Displays top 2-3 most frequent kudos with elegant icons/badges
 - **Impact**: Provides authentic, peer-validated glimpse into social character
-
-#### Event DNA
-
-- **Purpose**: Express character through actions, not just words
-- **How it Works**: Users select 3-5 past events they attended and rated highly to showcase
-- **Visualization**: Visually rich gallery of selected event cards
-- **Impact**: Transforms profile into living testament of adventures and passions
 
 #### The Vibe Summary (AI-Generated)
 
@@ -224,13 +223,52 @@ Settings are divided into two distinct areas:
 - **Event Itinerary**: Dynamic events with multiple stops, times, locations
 - **Collaborators**: Add co-hosts or instructors
 
+### Professional Host Features
+
+#### Enhanced Host Dashboard
+
+- **Basic View**: Available to all hosts with event history, attendance rates, basic ratings
+- **Advanced View**: Professional hosts get detailed analytics including:
+  - Revenue tracking and income analysis
+  - Customer insights and participant demographics
+  - Event performance metrics and trends
+  - Success rate tracking for different event formats
+
+#### Event Templates & Recurring Events
+
+- **Template Creation**: Save successful event formats for easy duplication
+- **Template Management**: Create, edit, and organize event templates
+- **Quick Event Creation**: Generate new events from templates with minimal setup
+- **Performance Tracking**: Track success metrics for each template type
+
+#### Event Performance Tracking
+
+- **Success Metrics**: Track ratings and feedback for each event instance
+- **Format Analysis**: Identify which event formats perform best
+- **Customer Retention**: Monitor repeat customer rates and satisfaction
+- **Algorithm Weighting**: Use historical performance in matching algorithm
+
+#### Calendar Integration
+
+- **External Calendar Sync**: Integrate with Google Calendar, Outlook, etc.
+- **Availability Management**: Set and manage availability windows
+- **Conflict Detection**: Automatically detect scheduling conflicts
+- **Automated Scheduling**: Streamline event scheduling and coordination
+
+#### Quality Control & Optimization
+
+- **Performance Reviews**: Regular analysis of event success patterns
+- **Quality Standards**: Maintain high ratings through consistent execution
+- **Feedback Loop**: Continuous improvement based on participant feedback
+- **Success Replication**: Identify and replicate successful event patterns
+
 ---
 
 ## 4. Interest Building Flow
 
 ### The Momento Preview
 
-- **Purpose**: Critical onboarding process that feels like adventure, not survey
+- **Purpose**: Critical onboarding process that feels like adventure, not interview
 - **Implementation**: "Possibility Card" deck with 8-10 fictitious event cards
 - **Interaction**: Swipe right ("I'm Interested") or left ("Not for Me")
 - **Content**: Stunning images, intriguing titles, evocative descriptions
@@ -253,7 +291,7 @@ Settings are divided into two distinct areas:
 
 ### Invitation Management
 
-- **Response Options**: Accept, decline, or defer
+- **Response Options**: Accept or decline
 - **Declining Flow**: Capture user intent for future matching
 - **Calendar Integration**: Post-confirmation calendar integration
 
@@ -461,13 +499,18 @@ Settings are divided into two distinct areas:
 
 - **Event Encore Signals**: Anonymous feedback for event repetition
 - **Enhanced Host Tools**: Advanced hosting capabilities
+- **Professional Host Dashboard**: Basic and advanced analytics views
+- **Event Templates**: Save and duplicate successful event formats
+- **Calendar Integration**: External calendar sync and availability management
 
 ### Phase 3 Features
 
 - **In-App Camera Requirement**: Mandatory authentic photos
 - **AI-Powered Hosting Assistant**: AI tools for event creation
 - **Advanced Analytics**: Enhanced insights and metrics
+- **Event Performance Tracking**: Detailed success metrics and optimization tools
+- **Quality Control Systems**: Advanced quality assurance and rating systems
 
 ---
 
-**Last Updated:** 2024-12-19
+**Last Updated:** 2024-12-19 (Updated with Professional Host Features)

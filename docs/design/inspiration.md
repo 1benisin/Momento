@@ -144,7 +144,7 @@ The core aesthetic draws from a unique blend of mystical and sophisticated sourc
 
 ### Phase 2 & 3 Considerations
 
-- **Advanced Animation:** Lottie animations and complex interactions
+- **Advanced Animation:** React Native Reanimated for complex interactions
 - **Custom Illustrations:** Themed artwork for events and experiences
 - **Premium Effects:** Foil-stamp, metallic gradients, and sophisticated textures
 

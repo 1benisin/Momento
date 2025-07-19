@@ -49,7 +49,7 @@ Utilizing subtle gold gradients on dark card elements to create a premium, tacti
 
 ### Living Blueprint Effect
 
-Animating lines to "draw" themselves in on hover or load, creating a dynamic, living feel. This could be applied to:
+Animating lines to "draw" themselves in on press or load, creating a dynamic, living feel. This could be applied to:
 
 - Event invitations as looping animations
 - Gold leaf filigree that gently moves
@@ -67,7 +67,7 @@ Turning static elements into dynamic experiences:
 
 ## Experiential Design Philosophy
 
-### "This is an Adventure, Not a Survey"
+### "This is an Adventure, Not an Interview"
 
 Every interaction should feel exciting and meaningful, not like filling out paperwork. This principle guides:
 

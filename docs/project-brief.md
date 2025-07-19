@@ -8,9 +8,9 @@
 
 ## Executive Summary
 
-Momento is a social platform designed to foster genuine human connection through curated, invite-only group events. The platform moves beyond superficial swiping and endless messaging by creating real-world experiences where meaningful relationships—both platonic and romantic—can emerge organically.
+Momento is a social platform designed to foster genuine human connection through curated, invite-only group events. The platform moves beyond superficial swiping and endless messaging by creating real-world experiences where meaningful relationships —both platonic and romantic— can emerge organically.
 
-The core value proposition is a $5 "Cost of a Handshake" confirmation fee that ensures commitment and reduces no-shows, while AI-powered matching creates balanced groups with high social chemistry. The platform serves three distinct user types: participants seeking connections, individual hosts creating unique experiences, and community hosts (businesses) driving foot traffic.
+The core monetization proposition is a $5 invitation confirmation fee that ensures commitment and reduces no-shows, while AI-powered matching creates balanced groups with high social chemistry. The platform serves four distinct user types: participants seeking connections, individual hosts creating unique experiences, community hosts (businesses) driving foot traffic, and professional hosts using event hosting as a primary income source.
 
 ## Problem Statement
 
@@ -35,21 +35,28 @@ Momento's solution centers on **curated group experiences** with several key dif
 
 ## Target Users
 
-### Primary User Segment: The Participant ("Alex, the Newcomer")
+### The Participant ("Alex, the Newcomer")
 
 **Demographics:** 25-35 years old, urban professionals, new to cities or seeking to expand social circles
 **Current Behaviors:** Uses dating apps but experiences fatigue, struggles to organize group activities, values authentic connections
 **Specific Needs:** Low-pressure social settings, curated experiences, safety and verification, post-event connection tools
 **Goals:** Find genuine connections, discover interesting activities, build a network of like-minded people
 
-### Secondary User Segment: The User Host ("David, the Curator")
+### The User Host ("David, the Curator")
 
 **Demographics:** 30-40 years old, passionate individuals who enjoy bringing people together
 **Current Behaviors:** Organizes events informally, struggles with flakiness and payment coordination
 **Specific Needs:** Powerful event creation tools, committed audiences, reputation building, automated logistics
 **Goals:** Share passions with enthusiastic audiences, build reputation as a great host, meet new people
 
-### Tertiary User Segment: The Community Host ("The Juniper Cafe")
+### Quaternary User Segment: The Professional Host ("Sarah, the Entrepreneur")
+
+**Demographics:** 28-45 years old, entrepreneurs and freelancers using event hosting as primary or significant income source
+**Current Behaviors:** Hosts 2-4 hour events 5 days/week, generates $50-100/hour through event costs collected directly from participants
+**Specific Needs:** Reliable customer flow, event performance tracking, recurring event templates, calendar integration
+**Goals:** Generate consistent income through high-quality events, build reputation for exceptional experiences, scale event hosting business
+
+### The Community Host ("The Juniper Cafe")
 
 **Demographics:** Local businesses, cafes, venues seeking to increase foot traffic and build community
 **Current Behaviors:** Struggles with traditional marketing ROI, lacks event management expertise
@@ -64,6 +71,7 @@ Momento's solution centers on **curated group experiences** with several key dif
 - **Revenue Growth:** Generate $50,000 in confirmation fees within the first year
 - **Retention:** Maintain 40% monthly active user retention by month 6
 - **Market Validation:** Successfully host 500+ events with average 4.5+ star ratings
+- **Professional Host Growth:** Attract 25+ professional hosts generating consistent high-quality events
 
 ### User Success Metrics
 
@@ -71,6 +79,7 @@ Momento's solution centers on **curated group experiences** with several key dif
 - **Connection Formation:** 60% of attendees report making at least one meaningful connection per event
 - **Host Satisfaction:** 80% of hosts report positive experience and intent to host again
 - **Safety Incidents:** Less than 1% of events result in safety reports
+- **Professional Host Success:** 80% of professional hosts achieve $50-100/hour income targets
 
 ### Key Performance Indicators (KPIs)
 
@@ -104,6 +113,7 @@ Momento's solution centers on **curated group experiences** with several key dif
 - **AI-Powered Features:** Vibe summaries and hosting assistance
 - **Geofenced Features:** Location-based check-in reminders
 - **Host Payment Processing:** Complex financial features deferred to future phases
+- **Professional Host Features:** Enhanced dashboard, event templates, performance tracking (Phase 2)
 
 ### MVP Success Criteria
 
@@ -114,7 +124,7 @@ The MVP will be considered successful if we can demonstrate: 1) Users will pay $
 ### Phase 2: Deepening Engagement & Connection
 
 **Goal:** Turn one-time events into lasting experiences and encourage user retention
-**Key Features:** Memory Book & Face Cards, peer-to-peer kudos, 1-on-1 messaging, "Discovering Your Type" matching, richer profiles with Interest Constellations and Event DNA, Dynamic Duos, event preferences and filters
+**Key Features:** Memory Book & Face Cards, peer-to-peer kudos, 1-on-1 messaging, "Discovering Your Type" matching, richer profiles with Interest Constellations, Dynamic Duos, event preferences and filters, Professional Host Features (enhanced dashboard, event templates, performance tracking)
 
 ### Phase 3: Sophistication & Intelligence
 
@@ -206,7 +216,7 @@ The MVP will be considered successful if we can demonstrate: 1) Users will pay $
 
 ### B. Stakeholder Input
 
-**Founder Vision:** Strong emphasis on creating "adventures, not surveys" with a focus on genuine human connection over superficial interactions.
+**Founder Vision:** Strong emphasis on creating "adventures, not interviews" with a focus on genuine human connection over superficial interactions.
 
 **Technical Team:** Recommends starting with proven technologies (React Native, Convex) to ensure rapid development and scalability.
 
@@ -234,3 +244,7 @@ The MVP will be considered successful if we can demonstrate: 1) Users will pay $
 ### PM Handoff
 
 This Project Brief provides the full context for Momento. Please start in 'PRD Generation Mode', review the brief thoroughly to work with the user to create the PRD section by section as the template indicates, asking for any necessary clarification or suggesting improvements. The brief establishes the foundation for all subsequent product development decisions and should serve as the primary reference document for the development team.
+
+---
+
+**Last Updated:** 2024-12-19 (Updated with Professional Host persona)

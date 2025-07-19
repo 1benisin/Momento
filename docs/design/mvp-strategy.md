@@ -45,7 +45,7 @@ This document outlines the design implementation strategy for the Momento MVP, p
 
 #### Sophisticated Interactions
 
-- **Micro-animations** and hover effects
+- **Micro-animations** using React Native Reanimated
 - **Complex loading animations** with drawing effects
 - **Interactive illustrations** that respond to user actions
 - **Advanced card interactions** with 3D effects
@@ -177,7 +177,7 @@ This document outlines the design implementation strategy for the Momento MVP, p
 
 - **System fonts** for faster loading
 - **Minimal custom assets** to reduce bundle size
-- **Efficient CSS** with minimal custom properties
+- **Efficient styling** with React Native StyleSheet and minimal custom properties
 - **Progressive enhancement** - core functionality works without JavaScript
 
 ## Design-to-Development Handoff
@@ -185,7 +185,7 @@ This document outlines the design implementation strategy for the Momento MVP, p
 ### MVP Handoff Requirements
 
 - **Clear component specifications** with exact measurements
-- **Color values** in hex and CSS variable format
+- **Color values** in hex and React Native color constants
 - **Typography specifications** with font sizes and weights
 - **Spacing system** with consistent values
 - **Responsive breakpoints** for mobile, tablet, and desktop
@@ -193,7 +193,7 @@ This document outlines the design implementation strategy for the Momento MVP, p
 ### Documentation Standards
 
 - **Component library** with usage examples
-- **Design tokens** in CSS variable format
+- **Design tokens** in React Native constants format
 - **Accessibility guidelines** for each component
 - **Implementation notes** for developers
 
@@ -219,7 +219,7 @@ This document outlines the design implementation strategy for the Momento MVP, p
 
 ### Phase 2 Design Enhancements
 
-- **Advanced animations** and micro-interactions
+- **Advanced animations** and micro-interactions using React Native Reanimated
 - **Custom illustrations** for events and experiences
 - **Premium visual effects** like foil-stamp and metallic gradients
 - **Enhanced typography** with custom fonts and elaborate styling
