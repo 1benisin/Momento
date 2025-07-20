@@ -72,6 +72,58 @@ export default defineSchema({
     .index("by_token", ["tokenIdentifier"])
     .index("by_clerk_id", ["clerkId"]),
 
+  locations: defineTable({
+    name: v.string(),
+    address: v.optional(v.string()),
+    latitude: v.number(),
+    longitude: v.number(),
+    google_place_id: v.optional(v.string()),
+  })
+    .index("by_position", ["latitude", "longitude"])
+    .index("by_google_place_id", ["google_place_id"]),
+
+  events: defineTable({
+    hostId: v.id("users"),
+    title: v.string(),
+    description: v.string(),
+    event_vector: v.optional(v.array(v.float64())),
+    status: v.string(), // 'draft', 'published', 'completed', 'cancelled'
+    min_attendees: v.number(),
+    max_attendees: v.number(),
+    age_min: v.optional(v.number()),
+    age_max: v.optional(v.number()),
+    arrival_signpost: v.optional(v.string()),
+    estimated_event_cost: v.array(
+      v.object({
+        amount: v.number(), // dollar amount
+        description: v.string(),
+      })
+    ),
+    itinerary: v.array(
+      v.object({
+        start_time: v.number(),
+        location: v.object({
+          name: v.string(),
+          address: v.optional(v.string()),
+          latitude: v.number(),
+          longitude: v.number(),
+          google_place_id: v.optional(v.string()),
+        }),
+        description: v.string(),
+      })
+    ),
+    collaborators: v.optional(
+      v.array(
+        v.object({
+          userId: v.optional(v.id("users")),
+          role: v.string(),
+          first_name: v.string(),
+        })
+      )
+    ),
+    // event_summary object omitted for brevity
+  }).index("by_hostId_and_status", ["hostId", "status"]),
+
   // Other tables from your original schema can go here
   // e.g. messages: defineTable({ ... })
 

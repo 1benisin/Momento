@@ -1,0 +1,13 @@
+---
+alwaysApply: true
+---
+
+Use devLog from `utils/devLog.ts` to log debug information.
+
+devLog(message, ...args)
+
+message: string
+args: any[]
+
+Example:
+devLog("Event created", event);

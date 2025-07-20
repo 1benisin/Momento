@@ -208,6 +208,7 @@ export default function TabLayout() {
       ))}
       <Tabs.Screen name="account" options={{ href: null }} />
       <Tabs.Screen name="settings" options={{ href: null }} />
+      <Tabs.Screen name="(host)/create-event" options={{ href: null }} />
     </Tabs>
   );
 }

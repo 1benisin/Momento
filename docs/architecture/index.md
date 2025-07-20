@@ -1,0 +1,25 @@
+# Momento Fullstack Architecture Document
+
+## Table of Contents
+
+- [Momento Fullstack Architecture Document](#table-of-contents)
+  - [Introduction](./introduction.md)
+  - [High Level Architecture](./high-level-architecture.md)
+    - [Technical Summary](./high-level-architecture.md#technical-summary)
+    - [Platform and Infrastructure Choice](./high-level-architecture.md#platform-and-infrastructure-choice)
+    - [Repository Structure](./high-level-architecture.md#repository-structure)
+    - [High Level Architecture Diagram](./high-level-architecture.md#high-level-architecture-diagram)
+    - [Architectural Patterns](./high-level-architecture.md#architectural-patterns)
+  - [Tech Stack](./tech-stack.md)
+  - [Data Models](./data-models.md)
+    - [User Deletion Strategy & Data Retention](./data-models.md#user-deletion-strategy--data-retention)
+    - [Users](./data-models.md#users)
+    - [Events](./data-models.md#events)
+    - [Locations](./data-models.md#locations)
+    - [Invitations](./data-models.md#invitations)
+    - [Connections](./data-models.md#connections)
+  - [User Deletion Strategy](./user-deletion-strategy.md)
+  - [API Specification](./api-specification.md)
+    - [API Style: Convex Functions](./api-specification.md#api-style-convex-functions)
+    - [Authentication](./api-specification.md#authentication)
+    - [Example Function Definition ()](./api-specification.md#example-function-definition)

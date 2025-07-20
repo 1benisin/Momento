@@ -11,32 +11,32 @@ The focus of this phase is to build the foundational data schema and business lo
 ### 1.1. Data Schema
 
 - **File:** `convex/schema.ts`
-- [ ] Add the `locations` table definition with a geospatial index.
-- [ ] Add the `events` table definition with an index on `hostId` and `status`.
+- [x] Add the `locations` table definition with a geospatial index.
+- [x] Add the `events` table definition with an index on `hostId` and `status`.
 
 ### 1.2. Location Logic
 
 - **File:** `convex/locations.ts` (new file)
-- [ ] Create the `getOrCreateLocation` mutation to handle finding or creating location documents.
+- [x] Create the `getOrCreateLocation` mutation to handle finding or creating location documents.
 
 ### 1.3. Event Logic
 
 - **File:** `convex/events.ts` (new file)
-- [ ] Implement the `createOrUpdateDraft` mutation for creating/updating events with `status: 'draft'`.
-- [ ] Implement the `publishEvent` mutation, which includes the critical check against the host's verification status before changing the event status to `'published'`.
-- [ ] Implement the `getMyEvents` query to fetch all events created by the currently authenticated host.
+- [x] Implement the `createOrUpdateDraft` mutation for creating/updating events with `status: 'draft'`.
+- [x] Implement the `publishEvent` mutation, which includes the critical check against the host's verification status before changing the event status to `'published'`.
+- [x] Implement the `getMyEvents` query to fetch all events created by the currently authenticated host.
 
 ### 1.4. Supporting Actions
 
 - **File:** `convex/lib/actions.ts` (or a new `convex/actions.ts` if it doesn't exist)
-- [ ] Implement the `generateEventVector` internal action to be called after an event is successfully published.
+- [x] Implement the `generateEventVector` internal action to be called after an event is successfully published.
 
 ### 1.5. Backend Testing
 
 - **File:** `convex/tests/events.test.mts` (new file)
-- [ ] Write unit tests for the `createOrUpdateDraft` mutation.
-- [ ] Write unit tests for the `publishEvent` mutation, specifically testing the success case for verified hosts and the failure case for unverified hosts.
-- [ ] Write a unit test for the `getOrCreateLocation` mutation.
+- [x] Write unit tests for the `createOrUpdateDraft` mutation.
+- [x] Write unit tests for the `publishEvent` mutation, specifically testing the success case for verified hosts and the failure case for unverified hosts.
+- [x] Write a unit test for the `getOrCreateLocation` mutation.
 
 ---
 
@@ -47,33 +47,33 @@ This phase focuses on building the user interface and connecting it to the backe
 ### 2.1. Navigation
 
 - **File:** `app/(tabs)/(host)/_layout.tsx`
-- [ ] Add a new route for `create-event` to the host tab's stack navigator.
+- [x] Add a new route for `create-event` to the host tab's stack navigator.
 
 ### 2.2. Event Management Screen
 
 - **File:** `app/(tabs)/(host)/events.tsx`
-- [ ] Add a "Create Event" Floating Action Button (FAB) that navigates to the new `create-event` screen.
-- [ ] Use the `useQuery` hook with `api.events.getMyEvents` to fetch the host's events.
-- [ ] Render two lists on the screen: "Drafts" and "Published," populated from the query results. Allow tapping on a draft to navigate to the `create-event` screen with the draft's data pre-filled.
+- [x] Add a "Create Event" Floating Action Button (FAB) that navigates to the new `create-event` screen.
+- [x] Use the `useQuery` hook with `api.events.getMyEvents` to fetch the host's events.
+- [x] Render two lists on the screen: "Drafts" and "Published," populated from the query results. Allow tapping on a draft to navigate to the `create-event` screen with the draft's data pre-filled.
 
 ### 2.3. Event Creation Flow
 
 - **File:** `app/(tabs)/(host)/create-event.tsx` (new file)
-- [ ] Create the main screen component that will manage the state of the multi-step form.
-- [ ] Implement the logic to pre-fill the form if navigating from an existing draft.
+- [x] Create the main screen component that will manage the state of the multi-step form.
+- [x] Implement the logic to pre-fill the form if navigating from an existing draft.
 
 ### 2.4. Form Components
 
 - **File:** `components/forms/EventDetailsForm.tsx` (new file)
-- [ ] Build the form inputs for the event's core details (title, description, capacity, etc.).
+- [x] Build the form inputs for the event's core details (title, description, capacity, etc.).
 - **File:** `components/forms/EventItineraryForm.tsx` (new file)
-- [ ] Build the UI for adding/editing itinerary stops.
-- [ ] Integrate a location search input (e.g., using Google Places Autocomplete API) that provides data for the `getOrCreateLocation` mutation.
+- [x] Build the UI for adding/editing itinerary stops.
+- [x] Integrate a location search input (e.g., using Google Places Autocomplete API) that provides data for the `getOrCreateLocation` mutation.
 - **File:** `components/forms/EventPublishForm.tsx` (new file)
-- [ ] Build the final summary screen with "Save Draft" and "Publish" buttons.
-- [ ] Wire the `onPress` for "Save Draft" to the `createOrUpdateDraft` mutation.
-- [ ] Wire the `onPress` for "Publish" to the `publishEvent` mutation.
-- [ ] Add error handling to the publish flow to catch the error for unverified hosts and display an alert or the `VerificationPromptBanner`.
+- [x] Build the final summary screen with "Save Draft" and "Publish" buttons.
+- [x] Wire the `onPress` for "Save Draft" to the `createOrUpdateDraft` mutation.
+- [x] Wire the `onPress` for "Publish" to the `publishEvent` mutation.
+- [x] Add error handling to the publish flow to catch the error for unverified hosts and display an alert or the `VerificationPromptBanner`.
 
 ---
 
