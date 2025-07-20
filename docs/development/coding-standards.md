@@ -76,7 +76,7 @@ function createUser(userData: CreateUserData): Promise<User> {
 // ✅ Good: Arrow functions with types
 const updateUser = async (
   id: string,
-  updates: Partial<User>
+  updates: Partial<User>,
 ): Promise<User> => {
   // implementation
 };
@@ -360,37 +360,135 @@ hooks/
 
 ## Development Workflow
 
-### Git Workflow
+### Git Workflow: Branching, Committing, and Pull Requests
 
-#### Branch Naming
+This section outlines the standard process for creating branches, committing code, and submitting pull requests. Following these guidelines ensures a consistent and understandable version control history.
 
-- **Feature**: `feature/001-user-profile`
-- **Bug Fix**: `fix/authentication-error`
-- **Hotfix**: `hotfix/critical-payment-issue`
-- **Release**: `release/v1.0.0`
+#### 1. Branching
 
-#### Commit Messages
+All new work should be done on a feature branch. Branches should be created from the `main` branch.
+
+##### Branch Naming Convention
+
+Branches should be named using the following pattern:
+
+`story/{story_number}-{kebab-case-story-name}`
+
+- `{story_number}`: The story number, including the epic number (e.g., `1.1`).
+- `{kebab-case-story-name}`: A short, descriptive name for the story in kebab-case.
+
+**Example:**
+
+For a story file named `story-1.1-project-setup.md`, the branch name would be:
+
+`story/1.1-project-setup`
+
+##### Checking for Existing Branches
+
+Before creating a new branch, check if a branch for the story already exists.
 
 ```bash
-# ✅ Good: Conventional commit format
-feat(profile): add user profile editing functionality
-fix(auth): resolve login redirect issue
-docs(readme): update setup instructions
-refactor(components): extract reusable button component
-
-# ❌ Bad: Unclear commit messages
-fixed stuff
-updated code
-wip
+git branch --list 'story/1.1-*'
 ```
 
-#### Pull Request Process
+If a branch for your story already exists, switch to it instead of creating a new one:
 
-1. **Create Feature Branch**: `git checkout -b feature/001-user-profile`
-2. **Make Changes**: Implement feature with proper commits
-3. **Create PR**: Use PR template and link related issues
-4. **Code Review**: Address feedback and make changes
-5. **Merge**: Squash and merge to main branch
+```bash
+git checkout story/1.1-project-setup
+```
+
+##### Creating a New Branch
+
+If a branch does not exist, create and switch to it:
+
+```bash
+git checkout -b story/1.1-project-setup
+```
+
+#### 2. Committing
+
+Once you have made changes, you need to commit them.
+
+##### Staging Changes
+
+Add all relevant changes to the staging area.
+
+```bash
+git add .
+```
+
+##### Commit Messages
+
+We follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification. Your commit messages should be structured as follows:
+
+`<type>(<scope>): <subject>`
+
+- **type**: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`.
+- **scope**: The part of the codebase you're changing (e.g., `auth`, `profile`, `onboarding`).
+- **subject**: A short, imperative-tense description of the change.
+
+**Example Commit Message:**
+
+```
+feat(profile): Implement basic UI for social profile setup
+```
+
+**To commit your staged changes:**
+
+```bash
+git commit -m "feat(profile): Implement basic UI for social profile setup"
+```
+
+#### 3. Pushing
+
+Push your branch to the remote repository. The `-u` flag sets the upstream branch.
+
+```bash
+git push -u origin story/1.1-project-setup
+```
+
+#### 4. Creating a Pull Request (PR)
+
+Once your branch is pushed, the AI assistant will create a Pull Request on GitHub using the `gh` CLI.
+
+##### PR Title
+
+The PR title should be clear and concise, similar to your primary commit message.
+
+**Example:**
+
+`feat(profile): Social Profile Creation`
+
+##### PR Body
+
+The PR body will be populated from a template, but should include:
+
+- **Link to the Story:** Reference the story file path (e.g., `docs/prd/epic-1/story-1.1-project-setup.md`).
+- **Changes Made:** A summary of what was implemented.
+
+**CLI Command for the Assistant:**
+
+```bash
+gh pr create --title "feat(setup): Project Setup" --body "Closes #issue_number. Implements the project setup as described in story 1.1."
+```
+
+#### 5. Returning to Main
+
+After creating the pull request, the assistant will switch back to the `main` branch to ensure a clean working state.
+
+```bash
+git checkout main
+```
+
+By following this process, we maintain a clean and traceable project history, making it easier for everyone to collaborate effectively.
+
+#### 6. Pull Changes from Main
+
+Lastly, pull the latest changes from the `main` branch to ensure your branch is up to date.
+
+```bash
+git pull origin main
+```
 
 ### Code Review Guidelines
 
@@ -519,7 +617,7 @@ export const mockUsers = {
  */
 export const createUser = async (
   userData: CreateUserData,
-  options?: CreateUserOptions
+  options?: CreateUserOptions,
 ): Promise<User> => {
   // implementation
 };
@@ -579,7 +677,7 @@ export const UserCard: React.FC<UserCardProps> = ({
 export const ExpensiveComponent = React.memo<ExpensiveComponentProps>(
   ({ data }) => {
     // Expensive rendering logic
-  }
+  },
 );
 
 // ✅ Good: Use useMemo for expensive calculations
@@ -592,7 +690,7 @@ const handlePress = useCallback(
   (id: string) => {
     onItemPress(id);
   },
-  [onItemPress]
+  [onItemPress],
 );
 ```
 
@@ -625,7 +723,7 @@ export const useUserData = (userId: string) => {
     {
       staleTime: 5 * 60 * 1000, // 5 minutes
       cacheTime: 10 * 60 * 1000, // 10 minutes
-    }
+    },
   );
 };
 ```
