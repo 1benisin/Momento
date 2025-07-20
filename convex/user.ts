@@ -13,6 +13,7 @@ import {
   userRoleValidator,
   UserRole,
 } from "./schema";
+import { devLog } from "../utils/devLog";
 
 /**
  * Retrieves the database record for the currently authenticated user.
@@ -163,6 +164,41 @@ export const updateUser = internalMutation({
       phone_number: args.phone_number,
       first_name: args.firstName,
       last_name: args.lastName,
+    });
+  },
+});
+
+export const updateVerificationStatus = internalMutation({
+  args: {
+    userId: v.id("users"),
+    isVerified: v.boolean(),
+    sessionId: v.string(),
+    verificationData: v.optional(v.any()),
+    verificationStatus: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.db.get(args.userId);
+    if (!user || !user.hostProfile) {
+      throw new Error("User or host profile not found");
+    }
+
+    const hostProfile = { ...user.hostProfile };
+
+    await ctx.db.patch(user._id, {
+      hostProfile: {
+        ...hostProfile,
+        is_verified: args.isVerified,
+        verification_session_id: args.sessionId,
+        verification_data: args.verificationData,
+        verification_status: args.verificationStatus,
+        verification_completed_at: args.isVerified ? Date.now() : undefined,
+      },
+    });
+
+    devLog("User verification status updated", {
+      userId: args.userId,
+      isVerified: args.isVerified,
+      status: args.verificationStatus,
     });
   },
 });

@@ -150,6 +150,20 @@ Momento handles sensitive user data including personal information, payment deta
 4. **Idempotency**: Prevent duplicate payment processing
 5. **Audit Logging**: Complete audit trail for all payment activities
 
+### PCI DSS Compliance Implementation
+
+The Momento platform adheres to PCI DSS requirements by leveraging Stripe's client-side encryption and tokenization, which ensures that sensitive cardholder data never touches the application servers.
+
+- **Tokenization**: The Stripe React Native SDK captures card details within a secure, sandboxed UI component. This information is sent directly to Stripe's servers, which return a non-sensitive token. This token is then used for all subsequent payment operations. This approach prevents raw card data from being stored, processed, or transmitted by the Momento backend.
+
+- **Client-Side Implementation**: The `components/PaymentSheet.tsx` component utilizes the `usePaymentSheet` hook from `@stripe/stripe-react-native`. This hook manages the entire payment UI and data capture process, ensuring that the client-side implementation is PCI compliant out-of-the-box.
+
+- **Backend Implementation**: The backend, specifically in `convex/payments.ts`, only ever receives and handles the tokenized payment method information. All interactions with the Stripe API are performed using these tokens, which means the backend is never exposed to raw cardholder data.
+
+- **Webhook Security**: All incoming webhooks from Stripe are verified using a webhook signing secret, as implemented in `convex/webhooks.ts`. This prevents spoofing and ensures that only legitimate requests from Stripe are processed. The `verifyWebhookSignature` function in `convex/lib/stripe.ts` uses the `stripe.webhooks.constructEvent` method, which is the standard and secure way to handle webhook verification.
+
+By following this architecture, the Momento platform significantly reduces its PCI compliance scope, as the handling of sensitive cardholder data is outsourced to Stripe, a certified Level 1 PCI Service Provider.
+
 ### Refund and Dispute Handling
 
 #### Refund Process

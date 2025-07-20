@@ -14,7 +14,7 @@ This guide will help you set up your development environment for the Momento pro
 
 ### Recommended Tools
 
-- **VS Code** with recommended extensions
+- **Cursor** with recommended extensions
 - **React Native Debugger** for debugging
 - **Flipper** for advanced debugging and network inspection
 

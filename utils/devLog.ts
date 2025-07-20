@@ -1,12 +1,15 @@
-// utils/devLog.ts
+/**
+ * Custom development logger
+ * Logs messages only in development mode and when debug logs are enabled
+ */
+export const devLog = (message: string, ...args: any[]) => {
+  // process.env.NODE_ENV is 'development' in Expo and during `npx convex dev`.
+  // This provides a reliable way to check for development mode in both environments.
+  const isDev = process.env.NODE_ENV === "development";
 
-// __DEV__ is a global variable in React Native/Expo that's true in development
-// To enable debug logs, set EXPO_PUBLIC_DEBUG_LOGS=true in your environment.
-export function devLog(...args: any[]) {
-  if (__DEV__ && process.env.EXPO_PUBLIC_DEBUG_LOGS === "true") {
-    // You can add a prefix to make these logs easy to search for
-    // Uncomment the next line to debug when devLog is called:
-    // console.log("[DEVLOG CALLED]", ...args);
-    console.log("[DEV]", ...args);
+  const isDebugEnabled = process.env.EXPO_PUBLIC_DEBUG_LOGS === "true";
+
+  if (isDev && isDebugEnabled) {
+    console.log(`[DEVLOG] ${message}`, ...args);
   }
-}
+};

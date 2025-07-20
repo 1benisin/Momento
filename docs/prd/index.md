@@ -1,5 +1,9 @@
 # Momento Product Requirements Document (PRD)
 
+> **📋 Documentation & Planning Index**  
+> This is the comprehensive PRD reference for stakeholders, planning, and documentation.  
+> For development workflow, see [Sharded Stories Index](./sharded-index.md).
+
 ## Table of Contents
 
 - [Momento Product Requirements Document (PRD)](#table-of-contents)

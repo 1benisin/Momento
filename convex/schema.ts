@@ -50,6 +50,12 @@ export default defineSchema({
         reliabilityLog: v.optional(v.array(v.object({}))), // Define log object later
         push_account_and_safety: v.optional(v.boolean()),
         email_account_and_safety: v.optional(v.boolean()),
+        stripe_customer_id: v.optional(v.string()), // Stripe customer ID for payments
+        is_verified: v.optional(v.boolean()), // Identity verification status
+        verification_session_id: v.optional(v.string()), // Stripe verification session ID
+        verification_data: v.optional(v.any()), // Verification response data
+        verification_completed_at: v.optional(v.number()), // Timestamp when verification completed
+        verification_status: v.optional(v.string()), // e.g., 'processing', 'requires_input', 'canceled'
       })
     ),
 

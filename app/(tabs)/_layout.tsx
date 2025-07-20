@@ -70,6 +70,7 @@ const allTabs: {
 ];
 
 export default function TabLayout() {
+  devLog("Hot reloading test!");
   const colorScheme = useColorScheme();
   const router = useRouter();
   const user = useQuery(api.user.me);

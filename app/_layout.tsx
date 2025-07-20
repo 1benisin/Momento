@@ -38,6 +38,7 @@ import { api } from "@/convex/_generated/api";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { MenuProvider } from "react-native-popup-menu";
 import { devLog } from "@/utils/devLog";
+import { StripeProvider } from "@/components/StripeProvider";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -89,7 +90,9 @@ export default function RootLayout() {
       publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!}
     >
       <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
-        <RootLayoutNav />
+        <StripeProvider>
+          <RootLayoutNav />
+        </StripeProvider>
       </ConvexProviderWithClerk>
     </ClerkProvider>
   );
