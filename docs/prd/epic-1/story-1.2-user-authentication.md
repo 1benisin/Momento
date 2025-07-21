@@ -82,6 +82,10 @@ In Progress
 
 ## Dev Notes
 
+**Context from Story 1.1 (Project Setup):**
+
+This story builds upon the foundational project setup from Story 1.1, which established the initial integration with Clerk for authentication and configured the necessary environment variables. The basic user schema in Convex is already linked to Clerk's authentication system.
+
 **Technology Integration:**
 
 - Integrates with existing Clerk authentication system
@@ -96,6 +100,10 @@ In Progress
 - User management mutations in `convex/user.ts`
 - Session management using Expo SecureStore
 
+**Required Environment Variables:**
+
+- `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY`: The publishable key from your Clerk project dashboard.
+
 **Testing Standards:**
 
 - Test file location: `__tests__/` directories alongside auth components
@@ -109,7 +117,7 @@ In Progress
 - Must work with existing Clerk integration from Story 1.1
 - Must support both iOS and Android platforms
 - Must maintain backward compatibility with existing authentication flow
-- Must follow security best practices from `docs/development/security.md`
+- Must follow security best practices from `docs/development/security.md#authentication-security`
 - Use `devLog` from `utils/devLog.ts` for authentication debugging
 
 ## Testing
