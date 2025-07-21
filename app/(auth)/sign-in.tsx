@@ -1,297 +1,208 @@
-import { useSignIn } from "@clerk/clerk-expo";
-import { Link, useRouter } from "expo-router";
-import * as React from "react";
+import {useSignIn} from '@clerk/clerk-expo'
+import {Link} from 'expo-router'
+import React, {useState} from 'react'
 import {
   Text,
-  TextInput,
-  TouchableOpacity,
   View,
-  StyleSheet,
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-} from "react-native";
+  ScrollView,
+} from 'react-native'
+import {AuthButton} from '@/components/auth/AuthButton'
+import {AuthInput} from '@/components/auth/AuthInput'
+import {TabSelector} from '@/components/auth/TabSelector'
 
 export default function SignInScreen() {
-  const { signIn, setActive, isLoaded } = useSignIn();
-  const router = useRouter();
+  const {signIn, setActive, isLoaded} = useSignIn()
 
-  const [signInMethod, setSignInMethod] = React.useState<"email" | "phone">(
-    "phone"
-  );
-  const [emailAddress, setEmailAddress] = React.useState("");
-  const [phoneNumber, setPhoneNumber] = React.useState("");
+  const [signInMethod, setSignInMethod] = useState<'email' | 'phone'>('phone')
+  const [emailAddress, setEmailAddress] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('')
 
-  const [pendingVerification, setPendingVerification] = React.useState(false);
-  const [code, setCode] = React.useState("");
-  const [error, setError] = React.useState<string | null>(null);
-  const [loading, setLoading] = React.useState(false);
+  const [pendingVerification, setPendingVerification] = useState(false)
+  const [code, setCode] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
 
   // --- Handlers ---
 
   const onSignInPress = async () => {
-    if (!isLoaded || loading) return;
-    setLoading(true);
-    setError(null);
+    if (!isLoaded || loading) return
+    setLoading(true)
+    setError(null)
 
     try {
-      const identifier = signInMethod === "email" ? emailAddress : phoneNumber;
-      const { supportedFirstFactors } = await signIn.create({ identifier });
+      const identifier = signInMethod === 'email' ? emailAddress : phoneNumber
+      const {supportedFirstFactors} = await signIn.create({identifier})
 
-      const firstFactor: any = supportedFirstFactors?.find((f) => {
-        return signInMethod === "email"
-          ? f.strategy === "email_code"
-          : f.strategy === "phone_code";
-      });
+      const firstFactor: any = supportedFirstFactors?.find(f => {
+        return signInMethod === 'email'
+          ? f.strategy === 'email_code'
+          : f.strategy === 'phone_code'
+      })
 
       if (firstFactor) {
-        if (signInMethod === "email") {
-          const { emailAddressId } = firstFactor;
+        if (signInMethod === 'email') {
+          const {emailAddressId} = firstFactor
           await signIn.prepareFirstFactor({
-            strategy: "email_code",
+            strategy: 'email_code',
             emailAddressId,
-          });
+          })
         } else {
-          const { phoneNumberId } = firstFactor;
+          const {phoneNumberId} = firstFactor
           await signIn.prepareFirstFactor({
-            strategy: "phone_code",
+            strategy: 'phone_code',
             phoneNumberId,
-          });
+          })
         }
-        setPendingVerification(true);
+        setPendingVerification(true)
       } else {
-        // This can happen if the user's primary contact method in Clerk
-        // does not match the selected sign-in method.
         setError(
-          `This account does not have a verified ${signInMethod}. Please try another method.`
-        );
+          `This account does not have a verified ${signInMethod}. Please try another method.`,
+        )
       }
     } catch (err: any) {
-      console.error("Error signing in:", JSON.stringify(err, null, 2));
-      const defaultMessage = "An error occurred during sign in.";
-      // Customize error for "not found" which is common
-      if (err.errors?.[0]?.code === "form_identifier_not_found") {
+      console.error('Error signing in:', JSON.stringify(err, null, 2))
+      const defaultMessage = 'An error occurred during sign in.'
+      if (err.errors?.[0]?.code === 'form_identifier_not_found') {
         setError(
-          `We couldn't find an account with that ${signInMethod}. Please sign up.`
-        );
+          `We couldn't find an account with that ${signInMethod}. Please sign up.`,
+        )
       } else {
-        setError(err.errors?.[0]?.longMessage || defaultMessage);
+        setError(err.errors?.[0]?.longMessage || defaultMessage)
       }
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const onVerifyPress = async () => {
-    if (!isLoaded || loading) return;
-    setLoading(true);
-    setError(null);
+    if (!isLoaded || loading) return
+    setLoading(true)
+    setError(null)
 
     try {
-      const strategy = signInMethod === "email" ? "email_code" : "phone_code";
-      const result = await signIn.attemptFirstFactor({ strategy, code });
+      const strategy = signInMethod === 'email' ? 'email_code' : 'phone_code'
+      const result = await signIn.attemptFirstFactor({strategy, code})
 
-      if (result.status === "complete") {
-        await setActive({ session: result.createdSessionId });
+      if (result.status === 'complete') {
+        await setActive({session: result.createdSessionId})
       } else {
-        // Handle other cases like MFA required
         setError(
-          "Could not complete sign in. Please check the code and try again."
-        );
+          'Could not complete sign in. Please check the code and try again.',
+        )
       }
     } catch (err: any) {
-      console.error("Error verifying code:", JSON.stringify(err, null, 2));
-      setError(err.errors?.[0]?.longMessage || "Invalid verification code.");
+      console.error('Error verifying code:', JSON.stringify(err, null, 2))
+      setError(err.errors?.[0]?.longMessage || 'Invalid verification code.')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const onBackPress = () => {
-    setPendingVerification(false);
-    setCode("");
-    setError(null);
-  };
+    setPendingVerification(false)
+    setCode('')
+    setError(null)
+  }
 
   // --- Render ---
 
   const renderSignInForm = () => (
     <>
-      <View style={styles.tabContainer}>
-        <TouchableOpacity
-          style={[styles.tab, signInMethod === "phone" && styles.activeTab]}
-          onPress={() => setSignInMethod("phone")}
-        >
-          <Text style={styles.tabText}>Phone</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tab, signInMethod === "email" && styles.activeTab]}
-          onPress={() => setSignInMethod("email")}
-        >
-          <Text style={styles.tabText}>Email</Text>
-        </TouchableOpacity>
-      </View>
+      <TabSelector
+        tabs={['Phone', 'Email']}
+        activeTab={signInMethod}
+        onTabChange={tab =>
+          setSignInMethod(tab.toLowerCase() as 'email' | 'phone')
+        }
+      />
 
-      {signInMethod === "phone" ? (
-        <>
-          <Text style={styles.label}>Phone Number</Text>
-          <TextInput
-            autoCapitalize="none"
-            placeholder="+1..."
-            value={phoneNumber}
-            onChangeText={setPhoneNumber}
-            style={styles.input}
-            keyboardType="phone-pad"
-          />
-        </>
+      {signInMethod === 'phone' ? (
+        <AuthInput
+          label="Phone Number"
+          value={phoneNumber}
+          onChangeText={setPhoneNumber}
+          placeholder="+1..."
+          keyboardType="phone-pad"
+          autoComplete="tel"
+          error={error ?? undefined}
+        />
       ) : (
-        <>
-          <Text style={styles.label}>Email Address</Text>
-          <TextInput
-            autoCapitalize="none"
-            placeholder="email@example.com"
-            value={emailAddress}
-            onChangeText={setEmailAddress}
-            style={styles.input}
-            keyboardType="email-address"
-          />
-        </>
+        <AuthInput
+          label="Email Address"
+          value={emailAddress}
+          onChangeText={setEmailAddress}
+          placeholder="email@example.com"
+          keyboardType="email-address"
+          autoComplete="email"
+          error={error ?? undefined}
+        />
       )}
 
-      <TouchableOpacity
+      <AuthButton
+        title="Sign In"
         onPress={onSignInPress}
-        style={styles.button}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator color="white" />
-        ) : (
-          <Text style={styles.buttonText}>Sign In</Text>
-        )}
-      </TouchableOpacity>
-      {error && <Text style={styles.errorText}>{error}</Text>}
-
-      <Link href="/sign-up" asChild>
-        <TouchableOpacity style={styles.link}>
-          <Text>Don't have an account? Sign up</Text>
-        </TouchableOpacity>
-      </Link>
+        isLoading={loading}
+        disabled={signInMethod === 'email' ? !emailAddress : !phoneNumber}
+      />
     </>
-  );
+  )
 
   const renderVerificationForm = () => (
     <>
-      <Text style={styles.label}>Verification Code</Text>
-      <TextInput
+      <AuthInput
+        label="Verification Code"
         value={code}
-        placeholder="Code..."
         onChangeText={setCode}
-        style={styles.input}
+        placeholder="Code..."
         keyboardType="numeric"
+        error={error ?? undefined}
       />
-      <TouchableOpacity
-        onPress={onVerifyPress}
-        style={styles.button}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator color="white" />
-        ) : (
-          <Text style={styles.buttonText}>Verify</Text>
-        )}
-      </TouchableOpacity>
-      {error && <Text style={styles.errorText}>{error}</Text>}
-      <TouchableOpacity
-        onPress={onBackPress}
-        style={[styles.button, styles.secondaryButton]}
-      >
-        <Text style={[styles.buttonText, styles.secondaryButtonText]}>
-          Back
-        </Text>
-      </TouchableOpacity>
+      <AuthButton title="Verify" onPress={onVerifyPress} isLoading={loading} />
+      <View className="mt-4">
+        <AuthButton title="Back" onPress={onBackPress} variant="secondary" />
+      </View>
     </>
-  );
+  )
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
-    >
-      <View style={styles.form}>
-        {pendingVerification ? renderVerificationForm() : renderSignInForm()}
-      </View>
-    </KeyboardAvoidingView>
-  );
-}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      className="flex-1 bg-black">
+      <ScrollView
+        contentContainerClassName="flex-grow justify-center px-6 py-12"
+        keyboardShouldPersistTaps="handled">
+        <View className="items-center mb-8">
+          <Text className="font-['Playfair_Display'] text-3xl text-[#F8F6F1] text-center">
+            Welcome Back
+          </Text>
+          <Text className="font-['Inter'] text-[#F8F6F1] text-center mt-2 opacity-80">
+            Continue your journey with Momento
+          </Text>
+        </View>
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  form: {
-    width: "100%",
-  },
-  label: {
-    marginBottom: 8,
-    fontSize: 16,
-  },
-  input: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    marginBottom: 12,
-    paddingHorizontal: 8,
-    width: "100%",
-    borderRadius: 5,
-  },
-  button: {
-    backgroundColor: "#007BFF",
-    padding: 15,
-    borderRadius: 5,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  link: {
-    marginTop: 15,
-    alignItems: "center",
-  },
-  errorText: {
-    color: "red",
-    textAlign: "center",
-    marginTop: 10,
-    marginBottom: 10,
-  },
-  secondaryButton: {
-    backgroundColor: "transparent",
-    borderWidth: 1,
-    borderColor: "#007BFF",
-    marginTop: 10,
-  },
-  secondaryButtonText: {
-    color: "#007BFF",
-  },
-  tabContainer: {
-    flexDirection: "row",
-    marginBottom: 20,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: 10,
-    alignItems: "center",
-    backgroundColor: "#f0f0f0",
-    borderBottomWidth: 2,
-    borderBottomColor: "transparent",
-  },
-  activeTab: {
-    borderBottomColor: "#007BFF",
-  },
-  tabText: {
-    fontSize: 16,
-  },
-});
+        {error && (
+          <View className="mb-4 p-3 bg-[#8B2635]/20 rounded-md">
+            <Text className="text-[#8B2635] font-['Inter'] text-center">
+              {error}
+            </Text>
+          </View>
+        )}
+
+        <View className="w-full">
+          {pendingVerification ? renderVerificationForm() : renderSignInForm()}
+        </View>
+
+        <View className="mt-8 items-center">
+          <Text className="text-[#F8F6F1] font-['Inter'] text-center">
+            Don't have an account?{' '}
+            <Link href="/sign-up" asChild>
+              <Text className="text-[#D4AF37]">Sign Up</Text>
+            </Link>
+          </Text>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  )
+}

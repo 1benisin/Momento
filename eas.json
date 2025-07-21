@@ -11,7 +11,7 @@
         "image": "latest"
       }
     },
-    "development-simulator": {
+    "dev-simulator": {
       "developmentClient": true,
       "distribution": "internal",
       "ios": {
@@ -25,7 +25,9 @@
     },
     "production": {
       "autoIncrement": true,
-      "image": "latest",
+      "ios": {
+        "image": "latest"
+      },
       "env": {}
     }
   },
