@@ -12,10 +12,6 @@ Comprehensive overview of the Momento platform, including mission, technology st
 
 Comprehensive project overview serving as foundational input for product development and stakeholder alignment, including problem statement, solution approach, target users, and technical considerations.
 
-### [Product Requirements Document](./prd.md)
-
-Complete product requirements document with detailed functional and non-functional requirements, user stories, and technical specifications for the Momento platform.
-
 ### [Features Documentation](./features.md)
 
 Detailed documentation of all core features including user profiles, monetization, hosting, event creation, matching algorithms, safety features, and post-event interactions.
@@ -52,37 +48,33 @@ UX vision, interaction paradigms, core screens, accessibility requirements, and 
 
 Repository structure, service architecture, testing requirements, and additional technical considerations.
 
-### [Epic List](./prd/epic-list.md)
+### [Sharded Stories Index](./prd/sharded-index.md)
 
-Overview of all development epics and their high-level goals.
+Provides an overview of all sharded stories organized by epic for easy navigation during development.
 
-### [Epic 1: Foundation & Core Infrastructure](./prd/epic-1-foundation-core-infrastructure.md)
+### [Epic 1: Foundation & Core Infrastructure](./prd/epic-1/index.md)
 
 User authentication, role selection, onboarding flows, and basic user profile creation.
 
-### [Epic 2: User Profiles & Interest Discovery](./prd/epic-2-user-profiles-interest-discovery.md)
+### [Epic 2: User Profiles & Interest Discovery](./prd/epic-2/index.md)
 
 Enhanced profile management, interest discovery card deck, host specialization, and matching algorithm foundation.
 
-### [Epic 3: Host Verification & Event Creation](./prd/epic-3-host-verification-event-creation.md)
+### [Epic 3: Host Verification & Event Creation](./prd/epic-3/index.md)
 
 Stripe Identity verification, event creation workflow, management dashboard, and location services.
 
-### [Epic 4: Matching Algorithm & Invitations](./prd/epic-4-matching-algorithm-invitations.md)
+### [Epic 4: Matching Algorithm & Invitations](./prd/epic-4/index.md)
 
 Core matching logic, invitation delivery system, RSVP management, and group balancing algorithms.
 
-### [Epic 5: Event Lifecycle & The Signal](./prd/epic-5-event-lifecycle-the-signal.md)
+### [Epic 5: Event Lifecycle & The Signal](./prd/epic-5/index.md)
 
 Payment processing, arrival experience, event day management, and post-event features.
 
-### [Epic 6: Safety & Platform Management](./prd/epic-6-safety-platform-management.md)
+### [Epic 6: Safety & Platform Management](./prd/epic-6/index.md)
 
 User safety controls, content moderation, host verification, and platform administration tools.
-
-### [Checklist Results Report](./prd/checklist-results-report.md)
-
-Executive summary, category analysis, issue prioritization, and technical readiness assessment.
 
 ### [Next Steps](./prd/next-steps.md)
 
@@ -167,6 +159,10 @@ Complete testing strategy including unit testing, integration testing, end-to-en
 ### [API Integration Guide](./development/api-integrations.md)
 
 Comprehensive guide for integrating and working with third-party APIs including Stripe, Clerk, Convex, and Postmark services.
+
+### [AI-Assisted Product Development Flow](./development/ai-assisted-product-development-flow.md)
+
+Outlines a structured, AI-assisted workflow for product development, leveraging the BMad Method's agents, tasks, and templates.
 
 ### [Error Handling](./development/error-handling.md)
 

@@ -73,6 +73,7 @@ This project is documented in detail within the [`_docs`](/_docs) directory. For
   - [`ARCHITECTURE.md`](_docs/ARCHITECTURE.md): System architecture and data flow diagrams.
   - [`DATA_MODELS.md`](_docs/DATA_MODELS.md): Detailed database schemas for Convex.
   - [`MATCHING_ALGORITHM.md`](_docs/MATCHING_ALGORITHM.md): The strategy for matching users with events.
+  - [`AI-ASSISTED PRODUCT DEVELOPMENT FLOW.md`](docs/development/ai-assisted-product-development-flow.md): The process for using AI to build the app.
 
 ## Getting Started
 
