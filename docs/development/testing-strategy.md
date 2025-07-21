@@ -79,22 +79,22 @@ Our testing strategy follows the **testing pyramid** approach, with a strong fou
 #### Test Structure
 
 ```typescript
-describe("Component/Function Name", () => {
-  describe("when [specific condition]", () => {
-    it("should [expected behavior]", () => {
+describe('Component/Function Name', () => {
+  describe('when [specific condition]', () => {
+    it('should [expected behavior]', () => {
       // Arrange
       const input = {
         /* test data */
-      };
+      }
 
       // Act
-      const result = functionUnderTest(input);
+      const result = functionUnderTest(input)
 
       // Assert
-      expect(result).toEqual(expectedOutput);
-    });
-  });
-});
+      expect(result).toEqual(expectedOutput)
+    })
+  })
+})
 ```
 
 ### Component Testing
@@ -142,7 +142,7 @@ describe('EventCard', () => {
 
 #### Convex Functions
 
-- **Testing Framework**: Vitest with Convex testing utilities
+- **Testing Framework**: Vitest with the `convex-test` library
 - **Focus**: Data validation, business rules, error handling
 - **Mocking**: Database operations and external services
 - **Edge Cases**: Invalid inputs, error conditions, boundary values
@@ -150,37 +150,21 @@ describe('EventCard', () => {
 #### Example Convex Function Test
 
 ```typescript
-import { runQuery } from "convex-test";
-import { api } from "../convex/_generated/api";
-import { createEvent } from "../convex/events";
+import {convexTest} from 'convex-test'
+import {expect, test} from 'vitest'
+import {api} from './_generated/api'
+import schema from './schema'
 
-describe("createEvent", () => {
-  it("should create event with valid data", async () => {
-    const eventData = {
-      title: "Test Event",
-      description: "Test Description",
-      date: "2024-12-20",
-      location: "Test Location",
-      maxAttendees: 10,
-    };
-
-    const result = await runQuery(api.events.createEvent, eventData);
-
-    expect(result).toHaveProperty("_id");
-    expect(result.title).toBe("Test Event");
-  });
-
-  it("should reject invalid event data", async () => {
-    const invalidData = {
-      title: "", // Invalid: empty title
-      date: "invalid-date",
-    };
-
-    await expect(
-      runQuery(api.events.createEvent, invalidData)
-    ).rejects.toThrow();
-  });
-});
+test('sending messages', async () => {
+  const t = convexTest(schema)
+  await t.mutation(api.messages.send, {body: 'Hi!', author: 'Sarah'})
+  await t.mutation(api.messages.send, {body: 'Hey!', author: 'Tom'})
+  const messages = await t.query(api.messages.list)
+  expect(messages).toMatchObject([
+    {body: 'Hi!', author: 'Sarah'},
+    {body: 'Hey!', author: 'Tom'},
+  ])
+})
 ```
 
 ---
@@ -191,7 +175,7 @@ describe("createEvent", () => {
 
 #### Convex API Endpoints
 
-- **Testing Framework**: Supertest with Convex test utilities
+- **Testing Framework**: Vitest with `convex-test` utilities
 - **Focus**: Request/response handling, authentication, authorization
 - **Data Setup**: Test database with realistic data
 - **Cleanup**: Automatic test data cleanup after each test
@@ -199,38 +183,38 @@ describe("createEvent", () => {
 #### Example API Test
 
 ```typescript
-import { runMutation } from "convex-test";
-import { api } from "../convex/_generated/api";
+import {runMutation} from 'convex-test'
+import {api} from '../convex/_generated/api'
 
-describe("Events API", () => {
+describe('Events API', () => {
   beforeEach(async () => {
     // Setup test data
-    await setupTestDatabase();
-  });
+    await setupTestDatabase()
+  })
 
   afterEach(async () => {
     // Cleanup test data
-    await cleanupTestDatabase();
-  });
+    await cleanupTestDatabase()
+  })
 
-  it("should create event and return event details", async () => {
+  it('should create event and return event details', async () => {
     const eventData = {
-      title: "Integration Test Event",
-      description: "Test Description",
-      date: "2024-12-20",
-      location: "Test Location",
-    };
+      title: 'Integration Test Event',
+      description: 'Test Description',
+      date: '2024-12-20',
+      location: 'Test Location',
+    }
 
-    const result = await runMutation(api.events.create, eventData);
+    const result = await runMutation(api.events.create, eventData)
 
-    expect(result).toHaveProperty("_id");
-    expect(result.title).toBe("Integration Test Event");
+    expect(result).toHaveProperty('_id')
+    expect(result.title).toBe('Integration Test Event')
 
     // Verify event was saved to database
-    const savedEvent = await runQuery(api.events.get, { id: result._id });
-    expect(savedEvent).toEqual(result);
-  });
-});
+    const savedEvent = await runQuery(api.events.get, {id: result._id})
+    expect(savedEvent).toEqual(result)
+  })
+})
 ```
 
 ### Database Testing
@@ -245,28 +229,28 @@ describe("Events API", () => {
 #### Example Database Test
 
 ```typescript
-describe("User Database Operations", () => {
-  it("should handle user profile updates correctly", async () => {
+describe('User Database Operations', () => {
+  it('should handle user profile updates correctly', async () => {
     // Create test user
-    const user = await createTestUser();
+    const user = await createTestUser()
 
     // Update profile
     const updateData = {
-      firstName: "Updated Name",
-      bio: "Updated bio",
-    };
+      firstName: 'Updated Name',
+      bio: 'Updated bio',
+    }
 
     await runMutation(api.users.updateProfile, {
       userId: user._id,
       ...updateData,
-    });
+    })
 
     // Verify update
-    const updatedUser = await runQuery(api.users.get, { id: user._id });
-    expect(updatedUser.firstName).toBe("Updated Name");
-    expect(updatedUser.bio).toBe("Updated bio");
-  });
-});
+    const updatedUser = await runQuery(api.users.get, {id: user._id})
+    expect(updatedUser.firstName).toBe('Updated Name')
+    expect(updatedUser.bio).toBe('Updated bio')
+  })
+})
 ```
 
 ### External Service Integration
@@ -281,39 +265,39 @@ describe("User Database Operations", () => {
 #### Example Stripe Test
 
 ```typescript
-import Stripe from "stripe";
+import Stripe from 'stripe'
 
-describe("Stripe Integration", () => {
-  let stripe: Stripe;
+describe('Stripe Integration', () => {
+  let stripe: Stripe
 
   beforeEach(() => {
-    stripe = new Stripe(process.env.STRIPE_TEST_KEY!);
-  });
+    stripe = new Stripe(process.env.STRIPE_TEST_KEY!)
+  })
 
-  it("should process payment successfully", async () => {
+  it('should process payment successfully', async () => {
     const paymentIntent = await stripe.paymentIntents.create({
       amount: 500, // $5.00
-      currency: "usd",
-      payment_method_types: ["card"],
+      currency: 'usd',
+      payment_method_types: ['card'],
       confirm: true,
-      payment_method: "pm_card_visa",
-    });
+      payment_method: 'pm_card_visa',
+    })
 
-    expect(paymentIntent.status).toBe("succeeded");
-  });
+    expect(paymentIntent.status).toBe('succeeded')
+  })
 
-  it("should handle payment failures gracefully", async () => {
+  it('should handle payment failures gracefully', async () => {
     await expect(
       stripe.paymentIntents.create({
         amount: 500,
-        currency: "usd",
-        payment_method_types: ["card"],
+        currency: 'usd',
+        payment_method_types: ['card'],
         confirm: true,
-        payment_method: "pm_card_declined",
-      })
-    ).rejects.toThrow();
-  });
-});
+        payment_method: 'pm_card_declined',
+      }),
+    ).rejects.toThrow()
+  })
+})
 ```
 
 ---
@@ -340,34 +324,34 @@ describe("Stripe Integration", () => {
 #### Example E2E Test
 
 ```typescript
-import { device, element, by, expect } from "detox";
+import {device, element, by, expect} from 'detox'
 
-describe("User Registration Flow", () => {
+describe('User Registration Flow', () => {
   beforeAll(async () => {
-    await device.launchApp();
-  });
+    await device.launchApp()
+  })
 
-  it("should complete user registration successfully", async () => {
+  it('should complete user registration successfully', async () => {
     // Navigate to sign up
-    await element(by.id("sign-up-button")).tap();
+    await element(by.id('sign-up-button')).tap()
 
     // Fill registration form
-    await element(by.id("phone-input")).typeText("5551234567");
-    await element(by.id("submit-button")).tap();
+    await element(by.id('phone-input')).typeText('5551234567')
+    await element(by.id('submit-button')).tap()
 
     // Enter verification code
-    await element(by.id("verification-input")).typeText("123456");
-    await element(by.id("verify-button")).tap();
+    await element(by.id('verification-input')).typeText('123456')
+    await element(by.id('verify-button')).tap()
 
     // Complete profile setup
-    await element(by.id("name-input")).typeText("Test User");
-    await element(by.id("bio-input")).typeText("Test bio");
-    await element(by.id("save-profile-button")).tap();
+    await element(by.id('name-input')).typeText('Test User')
+    await element(by.id('bio-input')).typeText('Test bio')
+    await element(by.id('save-profile-button')).tap()
 
     // Verify successful registration
-    await expect(element(by.id("welcome-message"))).toBeVisible();
-  });
-});
+    await expect(element(by.id('welcome-message'))).toBeVisible()
+  })
+})
 ```
 
 ### Cross-Platform Testing
@@ -604,17 +588,17 @@ describe("User Registration Flow", () => {
 
 #### Unit Testing
 
-- **Framework**: Vitest
+- **Framework**: Jest for React Native, Vitest for Convex
 - **Coverage**: c8 for code coverage
 - **Mocking**: Vitest mocking utilities
 - **Assertions**: Vitest assertions
 
 #### Integration Testing
 
-- **Framework**: Vitest with Convex test utilities
+- **Framework**: Vitest with `convex-test` utilities
 - **Database**: Convex test database
-- **HTTP**: Supertest for API testing
-- **Mocking**: MSW for service mocking
+- **HTTP**: `t.fetch` from `convex-test`
+- **Mocking**: Vitest's `vi.stubGlobal` for mocking fetch
 
 #### E2E Testing
 

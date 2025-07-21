@@ -6,13 +6,10 @@
     "start": "expo start",
     "android": "expo run:android",
     "web": "expo start --web",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:once": "jest --runInBand",
-    "test:debug": "jest --inspect-brk --no-cache",
-    "test:coverage": "jest --coverage --coverageReporters=text",
-    "test:convex": "jest --selectProjects=Convex",
-    "test:react-native": "jest --selectProjects=React Native",
+    "deploy": "convex deploy",
+    "test": "npm run test:native && npm run test:convex",
+    "test:native": "jest",
+    "test:convex": "vitest",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "format": "prettier --write .",
@@ -88,7 +85,8 @@
     "prettier": "^3.6.2",
     "react-test-renderer": "19.0.0",
     "ts-jest": "^29.1.2",
-    "typescript": "~5.8.3"
+    "typescript": "~5.8.3",
+    "vitest": "^3.2.4"
   },
   "private": true,
   "lint-staged": {

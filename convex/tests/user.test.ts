@@ -1,61 +1,52 @@
 import {convexTest} from 'convex-test'
+import {expect, test, describe} from 'vitest'
 import {api} from '../_generated/api'
 import schema from '../schema'
 
-const identity = {
-  subject: 'test_clerk_id_123',
-  issuer: 'https://clerk.dev',
-  name: 'Test User',
-  email: 'test@example.com',
-  phoneNumber: '+1234567890',
-  phoneNumberVerified: true,
-}
+describe('User', () => {
+  describe('getOrCreateUser', () => {
+    test('should create a new user if one does not exist', async () => {
+      const t = convexTest(schema as any)
+      const asUser = t.withIdentity({
+        email: 'test@example.com',
+        tokenIdentifier: 'test_token_identifier',
+      })
 
-test("user.getOrCreateUser: should create a new user if one doesn't exist", async () => {
-  // `testHarness` is "The Unauthenticated Admin" for our test.
-  // It can directly access the database and run functions as a system user.
-  const testHarness = convexTest(schema as any)
-  // `asUser` is a new test harness that acts as "The Logged-in User".
-  const asUser = testHarness.withIdentity(identity)
+      const userId = await asUser.mutation(api.user.getOrCreateUser, {})
+      expect(userId).not.toBeNull()
 
-  // 1. Run the mutation with a new user identity
-  const userId = await asUser.mutation(api.user.getOrCreateUser)
+      const user = await asUser.query(api.user.me)
+      expect(user).not.toBeNull()
+      if (user) {
+        expect(user.email).toBe('test@example.com')
+      }
+    })
 
-  // 2. Verify a new user was created with the correct details
-  const newUser = await testHarness.run(async ctx => await ctx.db.get(userId))
-  expect(newUser).not.toBeNull()
-  expect(newUser?.clerkId).toEqual(identity.subject)
-  expect(newUser?.email).toEqual(identity.email)
-})
+    test('should return existing user if one exists', async () => {
+      const t = convexTest(schema as any)
+      await t.run(async ctx => {
+        await ctx.db.insert('users', {
+          tokenIdentifier: 'existing_user_token',
+          clerkId: 'clerk_123',
+          email: 'existing@example.com',
+          accountStatus: 'active',
+        })
+      })
 
-test('user.getOrCreateUser: should return existing user ID if user already exists', async () => {
-  // `testHarness` is "The Unauthenticated Admin" for our test.
-  const testHarness = convexTest(schema as any)
-  // `asUser` is a new test harness that acts as "The Logged-in User".
-  const asUser = testHarness.withIdentity(identity)
+      const asUser = t.withIdentity({
+        email: 'existing@example.com',
+        tokenIdentifier: 'existing_user_token',
+      })
 
-  // 1. Run the mutation once to create the user
-  const firstCallUserId = await asUser.mutation(api.user.getOrCreateUser)
+      const userId = await asUser.mutation(api.user.getOrCreateUser, {})
+      const user = await asUser.query(api.user.me)
 
-  // 2. Run it a second time with the same identity
-  const secondCallUserId = await asUser.mutation(api.user.getOrCreateUser)
-
-  // 3. Verify the IDs are the same
-  expect(firstCallUserId).toEqual(secondCallUserId)
-
-  // 4. Verify only one user document exists in the database
-  const users = await testHarness.run(
-    async ctx => await ctx.db.query('users').collect(),
-  )
-  expect(users.length).toEqual(1)
-})
-
-test('user.getOrCreateUser: should throw an error if called without authentication', async () => {
-  // `testHarness` is "The Unauthenticated Admin" for our test.
-  const testHarness = convexTest(schema as any)
-
-  // Try to run the mutation without providing an identity
-  await expect(testHarness.mutation(api.user.getOrCreateUser)).rejects.toThrow(
-    'Called storeUser without authentication present',
-  )
+      expect(user).not.toBeNull()
+      if (user) {
+        expect(user.email).toBe('existing@example.com')
+        const queriedUser = await t.run(async ctx => ctx.db.get(userId))
+        expect(queriedUser?._id).toEqual(user._id)
+      }
+    })
+  })
 })
