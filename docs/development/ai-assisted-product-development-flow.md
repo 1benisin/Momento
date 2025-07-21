@@ -52,6 +52,10 @@ Here is a typical flow you can follow. This is a general guide; you can adapt it
     - **Command**: `*task facilitate-brainstorming-session`
     - **Output**: A structured document with ideas, which can be based on `brainstorming-output-tmpl.yaml`.
 
+3.  **Validate Product Plan**: The `@pm` runs the `pm-checklist.md` to ensure the product vision, strategy, and goals are solid before moving forward.
+    - **Agent**: `@pm`
+    - **Task**: `execute-checklist.md pm-checklist.md`
+
 ### 2. Research and Analysis
 
 1.  **Market and Competitor Analysis**: Use the analyst to perform research.
@@ -60,6 +64,10 @@ Here is a typical flow you can follow. This is a general guide; you can adapt it
     - **Templates**:
       - `market-research-tmpl.yaml`
       - `competitor-analysis-tmpl.yaml`
+
+2.  **Deeper Requirements Elicitation**: For complex projects, the `@analyst` can perform deeper requirements gathering.
+    - **Agent**: `@analyst`
+    - **Task**: `advanced-elicitation.md`
 
 ### 3. Documentation and Planning
 
@@ -72,7 +80,15 @@ Here is a typical flow you can follow. This is a general guide; you can adapt it
     - **Command**: `*create-doc prd-tmpl`
     - **Note**: For existing projects, you might use `brownfield-prd-tmpl.yaml`.
 
-3.  **Define the Architecture**:
+3.  **Validate Product Backlog**: After the PRD is created, the `@po` runs the `po-master-checklist.md` to validate the product backlog.
+    - **Agent**: `@po`
+    - **Task**: `execute-checklist.md po-master-checklist.md`
+
+4.  **Create Front-End Specification**: For projects with a UI component, the `@ux-expert` can create a detailed front-end specification.
+    - **Agent**: `@ux-expert`
+    - **Task**: `create-doc front-end-spec-tmpl`
+
+5.  **Define the Architecture**:
     - **Agent**: `@architect`
     - **Task**: Use the `create-doc` task with an architecture template.
     - **Templates**:
@@ -80,6 +96,10 @@ Here is a typical flow you can follow. This is a general guide; you can adapt it
       - `fullstack-architecture-tmpl.yaml`
       - `front-end-architecture-tmpl.yaml`
       - `brownfield-architecture-tmpl.yaml`
+
+6.  **Validate Architecture**: After defining the architecture, the `@architect` agent runs the `architect-checklist.md` to ensure it is robust and well-designed.
+    - **Agent**: `@architect`
+    - **Task**: `execute-checklist.md architect-checklist.md`
 
 ### 4. Epics and User Stories
 
@@ -92,12 +112,21 @@ Here is a typical flow you can follow. This is a general guide; you can adapt it
     - **Task**: `create-next-story.md` or `create-brownfield-story.md`.
     - **Template**: `story-tmpl.yaml`
 
+3.  **Validate User Story Draft**: Before development begins, the `@sm` agent runs the `story-draft-checklist.md` to ensure the story is ready.
+    - **Agent**: `@sm`
+    - **Task**: `execute-checklist.md story-draft-checklist.md`
+
 ### 5. Development and Implementation
 
 1.  **Development**: The `@dev` agent takes the user stories and implements them.
+
 2.  **Front-end Prompting**: For UI work, the `generate-ai-frontend-prompt.md` can be useful.
     - **Agent**: `@dev`
     - **Task**: `generate-ai-frontend-prompt`
+
+3.  **Validate Definition of Done**: After implementation, the `@dev` agent runs the `story-dod-checklist.md` to ensure all criteria are met before review.
+    - **Agent**: `@dev`
+    - **Task**: `execute-checklist.md story-dod-checklist.md`
 
 ### 6. Testing and QA
 
@@ -106,7 +135,13 @@ Here is a typical flow you can follow. This is a general guide; you can adapt it
     - **Agent**: `@qa` or `@po`
     - **Task**: `review-story`
 
-### 7. Documentation and Housekeeping
+### 7. Change Management
+
+1.  **Assess Impact of Changes**: If project scope or requirements change, use the `change-checklist.md` to assess the impact.
+    - **Agent**: `@pm` or `@po`
+    - **Task**: `execute-checklist.md change-checklist.md`
+
+### 8. Documentation and Housekeeping
 
 1.  **Document the Project**: As you build, keep the documentation up to date.
     - **Task**: `document-project.md`
