@@ -1,5 +1,4 @@
 import { convexTest } from "convex-test";
-import { expect, test } from "vitest";
 import { api } from "../_generated/api";
 import {
   mockStripe,
@@ -28,7 +27,7 @@ describe("Payments", () => {
           eventId: "evt_12345" as Id<"events">,
           amount: 500,
           currency: "usd",
-        }
+        },
       );
 
       expect(mockStripe.customers.create).toHaveBeenCalledTimes(1);
@@ -65,7 +64,7 @@ describe("Payments", () => {
           eventId: "evt_12345" as Id<"events">,
           amount: 500,
           currency: "usd",
-        }
+        },
       );
 
       expect(mockStripe.customers.create).not.toHaveBeenCalled();
@@ -92,7 +91,7 @@ describe("Payments", () => {
       });
 
       expect(mockStripe.paymentIntents.retrieve).toHaveBeenCalledWith(
-        "pi_12345"
+        "pi_12345",
       );
       expect(result.id).toBe(mockPaymentIntent.id);
       expect(result.amount).toBe(mockPaymentIntent.amount);

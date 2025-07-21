@@ -2,7 +2,7 @@
 
 ## Status
 
-Draft
+Ready for QA
 
 ## Story
 

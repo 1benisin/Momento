@@ -1,5 +1,4 @@
 import { convexTest } from "convex-test";
-import { expect, test } from "vitest";
 import { api } from "../_generated/api";
 import {
   mockStripe,
@@ -43,11 +42,11 @@ describe("Identity", () => {
         {
           returnUrl: "https://example.com/return",
           type: "document",
-        }
+        },
       );
 
       expect(
-        mockStripe.identity.verificationSessions.create
+        mockStripe.identity.verificationSessions.create,
       ).toHaveBeenCalledTimes(1);
       expect(result.sessionId).toBe(mockVerificationSession.id);
       expect(result.clientSecret).toBe(mockVerificationSession.client_secret);
@@ -65,11 +64,11 @@ describe("Identity", () => {
         api.identity.getVerificationSessionDetails,
         {
           sessionId: "vs_12345",
-        }
+        },
       );
 
       expect(
-        mockStripe.identity.verificationSessions.retrieve
+        mockStripe.identity.verificationSessions.retrieve,
       ).toHaveBeenCalledWith("vs_12345");
       expect(result.id).toBe(mockVerificationSession.id);
       expect(result.status).toBe(mockVerificationSession.status);
@@ -102,7 +101,7 @@ describe("Identity", () => {
           sessionId: "vs_12345",
           isVerified: true,
           verificationData: { some: "data" },
-        }
+        },
       );
 
       expect(result.success).toBe(true);
@@ -137,7 +136,7 @@ describe("Identity", () => {
 
       const result = await asUser.query(
         api.identity.isUserVerifiedForHosting,
-        {}
+        {},
       );
       expect(result.isVerified).toBe(true);
     });
