@@ -105,8 +105,7 @@ function RootLayoutNav() {
       <MenuProvider>
         {/* The ClerkLoading component will be rendered while Clerk is checking the user's authentication state. */}
         <ClerkLoading>
-          <View
-            style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <View className="flex-1 items-center justify-center">
             <ActivityIndicator size="large" />
           </View>
         </ClerkLoading>
@@ -231,9 +230,9 @@ function InitialLayout() {
   }, [isLoading, isSignedIn, userData, segments, router])
 
   const loadingView = (msg: string) => (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+    <View className="flex-1 items-center justify-center">
       <ActivityIndicator size="large" />
-      <Text style={{marginTop: 16, color: 'gray'}}>{msg}</Text>
+      <Text className="mt-4 text-gray-500">{msg}</Text>
     </View>
   )
 

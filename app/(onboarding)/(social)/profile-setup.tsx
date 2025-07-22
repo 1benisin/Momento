@@ -1,101 +1,73 @@
-import { useUser } from "@clerk/clerk-expo";
-import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import {useUser} from '@clerk/clerk-expo'
+import {useRouter} from 'expo-router'
+import React, {useState} from 'react'
 import {
   View,
   Text,
   TextInput,
-  Button,
-  StyleSheet,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-} from "react-native";
+  TouchableOpacity,
+} from 'react-native'
 
 export default function ProfileSetupScreen() {
-  const { user } = useUser();
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const {user} = useUser()
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleContinue = async () => {
     if (firstName.trim().length === 0 || lastName.trim().length === 0) {
-      alert("Please enter your first and last name.");
-      return;
+      alert('Please enter your first and last name.')
+      return
     }
-    setIsLoading(true);
+    setIsLoading(true)
     try {
-      await user?.update({ firstName, lastName });
-      router.push("/initial-photo");
+      await user?.update({firstName, lastName})
+      router.push('/initial-photo')
     } catch (error) {
-      console.error("Failed to update user:", error);
-      alert("Failed to save your profile. Please try again.");
+      console.error('Failed to update user:', error)
+      alert('Failed to save your profile. Please try again.')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
-    >
-      <Text style={styles.title}>Tell us about yourself</Text>
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      className="flex-1 justify-center p-5">
+      <Text className="text-center text-2xl font-bold mb-5">
+        Tell us about yourself
+      </Text>
       <TextInput
-        style={styles.input}
+        className="border border-gray-300 p-2.5 rounded-md mb-4 text-base"
         placeholder="First Name (required)"
         value={firstName}
         onChangeText={setFirstName}
         autoCapitalize="words"
       />
       <TextInput
-        style={styles.input}
+        className="border border-gray-300 p-2.5 rounded-md mb-4 text-base"
         placeholder="Last Name (required)"
         value={lastName}
         onChangeText={setLastName}
         autoCapitalize="words"
       />
-      <View style={styles.buttonContainer}>
+      <View className="mt-5">
         {isLoading ? (
           <ActivityIndicator size="large" color="#0000ff" />
         ) : (
-          <Button
-            title="Continue"
+          <TouchableOpacity
             onPress={handleContinue}
             disabled={isLoading}
-          />
+            className="items-center rounded-md bg-blue-500 py-3 disabled:bg-blue-300">
+            <Text className="text-lg font-semibold text-white">Continue</Text>
+          </TouchableOpacity>
         )}
       </View>
     </KeyboardAvoidingView>
-  );
+  )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 15,
-    fontSize: 16,
-  },
-  bioInput: {
-    height: 100,
-    textAlignVertical: "top",
-  },
-  buttonContainer: {
-    marginTop: 20,
-  },
-});

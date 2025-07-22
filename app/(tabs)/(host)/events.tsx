@@ -1,10 +1,9 @@
 import React, {useMemo} from 'react'
-import {View, Text, TouchableOpacity, StyleSheet, FlatList} from 'react-native'
+import {View, Text, TouchableOpacity, FlatList} from 'react-native'
 import {useRouter} from 'expo-router'
 import {useQuery} from 'convex/react'
 import {api} from '@/convex/_generated/api'
 import {FontAwesome} from '@expo/vector-icons'
-import Colors from '@/constants/Colors'
 import {Doc} from '@/convex/_generated/dataModel'
 
 const HostEventsScreen = () => {
@@ -21,85 +20,54 @@ const HostEventsScreen = () => {
 
   const renderEventItem = ({item}: {item: Doc<'events'>}) => (
     <TouchableOpacity
-      style={styles.eventItem}
+      className="my-2 mx-4 rounded-lg bg-gray-50 p-5"
       onPress={() =>
         router.push({
           pathname: '/(tabs)/(host)/CreateEvent',
           params: {eventId: item._id},
         })
       }>
-      <Text style={styles.eventTitle}>{item.title}</Text>
+      <Text className="text-lg">{item.title}</Text>
     </TouchableOpacity>
   )
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 p-2.5">
       <FlatList
         data={drafts}
         renderItem={renderEventItem}
         keyExtractor={item => item._id}
-        ListHeaderComponent={<Text style={styles.listHeader}>Drafts</Text>}
+        ListHeaderComponent={
+          <Text className="mt-5 mb-2.5 px-2.5 text-2xl font-bold">Drafts</Text>
+        }
         ListEmptyComponent={
-          <Text style={styles.emptyText}>No drafts found.</Text>
+          <Text className="mt-5 text-center text-gray-500">
+            No drafts found.
+          </Text>
         }
       />
       <FlatList
         data={published}
         renderItem={renderEventItem}
         keyExtractor={item => item._id}
-        ListHeaderComponent={<Text style={styles.listHeader}>Published</Text>}
+        ListHeaderComponent={
+          <Text className="mt-5 mb-2.5 px-2.5 text-2xl font-bold">
+            Published
+          </Text>
+        }
         ListEmptyComponent={
-          <Text style={styles.emptyText}>No published events found.</Text>
+          <Text className="mt-5 text-center text-gray-500">
+            No published events found.
+          </Text>
         }
       />
       <TouchableOpacity
-        style={styles.fab}
+        className="absolute bottom-5 right-5 h-14 w-14 items-center justify-center rounded-full bg-blue-500 shadow-lg"
         onPress={() => router.push({pathname: '/(tabs)/(host)/CreateEvent'})}>
         <FontAwesome name="plus" size={24} color="white" />
       </TouchableOpacity>
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 10,
-  },
-  listHeader: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginTop: 20,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-  },
-  eventItem: {
-    backgroundColor: '#f9f9f9',
-    padding: 20,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    borderRadius: 10,
-  },
-  eventTitle: {
-    fontSize: 18,
-  },
-  fab: {
-    position: 'absolute',
-    width: 56,
-    height: 56,
-    alignItems: 'center',
-    justifyContent: 'center',
-    right: 20,
-    bottom: 20,
-    backgroundColor: Colors.light.tint,
-    borderRadius: 28,
-    elevation: 8,
-  },
-  emptyText: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: 'gray',
-  },
-})
 
 export default HostEventsScreen

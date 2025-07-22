@@ -1,52 +1,53 @@
-import { useRouter, Stack } from "expo-router";
-import React, { useState } from "react";
+import {useRouter, Stack} from 'expo-router'
+import React, {useState} from 'react'
 import {
   View,
   TextInput,
-  StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
   Alert,
-} from "react-native";
-import { Text } from "@/components/Themed";
-import { useMutation } from "convex/react";
-import { api } from "../../../convex/_generated/api";
+  Text,
+} from 'react-native'
+import {useMutation} from 'convex/react'
+import {api} from '../../../convex/_generated/api'
 
 export default function HostProfileSetupScreen() {
-  const router = useRouter();
-  const [hostName, setHostName] = useState("");
-  const [hostBio, setHostBio] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter()
+  const [hostName, setHostName] = useState('')
+  const [hostBio, setHostBio] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
-  const createHostProfile = useMutation(api.user.createHostProfile);
+  const createHostProfile = useMutation(api.user.createHostProfile)
 
   const handleContinue = async () => {
-    if (isLoading || !hostName || !hostBio) return;
+    if (isLoading || !hostName || !hostBio) return
 
-    setIsLoading(true);
+    setIsLoading(true)
     try {
       await createHostProfile({
         hostProfile: {
           host_name: hostName,
           host_bio: hostBio,
         },
-      });
-      router.push("./verification-prompt");
+      })
+      router.push('./verification-prompt')
     } catch (error) {
-      console.error("Failed to create host profile:", error);
-      Alert.alert("Error", "Could not create host profile. Please try again.");
+      console.error('Failed to create host profile:', error)
+      Alert.alert('Error', 'Could not create host profile. Please try again.')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
-    <View style={styles.container}>
-      <Stack.Screen options={{ title: "Host Profile" }} />
-      <Text style={styles.title}>Create Your Host Profile</Text>
+    <View className="flex-1 justify-center bg-white p-5">
+      <Stack.Screen options={{title: 'Host Profile'}} />
+      <Text className="text-center text-[26px] font-bold mb-5">
+        Create Your Host Profile
+      </Text>
 
       <TextInput
-        style={styles.input}
+        className="w-full rounded-xl border border-gray-200 bg-gray-50 p-4 mb-4 text-base"
         placeholder="Host Name"
         value={hostName}
         onChangeText={setHostName}
@@ -54,72 +55,25 @@ export default function HostProfileSetupScreen() {
       />
 
       <TextInput
-        style={[styles.input, styles.textArea]}
+        className="w-full rounded-xl border border-gray-200 bg-gray-50 p-4 mb-4 text-base h-32"
         placeholder="Host Bio"
         value={hostBio}
         onChangeText={setHostBio}
         multiline
         placeholderTextColor="#999"
+        style={{textAlignVertical: 'top'}}
       />
 
       <TouchableOpacity
-        style={[
-          styles.button,
-          (!hostName || !hostBio) && styles.disabledButton,
-        ]}
+        className="w-full items-center rounded-xl bg-blue-500 p-4 disabled:bg-blue-300"
         onPress={handleContinue}
-        disabled={isLoading || !hostName || !hostBio}
-      >
+        disabled={isLoading || !hostName || !hostBio}>
         {isLoading ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <Text style={styles.buttonText}>Continue</Text>
+          <Text className="font-bold text-white text-base">Continue</Text>
         )}
       </TouchableOpacity>
     </View>
-  );
+  )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 20,
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  input: {
-    width: "100%",
-    padding: 15,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 10,
-    marginBottom: 15,
-    fontSize: 16,
-    backgroundColor: "#f9f9f9",
-  },
-  textArea: {
-    height: 120,
-    textAlignVertical: "top",
-  },
-  button: {
-    width: "100%",
-    padding: 15,
-    backgroundColor: "#007bff",
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  disabledButton: {
-    backgroundColor: "#a0cfff",
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-});

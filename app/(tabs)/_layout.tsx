@@ -1,7 +1,7 @@
 import React from 'react'
 import {FontAwesome} from '@expo/vector-icons'
 import {Tabs, useRouter} from 'expo-router'
-import {View, StyleSheet, ActivityIndicator} from 'react-native'
+import {View, ActivityIndicator, Text} from 'react-native'
 import {
   Menu,
   MenuOptions,
@@ -16,7 +16,6 @@ import {useQuery} from 'convex/react'
 import {api} from '@/convex/_generated/api'
 import {UserRole, AccountStatuses} from '@/convex/schema'
 import {useAuth} from '@clerk/clerk-expo'
-import {Text} from '@/components/Themed'
 import {devLog} from '@/utils/devLog'
 
 function TabBarIcon(props: {
@@ -79,9 +78,9 @@ export default function TabLayout() {
   if (user === undefined) {
     devLog('[TabLayout] user is undefined, showing loading spinner')
     return (
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <View className="flex-1 items-center justify-center">
         <ActivityIndicator />
-        <Text style={{marginTop: 16, color: 'gray'}}>
+        <Text className="mt-4 text-gray-500">
           tabs loadingView (user undefined)
         </Text>
       </View>
@@ -121,9 +120,9 @@ export default function TabLayout() {
     // This can happen if user has no profile yet (still in onboarding)
     // or if there is an issue with the user document.
     return (
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <View className="flex-1 items-center justify-center">
         <ActivityIndicator />
-        <Text style={{marginTop: 16, color: 'gray'}}>
+        <Text className="mt-4 text-gray-500">
           tabs loadingView (no effectiveRole)
         </Text>
         <Text>
@@ -147,10 +146,10 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: useClientOnlyValue(false, true),
         headerRight: () => (
-          <View style={styles.headerRightContainer}>
+          <View className="flex-row items-center gap-4 pr-4">
             <Menu>
               <MenuTrigger>
-                <View style={styles.menuTrigger}>
+                <View className="flex-row items-center">
                   <FontAwesome
                     name="user-circle"
                     size={25}
@@ -161,15 +160,15 @@ export default function TabLayout() {
                       name="exclamation-triangle"
                       size={14}
                       color="gold"
-                      style={styles.pausedIcon}
+                      style={{position: 'absolute', right: -2, top: -2}}
                     />
                   )}
                 </View>
               </MenuTrigger>
               <MenuOptions customStyles={menuOptionsStyles}>
                 <MenuOption onSelect={() => router.push('/account')}>
-                  <View style={styles.accountMenuOption}>
-                    <Text style={styles.menuItemTextNaked}>Account</Text>
+                  <View className="flex-row items-center justify-between px-2.5 py-2.5">
+                    <Text className="text-base">Account</Text>
                     {isPaused && (
                       <FontAwesome
                         name="exclamation-triangle"
@@ -180,11 +179,11 @@ export default function TabLayout() {
                   </View>
                 </MenuOption>
                 <MenuOption onSelect={() => router.push('/settings')}>
-                  <Text style={styles.menuItemText}>Settings</Text>
+                  <Text className="px-2.5 py-2.5 text-base">Settings</Text>
                 </MenuOption>
-                <View style={styles.separator} />
+                <View className="my-1 h-px bg-gray-200" />
                 <MenuOption onSelect={onSignOutPress}>
-                  <Text style={[styles.menuItemText, {color: 'red'}]}>
+                  <Text className="px-2.5 py-2.5 text-base text-red-500">
                     Sign Out
                   </Text>
                 </MenuOption>
@@ -220,41 +219,3 @@ const menuOptionsStyles = {
     width: 160,
   },
 }
-
-const styles = StyleSheet.create({
-  headerRightContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 15,
-    paddingRight: 15,
-  },
-  menuTrigger: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  pausedIcon: {
-    position: 'absolute',
-    right: -2,
-    top: -2,
-  },
-  accountMenuOption: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-  },
-  menuItemText: {
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    fontSize: 16,
-  },
-  menuItemTextNaked: {
-    fontSize: 16,
-  },
-  separator: {
-    height: 1,
-    backgroundColor: '#e0e0e0',
-    marginVertical: 5,
-  },
-})

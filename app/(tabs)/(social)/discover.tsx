@@ -1,39 +1,10 @@
-import { StyleSheet } from "react-native";
-
-import EditScreenInfo from "@/components/EditScreenInfo";
-import { SignOutButton } from "@/components/SignOutButton";
-import { Text, View } from "@/components/Themed";
-import UserInfo from "@/components/UserInfo";
+import {View, Text} from 'react-native'
 
 export default function DiscoverScreen() {
   return (
-    <View style={styles.container}>
-      <UserInfo />
-      <Text style={styles.title}>Tab One</Text>
-      <View
-        style={styles.separator}
-        lightColor="#eee"
-        darkColor="rgba(255,255,255,0.1)"
-      />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
-      <SignOutButton />
+    <View className="flex-1 items-center justify-center">
+      {/* TODO: Build the UI for the discover screen */}
+      <Text>Discover Screen</Text>
     </View>
-  );
+  )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: "80%",
-  },
-});

@@ -1,377 +1,260 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, {useState, useEffect, useRef} from 'react'
 import {
   View,
   Text,
-  StyleSheet,
   Pressable,
   TextInput,
   ActivityIndicator,
   Image,
   Alert,
   ScrollView,
-} from "react-native";
-import { useUser } from "@clerk/clerk-expo";
-import { useRouter } from "expo-router";
-import { useMutation, useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import { SignOutButton } from "@/components/SignOutButton";
-import { AccountStatuses } from "@/convex/schema";
-import ContactMethodManager from "@/components/ContactMethodManager";
+} from 'react-native'
+import {useUser} from '@clerk/clerk-expo'
+import {useRouter} from 'expo-router'
+import {useMutation, useQuery} from 'convex/react'
+import {api} from '@/convex/_generated/api'
+import {SignOutButton} from '@/components/SignOutButton'
+import {AccountStatuses} from '@/convex/schema'
+import ContactMethodManager from '@/components/ContactMethodManager'
 
 const AccountScreen = () => {
-  const { user, isLoaded } = useUser();
-  const router = useRouter();
-  const convexUser = useQuery(api.user.me);
-  const pauseAccount = useMutation(api.user.pauseAccount);
-  const unpauseAccount = useMutation(api.user.unpauseAccount);
-  const scrollViewRef = useRef<ScrollView>(null);
+  const {user, isLoaded} = useUser()
+  const router = useRouter()
+  const convexUser = useQuery(api.user.me)
+  const pauseAccount = useMutation(api.user.pauseAccount)
+  const unpauseAccount = useMutation(api.user.unpauseAccount)
+  const scrollViewRef = useRef<ScrollView>(null)
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false)
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
     if (user) {
-      setFirstName(user.firstName ?? "");
-      setLastName(user.lastName ?? "");
+      setFirstName(user.firstName ?? '')
+      setLastName(user.lastName ?? '')
     }
-  }, [user]);
+  }, [user])
 
   const onSave = async () => {
-    if (!user) return;
-    setIsSaving(true);
+    if (!user) return
+    setIsSaving(true)
     try {
       await user.update({
         firstName: firstName,
         lastName: lastName,
-      });
-      setIsEditing(false);
+      })
+      setIsEditing(false)
     } catch (error) {
-      console.error("Error updating user:", error);
-      Alert.alert("Error", "Could not save your changes. Please try again.");
+      console.error('Error updating user:', error)
+      Alert.alert('Error', 'Could not save your changes. Please try again.')
     } finally {
-      setIsSaving(false);
+      setIsSaving(false)
     }
-  };
+  }
 
   const onEdit = () => {
-    setIsEditing(true);
-  };
+    setIsEditing(true)
+  }
 
   const onCancel = () => {
-    setIsEditing(false);
+    setIsEditing(false)
     // Reset fields to original values
     if (user) {
-      setFirstName(user.firstName ?? "");
-      setLastName(user.lastName ?? "");
+      setFirstName(user.firstName ?? '')
+      setLastName(user.lastName ?? '')
     }
-  };
+  }
 
   const onPauseAccount = async () => {
     Alert.alert(
-      "Pause Account",
-      "Pausing your account will hide your profile from others and stop all non-critical notifications. You can reactivate it at any time. Are you sure?",
+      'Pause Account',
+      'Pausing your account will hide your profile from others and stop all non-critical notifications. You can reactivate it at any time. Are you sure?',
       [
-        { text: "Cancel", style: "cancel" },
+        {text: 'Cancel', style: 'cancel'},
         {
-          text: "Pause",
-          style: "destructive",
+          text: 'Pause',
+          style: 'destructive',
           onPress: async () => {
             try {
-              await pauseAccount();
+              await pauseAccount()
               // The root layout will handle showing the paused banner.
             } catch (error) {
-              console.error("Error pausing account:", error);
-              Alert.alert("Error", "Could not pause your account.");
+              console.error('Error pausing account:', error)
+              Alert.alert('Error', 'Could not pause your account.')
             }
           },
         },
-      ]
-    );
-  };
+      ],
+    )
+  }
 
   const onUnpauseAccount = async () => {
     try {
-      await unpauseAccount();
+      await unpauseAccount()
     } catch (error) {
-      console.error("Error unpausing account:", error);
-      Alert.alert("Error", "Could not unpause your account.");
+      console.error('Error unpausing account:', error)
+      Alert.alert('Error', 'Could not unpause your account.')
     }
-  };
+  }
 
   const onDeleteAccount = async () => {
-    if (!user) return;
+    if (!user) return
 
     Alert.alert(
-      "Are you sure?",
-      "Pausing your account hides your profile and stops notifications. Deleting is permanent and cannot be undone. We recommend pausing if you just need a break.",
+      'Are you sure?',
+      'Pausing your account hides your profile and stops notifications. Deleting is permanent and cannot be undone. We recommend pausing if you just need a break.',
       [
         {
-          text: "Pause Account",
+          text: 'Pause Account',
           onPress: onPauseAccount,
         },
         {
-          text: "Delete",
-          style: "destructive",
+          text: 'Delete',
+          style: 'destructive',
           onPress: async () => {
             try {
-              await user.delete();
+              await user.delete()
             } catch (error) {
-              console.error("Error deleting account:", error);
-              Alert.alert("Error", "Could not delete your account.");
+              console.error('Error deleting account:', error)
+              Alert.alert('Error', 'Could not delete your account.')
             }
           },
         },
-        { text: "Cancel", style: "cancel" },
-      ]
-    );
-  };
+        {text: 'Cancel', style: 'cancel'},
+      ],
+    )
+  }
 
-  const isLoading = !isLoaded || convexUser === undefined;
-  const isPaused = convexUser?.accountStatus === AccountStatuses.PAUSED;
+  const isLoading = !isLoaded || convexUser === undefined
+  const isPaused = convexUser?.accountStatus === AccountStatuses.PAUSED
 
   if (isLoading || !user) {
     return (
-      <View style={styles.container}>
+      <View className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" />
       </View>
-    );
+    )
   }
 
   return (
-    <ScrollView ref={scrollViewRef} contentContainerStyle={styles.container}>
+    <ScrollView
+      ref={scrollViewRef}
+      contentContainerStyle={{
+        flexGrow: 1,
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        paddingVertical: 20,
+      }}>
       {isPaused && (
         <Pressable onPress={() => scrollViewRef.current?.scrollToEnd()}>
-          <View style={styles.pausedBanner}>
-            <Text style={styles.pausedBannerText}>
+          <View className="w-full items-center bg-orange-400 p-2.5 mb-5">
+            <Text className="font-bold text-white">
               Your account is currently paused. Tap to manage.
             </Text>
           </View>
         </Pressable>
       )}
-      <View style={styles.profileContainer}>
-        <Image source={{ uri: user.imageUrl }} style={styles.profileImage} />
+      <View className="items-center mb-5">
+        <Image
+          source={{uri: user.imageUrl}}
+          className="mb-2.5 h-24 w-24 rounded-full"
+        />
         {isEditing ? (
-          <View style={styles.editNameContainer}>
+          <View className="flex-row items-center gap-2.5">
             <TextInput
               placeholder="First Name"
               value={firstName}
               onChangeText={setFirstName}
-              style={[styles.input, styles.nameInput]}
+              className="flex-1 border-b border-gray-300 p-2 text-center text-2xl font-bold"
             />
             <TextInput
               placeholder="Last Name"
               value={lastName}
               onChangeText={setLastName}
-              style={[styles.input, styles.nameInput]}
+              className="flex-1 border-b border-gray-300 p-2 text-center text-2xl font-bold"
             />
           </View>
         ) : (
-          <Text style={styles.name}>
+          <Text className="text-2xl font-bold">
             {user.firstName} {user.lastName}
           </Text>
         )}
-        <Text style={styles.email}>
+        <Text className="mt-1 text-base text-gray-500">
           {user.primaryEmailAddress?.emailAddress}
         </Text>
-        <Text style={styles.phone}>{user.primaryPhoneNumber?.phoneNumber}</Text>
+        <Text className="mt-1 text-base text-gray-500">
+          {user.primaryPhoneNumber?.phoneNumber}
+        </Text>
         {convexUser?.accountStatus && (
-          <Text style={styles.statusText}>
-            Status:{" "}
+          <Text className="mt-2 text-base italic text-gray-800">
+            Status:{' '}
             {convexUser.accountStatus.charAt(0).toUpperCase() +
               convexUser.accountStatus.slice(1)}
           </Text>
         )}
       </View>
 
-      <View style={styles.contactMethodsContainer}>
+      <View className="mt-5 w-4/5 gap-5">
         <ContactMethodManager methodType="email" />
         <ContactMethodManager methodType="phone" />
       </View>
 
-      <View style={styles.buttonContainer}>
+      <View className="w-4/5">
         {isEditing ? (
           <>
             <Pressable
               onPress={onSave}
-              style={styles.button}
-              disabled={isSaving}
-            >
-              <Text style={styles.buttonText}>
-                {isSaving ? "Saving..." : "Save"}
+              className="mb-2.5 items-center rounded-xl bg-blue-500 p-4"
+              disabled={isSaving}>
+              <Text className="text-base font-bold text-white">
+                {isSaving ? 'Saving...' : 'Save'}
               </Text>
             </Pressable>
             <Pressable
               onPress={onCancel}
-              style={[styles.button, styles.secondaryButton]}
-              disabled={isSaving}
-            >
-              <Text style={[styles.buttonText, styles.secondaryButtonText]}>
-                Cancel
-              </Text>
+              className="mb-2.5 items-center rounded-xl border border-blue-500 bg-white p-4"
+              disabled={isSaving}>
+              <Text className="text-base font-bold text-blue-500">Cancel</Text>
             </Pressable>
           </>
         ) : (
-          <Pressable onPress={onEdit} style={styles.button}>
-            <Text style={styles.buttonText}>Edit Profile</Text>
+          <Pressable
+            onPress={onEdit}
+            className="mb-2.5 items-center rounded-xl bg-blue-500 p-4">
+            <Text className="text-base font-bold text-white">Edit Profile</Text>
           </Pressable>
         )}
         <Pressable
-          onPress={() => router.push("/settings")}
-          style={[styles.button, styles.secondaryButton]}
-        >
-          <Text style={[styles.buttonText, styles.secondaryButtonText]}>
+          onPress={() => router.push('/settings')}
+          className="mb-2.5 items-center rounded-xl border border-blue-500 bg-white p-4">
+          <Text className="text-base font-bold text-blue-500">
             App Settings
           </Text>
         </Pressable>
         <SignOutButton />
       </View>
 
-      <View style={styles.dangerZone}>
-        <Text style={styles.dangerZoneText}>Danger Zone</Text>
+      <View className="mt-7 w-4/5 items-center border-t border-gray-200 pt-5">
+        <Text className="mb-2.5 text-lg font-bold text-red-600">
+          Danger Zone
+        </Text>
         <Pressable
           onPress={isPaused ? onUnpauseAccount : onPauseAccount}
-          style={[styles.button, styles.warningButton, { marginBottom: 10 }]}
-        >
-          <Text style={[styles.buttonText, styles.warningButtonText]}>
-            {isPaused ? "Unpause Account" : "Pause Account"}
+          className="mb-2.5 items-center rounded-xl border-yellow-500 bg-yellow-500 p-4">
+          <Text className="text-base font-bold text-white">
+            {isPaused ? 'Unpause Account' : 'Pause Account'}
           </Text>
         </Pressable>
         <Pressable
           onPress={onDeleteAccount}
-          style={[styles.button, styles.dangerButton]}
-        >
-          <Text style={styles.buttonText}>Delete Account</Text>
+          className="items-center rounded-xl border-red-600 bg-red-600 p-4">
+          <Text className="text-base font-bold text-white">Delete Account</Text>
         </Pressable>
       </View>
     </ScrollView>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    alignItems: "center",
-    backgroundColor: "#fff",
-    paddingVertical: 20,
-  },
-  contactMethodsContainer: {
-    width: "80%",
-    marginTop: 20,
-    gap: 20,
-  },
-  pausedBanner: {
-    width: "100%",
-    backgroundColor: "orange",
-    padding: 10,
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  pausedBannerText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  profileContainer: {
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: 10,
-  },
-  editNameContainer: {
-    flexDirection: "row",
-    gap: 10,
-    alignItems: "center",
-  },
-  nameInput: {
-    borderBottomWidth: 1,
-    borderColor: "#ccc",
-    padding: 8,
-    flex: 1,
-    textAlign: "center",
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  name: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  email: {
-    fontSize: 16,
-    color: "#666",
-    marginTop: 4,
-  },
-  phone: {
-    fontSize: 16,
-    color: "#666",
-    marginTop: 4,
-  },
-  statusText: {
-    fontSize: 16,
-    color: "#333",
-    marginTop: 8,
-    fontStyle: "italic",
-  },
-  buttonContainer: {
-    width: "80%",
-  },
-  button: {
-    backgroundColor: "#007AFF",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  secondaryButton: {
-    backgroundColor: "white",
-    borderWidth: 1,
-    borderColor: "#007AFF",
-  },
-  secondaryButtonText: {
-    color: "#007AFF",
-  },
-  dangerZone: {
-    marginTop: 30,
-    borderTopWidth: 1,
-    borderTopColor: "#eee",
-    width: "80%",
-    paddingTop: 20,
-    alignItems: "center",
-  },
-  dangerZoneText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#D93F33",
-    marginBottom: 10,
-  },
-  warningButton: {
-    backgroundColor: "#E59400",
-    borderColor: "#E59400",
-  },
-  warningButtonText: {
-    color: "#fff",
-  },
-  dangerButton: {
-    backgroundColor: "#D93F33",
-    borderColor: "#D93F33",
-  },
-  input: {
-    width: "80%",
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-});
-
-export default AccountScreen;
+export default AccountScreen

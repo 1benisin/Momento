@@ -1,65 +1,41 @@
-import React from "react";
-import { View, StyleSheet, Button, ActivityIndicator } from "react-native";
-import { Text } from "@/components/Themed";
-import { Stack, useRouter } from "expo-router";
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
+import React from 'react'
+import {View, ActivityIndicator, TouchableOpacity, Text} from 'react-native'
+import {Stack, useRouter} from 'expo-router'
+import {useQuery} from 'convex/react'
+import {api} from '@/convex/_generated/api'
 
 export default function HostDashboardScreen() {
-  const user = useQuery(api.user.me);
-  const router = useRouter();
+  const user = useQuery(api.user.me)
+  const router = useRouter()
 
   const handleJoinSocially = () => {
-    router.push("/(onboarding)/(social)/profile-setup");
-  };
+    router.push('/(onboarding)/(social)/profile-setup')
+  }
 
   if (user === undefined) {
     return (
-      <View style={styles.loadingContainer}>
+      <View className="flex-1 items-center justify-center">
         <ActivityIndicator />
       </View>
-    );
+    )
   }
 
   return (
-    <View style={styles.container}>
-      <Stack.Screen options={{ title: "Host Dashboard" }} />
-      <Text style={styles.title}>Host Dashboard</Text>
-      <Text style={styles.subtitle}>
+    <View className="flex-1 items-center justify-center p-5">
+      <Stack.Screen options={{title: 'Host Dashboard'}} />
+      <Text className="mb-4 text-2xl font-bold">Host Dashboard</Text>
+      <Text className="text-base text-gray-500">
         Welcome to your host dashboard. This is a placeholder screen.
       </Text>
       {!user?.socialProfile && (
-        <View style={styles.ctaContainer}>
-          <Button title="Join Events Socially" onPress={handleJoinSocially} />
+        <View className="absolute bottom-12">
+          <TouchableOpacity
+            className="rounded-md bg-blue-500 px-4 py-2"
+            onPress={handleJoinSocially}>
+            <Text className="text-white">Join Events Socially</Text>
+          </TouchableOpacity>
         </View>
       )}
     </View>
-  );
+  )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 16,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "gray",
-  },
-  ctaContainer: {
-    position: "absolute",
-    bottom: 50,
-  },
-});

@@ -1,6 +1,13 @@
 import React, {useState, useEffect} from 'react'
-import {StyleSheet, ActivityIndicator, Button, ScrollView} from 'react-native'
-import {Text, View} from '@/components/Themed'
+import {
+  StyleSheet,
+  ActivityIndicator,
+  Button,
+  ScrollView,
+  TouchableOpacity,
+  Text,
+  View,
+} from 'react-native'
 import {useLocalSearchParams} from 'expo-router'
 import {useQuery} from 'convex/react'
 import {api} from '@/convex/_generated/api'
@@ -39,12 +46,12 @@ const CreateEventScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 p-5">
       <ScrollView
-        style={{flex: 1}}
+        className="flex-1"
         contentContainerStyle={{paddingBottom: 32}}
         keyboardShouldPersistTaps="handled">
-        <Text style={styles.title}>
+        <Text className="mb-5 text-2xl font-bold">
           {eventId ? 'Edit Event' : 'Create Event'} - Step {step} of 3
         </Text>
 
@@ -52,11 +59,21 @@ const CreateEventScreen = () => {
         {step === 2 && <EventItineraryForm event={event} setEvent={setEvent} />}
         {step === 3 && <EventPublishForm event={event} />}
       </ScrollView>
-      <View style={styles.navigation}>
+      <View className="mt-5 flex-row justify-around">
         {step > 1 && (
-          <Button title="Previous" onPress={() => setStep(step - 1)} />
+          <TouchableOpacity
+            className="rounded-md bg-gray-200 px-4 py-2"
+            onPress={() => setStep(step - 1)}>
+            <Text>Previous</Text>
+          </TouchableOpacity>
         )}
-        {step < 3 && <Button title="Next" onPress={() => setStep(step + 1)} />}
+        {step < 3 && (
+          <TouchableOpacity
+            className="rounded-md bg-blue-500 px-4 py-2"
+            onPress={() => setStep(step + 1)}>
+            <Text className="text-white">Next</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   )
