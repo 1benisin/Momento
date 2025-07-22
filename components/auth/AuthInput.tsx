@@ -43,6 +43,7 @@ export const AuthInput: React.FC<AuthInputProps> = ({
       </Text>
       <View className="relative">
         <TextInput
+          accessibilityLabel={label}
           className="w-full bg-black border border-[#333333] rounded-md px-4 py-3 text-[#F8F6F1] font-['Inter'] focus:border-[#D4AF37]"
           value={value}
           onChangeText={onChangeText}

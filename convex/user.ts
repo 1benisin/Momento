@@ -1,19 +1,14 @@
-import { v } from "convex/values";
+import {v} from 'convex/values'
 import {
   internalMutation,
   query,
   internalQuery,
   QueryCtx,
   mutation,
-} from "./_generated/server";
-import { Doc } from "./_generated/dataModel";
-import {
-  AccountStatuses,
-  UserRoles,
-  userRoleValidator,
-  UserRole,
-} from "./schema";
-import { devLog } from "../utils/devLog";
+} from './_generated/server'
+import {Doc} from './_generated/dataModel'
+import {AccountStatuses, UserRoles, userRoleValidator, UserRole} from './schema'
+import {devLog} from '../utils/devLog'
 
 /**
  * Retrieves the database record for the currently authenticated user.
@@ -22,18 +17,18 @@ import { devLog } from "../utils/devLog";
  */
 export const me = query({
   args: {},
-  handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
+  handler: async ctx => {
+    const identity = await ctx.auth.getUserIdentity()
     if (!identity) {
-      return null;
+      return null
     }
-    const user = await getUserByClerkId(ctx, { clerkId: identity.subject });
+    const user = await getUserByClerkId(ctx, {clerkId: identity.subject})
     if (!user) {
-      return null;
+      return null
     }
-    return user;
+    return user
   },
-});
+})
 
 /**
  * Ensures a user record exists for the currently authenticated user.
@@ -51,39 +46,39 @@ export const me = query({
  */
 export const getOrCreateUser = mutation({
   args: {},
-  handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
+  handler: async ctx => {
+    const identity = await ctx.auth.getUserIdentity()
     if (!identity) {
-      throw new Error("Called storeUser without authentication present");
+      throw new Error('Called storeUser without authentication present')
     }
 
     // Check if we've already stored this user.
     const user = await ctx.db
-      .query("users")
-      .withIndex("by_token", (q) =>
-        q.eq("tokenIdentifier", identity.tokenIdentifier)
+      .query('users')
+      .withIndex('by_token', q =>
+        q.eq('tokenIdentifier', identity.tokenIdentifier),
       )
-      .unique();
+      .unique()
 
     if (user !== null) {
       // If we've seen this user before, we don't need to do anything.
       // We can just return the user's ID.
-      return user._id;
+      return user._id
     }
 
     // If it's a new user, create a new record.
-    const newUser = await ctx.db.insert("users", {
+    const newUser = await ctx.db.insert('users', {
       clerkId: identity.subject,
       tokenIdentifier: identity.tokenIdentifier,
       email: identity.email,
       first_name: identity.givenName,
       last_name: identity.familyName,
       accountStatus: AccountStatuses.ACTIVE,
-    });
+    })
 
-    return newUser;
+    return newUser
   },
-});
+})
 
 /**
  * Retrieves a user by their Clerk ID.
@@ -94,7 +89,7 @@ export const getUser = internalQuery({
     clerkId: v.string(),
   },
   handler: getUserByClerkId,
-});
+})
 
 /**
  * Helper function to retrieve a user document by their Clerk ID.
@@ -104,12 +99,12 @@ export const getUser = internalQuery({
  */
 async function getUserByClerkId(
   ctx: QueryCtx,
-  { clerkId }: { clerkId: string }
-): Promise<Doc<"users"> | null> {
+  {clerkId}: {clerkId: string},
+): Promise<Doc<'users'> | null> {
   return await ctx.db
-    .query("users")
-    .withIndex("by_clerk_id", (q) => q.eq("clerkId", clerkId))
-    .unique();
+    .query('users')
+    .withIndex('by_clerk_id', q => q.eq('clerkId', clerkId))
+    .unique()
 }
 
 /**
@@ -127,7 +122,7 @@ export const createUser = internalMutation({
     tokenIdentifier: v.string(),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("users", {
+    await ctx.db.insert('users', {
       clerkId: args.clerkId,
       phone_number: args.phone_number,
       email: args.email,
@@ -135,9 +130,9 @@ export const createUser = internalMutation({
       last_name: args.lastName,
       tokenIdentifier: args.tokenIdentifier,
       accountStatus: AccountStatuses.ACTIVE,
-    });
+    })
   },
-});
+})
 
 /**
  * Updates an existing user's profile information.
@@ -153,10 +148,10 @@ export const updateUser = internalMutation({
     lastName: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const user = await getUserByClerkId(ctx, { clerkId: args.clerkId });
+    const user = await getUserByClerkId(ctx, {clerkId: args.clerkId})
 
     if (user === null) {
-      throw new Error("User not found, cannot update");
+      throw new Error('User not found, cannot update')
     }
 
     await ctx.db.patch(user._id, {
@@ -164,25 +159,25 @@ export const updateUser = internalMutation({
       phone_number: args.phone_number,
       first_name: args.firstName,
       last_name: args.lastName,
-    });
+    })
   },
-});
+})
 
 export const updateVerificationStatus = internalMutation({
   args: {
-    userId: v.id("users"),
+    userId: v.id('users'),
     isVerified: v.boolean(),
     sessionId: v.string(),
     verificationData: v.optional(v.any()),
     verificationStatus: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const user = await ctx.db.get(args.userId);
+    const user = await ctx.db.get(args.userId)
     if (!user || !user.hostProfile) {
-      throw new Error("User or host profile not found");
+      throw new Error('User or host profile not found')
     }
 
-    const hostProfile = { ...user.hostProfile };
+    const hostProfile = {...user.hostProfile}
 
     await ctx.db.patch(user._id, {
       hostProfile: {
@@ -193,15 +188,15 @@ export const updateVerificationStatus = internalMutation({
         verification_status: args.verificationStatus,
         verification_completed_at: args.isVerified ? Date.now() : undefined,
       },
-    });
+    })
 
-    devLog("User verification status updated", {
+    devLog('User verification status updated', {
       userId: args.userId,
       isVerified: args.isVerified,
       status: args.verificationStatus,
-    });
+    })
   },
-});
+})
 
 /**
  * Deletes a user from the database.
@@ -209,18 +204,18 @@ export const updateVerificationStatus = internalMutation({
  * that fires when a user is deleted from the Clerk service.
  */
 export const deleteUser = internalMutation({
-  args: { clerkId: v.string() },
+  args: {clerkId: v.string()},
   handler: async (ctx, args) => {
-    const user = await getUserByClerkId(ctx, { clerkId: args.clerkId });
+    const user = await getUserByClerkId(ctx, {clerkId: args.clerkId})
 
     if (user === null) {
-      console.warn("User not found, cannot delete");
-      return;
+      console.warn('User not found, cannot delete')
+      return
     }
 
-    await ctx.db.delete(user._id);
+    await ctx.db.delete(user._id)
   },
-});
+})
 
 /**
  * Sets a user's account status to 'paused' (hibernation mode).
@@ -228,44 +223,44 @@ export const deleteUser = internalMutation({
  */
 export const pauseAccount = mutation({
   args: {},
-  handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
+  handler: async ctx => {
+    const identity = await ctx.auth.getUserIdentity()
     if (!identity) {
-      throw new Error("Called pauseAccount without authentication present");
+      throw new Error('Called pauseAccount without authentication present')
     }
 
-    const user = await getUserByClerkId(ctx, { clerkId: identity.subject });
+    const user = await getUserByClerkId(ctx, {clerkId: identity.subject})
     if (user === null) {
-      throw new Error("User not found, cannot pause account");
+      throw new Error('User not found, cannot pause account')
     }
 
     await ctx.db.patch(user._id, {
       accountStatus: AccountStatuses.PAUSED,
-    });
+    })
   },
-});
+})
 
 /**
  * Reactivates a paused user's account, setting their status to 'active'.
  */
 export const unpauseAccount = mutation({
   args: {},
-  handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
+  handler: async ctx => {
+    const identity = await ctx.auth.getUserIdentity()
     if (!identity) {
-      throw new Error("Called unpauseAccount without authentication present");
+      throw new Error('Called unpauseAccount without authentication present')
     }
 
-    const user = await getUserByClerkId(ctx, { clerkId: identity.subject });
+    const user = await getUserByClerkId(ctx, {clerkId: identity.subject})
     if (user === null) {
-      throw new Error("User not found, cannot unpause account");
+      throw new Error('User not found, cannot unpause account')
     }
 
     await ctx.db.patch(user._id, {
       accountStatus: AccountStatuses.ACTIVE,
-    });
+    })
   },
-});
+})
 
 /**
  * Adds a new photo to a user's social profile.
@@ -273,35 +268,35 @@ export const unpauseAccount = mutation({
  */
 export const addProfilePhoto = mutation({
   args: {
-    storageId: v.id("_storage"),
+    storageId: v.id('_storage'),
     isAuthentic: v.boolean(),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
+    const identity = await ctx.auth.getUserIdentity()
     if (!identity) {
-      throw new Error("Called addProfilePhoto without authentication present");
+      throw new Error('Called addProfilePhoto without authentication present')
     }
 
-    const user = await getUserByClerkId(ctx, { clerkId: identity.subject });
+    const user = await getUserByClerkId(ctx, {clerkId: identity.subject})
     if (user === null) {
-      throw new Error("User not found, cannot add profile photo");
+      throw new Error('User not found, cannot add profile photo')
     }
 
     if (!user.socialProfile) {
-      throw new Error("User has no social profile, cannot add photo");
+      throw new Error('User has no social profile, cannot add photo')
     }
 
-    const url = await ctx.storage.getUrl(args.storageId);
+    const url = await ctx.storage.getUrl(args.storageId)
     if (url === null) {
-      throw new Error("Could not get file URL for storageId");
+      throw new Error('Could not get file URL for storageId')
     }
 
-    const now = Date.now();
-    let authentic_expires_at: number | undefined = undefined;
+    const now = Date.now()
+    let authentic_expires_at: number | undefined = undefined
     if (args.isAuthentic) {
       // 12 months in milliseconds (approximate)
-      const twelveMonths = 12 * 30 * 24 * 60 * 60 * 1000;
-      authentic_expires_at = now + twelveMonths;
+      const twelveMonths = 12 * 30 * 24 * 60 * 60 * 1000
+      authentic_expires_at = now + twelveMonths
     }
 
     const newPhoto = {
@@ -310,7 +305,7 @@ export const addProfilePhoto = mutation({
       is_authentic: args.isAuthentic,
       created_at: now,
       authentic_expires_at: authentic_expires_at,
-    };
+    }
 
     await ctx.db.patch(user._id, {
       socialProfile: {
@@ -318,9 +313,9 @@ export const addProfilePhoto = mutation({
         photos: [...user.socialProfile.photos, newPhoto],
         current_photo_url: url,
       },
-    });
+    })
   },
-});
+})
 
 /**
  * Creates and populates the `hostProfile` object for a user, completing
@@ -334,23 +329,21 @@ export const createHostProfile = mutation({
     }),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
+    const identity = await ctx.auth.getUserIdentity()
     if (!identity) {
-      throw new Error(
-        "Called createHostProfile without authentication present"
-      );
+      throw new Error('Called createHostProfile without authentication present')
     }
 
-    const user = await getUserByClerkId(ctx, { clerkId: identity.subject });
+    const user = await getUserByClerkId(ctx, {clerkId: identity.subject})
     if (user === null) {
-      throw new Error("User not found, cannot create host profile");
+      throw new Error('User not found, cannot create host profile')
     }
 
     // If the user is a pure social user, set their active role to host.
     // Otherwise, we can assume it was set by the ModeSwitcher.
-    let active_role: UserRole | undefined = undefined;
+    let active_role: UserRole | undefined = undefined
     if (!user.hostProfile) {
-      active_role = UserRoles.HOST;
+      active_role = UserRoles.HOST
     }
 
     await ctx.db.patch(user._id, {
@@ -358,11 +351,11 @@ export const createHostProfile = mutation({
       hostProfile: {
         ...args.hostProfile,
         // TODO: Allow for 'community' host_type creation
-        host_type: "user",
+        host_type: 'user',
       },
-    });
+    })
   },
-});
+})
 
 /**
  * Creates and populates the `socialProfile` object for a user, including their
@@ -373,41 +366,41 @@ export const createSocialProfile = mutation({
     bio: v.optional(v.string()),
     initialPhoto: v.optional(
       v.object({
-        storageId: v.id("_storage"),
+        storageId: v.id('_storage'),
         isAuthentic: v.boolean(),
-      })
+      }),
     ),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
+    const identity = await ctx.auth.getUserIdentity()
     if (!identity) {
       throw new Error(
-        "Called createSocialProfile without authentication present"
-      );
+        'Called createSocialProfile without authentication present',
+      )
     }
 
-    const user = await getUserByClerkId(ctx, { clerkId: identity.subject });
+    const user = await getUserByClerkId(ctx, {clerkId: identity.subject})
     if (user === null) {
-      throw new Error("User not found, cannot create social profile");
+      throw new Error('User not found, cannot create social profile')
     }
 
     let photoData:
       | {
-          photos: NonNullable<Doc<"users">["socialProfile"]>["photos"];
-          current_photo_url: string;
+          photos: NonNullable<Doc<'users'>['socialProfile']>['photos']
+          current_photo_url: string
         }
-      | undefined = undefined;
+      | undefined = undefined
 
     if (args.initialPhoto) {
-      const url = await ctx.storage.getUrl(args.initialPhoto.storageId);
+      const url = await ctx.storage.getUrl(args.initialPhoto.storageId)
       if (url === null) {
-        throw new Error("Could not get file URL for storageId");
+        throw new Error('Could not get file URL for storageId')
       }
-      const now = Date.now();
-      let authentic_expires_at: number | undefined = undefined;
+      const now = Date.now()
+      let authentic_expires_at: number | undefined = undefined
       if (args.initialPhoto.isAuthentic) {
-        const twelveMonths = 12 * 30 * 24 * 60 * 60 * 1000;
-        authentic_expires_at = now + twelveMonths;
+        const twelveMonths = 12 * 30 * 24 * 60 * 60 * 1000
+        authentic_expires_at = now + twelveMonths
       }
       const newPhoto = {
         storageId: args.initialPhoto.storageId,
@@ -415,11 +408,11 @@ export const createSocialProfile = mutation({
         is_authentic: args.initialPhoto.isAuthentic,
         created_at: now,
         authentic_expires_at: authentic_expires_at,
-      };
+      }
       photoData = {
         photos: [newPhoto],
         current_photo_url: url,
-      };
+      }
     }
 
     await ctx.db.patch(user._id, {
@@ -429,9 +422,9 @@ export const createSocialProfile = mutation({
         photos: photoData?.photos ?? [],
         current_photo_url: photoData?.current_photo_url,
       },
-    });
+    })
   },
-});
+})
 
 /**
  * Sets the active role for a hybrid user (one who is both a host and participant).
@@ -442,18 +435,37 @@ export const setActiveRole = mutation({
     role: userRoleValidator,
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
+    const identity = await ctx.auth.getUserIdentity()
     if (!identity) {
-      throw new Error("Called setActiveRole without authentication present");
+      throw new Error('Called setActiveRole without authentication present')
     }
 
-    const user = await getUserByClerkId(ctx, { clerkId: identity.subject });
+    const user = await getUserByClerkId(ctx, {clerkId: identity.subject})
     if (user === null) {
-      throw new Error("User not found, cannot set active role");
+      throw new Error('User not found, cannot set active role')
     }
 
     await ctx.db.patch(user._id, {
       active_role: args.role,
-    });
+    })
   },
-});
+})
+
+export const logSignOut = mutation({
+  args: {},
+  handler: async ctx => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      // Not an error, just means we can't log the sign out
+      devLog('logSignOut called without user identity.')
+      return
+    }
+    const user = await getUserByClerkId(ctx, {clerkId: identity.subject})
+
+    devLog('User signed out for security tracking', {
+      userId: user?._id,
+      clerkId: identity.subject,
+      timestamp: new Date().toISOString(),
+    })
+  },
+})

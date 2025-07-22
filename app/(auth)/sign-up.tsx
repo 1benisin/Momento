@@ -1,6 +1,6 @@
 import {useSignUp} from '@clerk/clerk-expo'
 import {Link} from 'expo-router'
-import React, {useState} from 'react'
+import React, {useState, useRef} from 'react'
 import {
   Text,
   View,
@@ -8,9 +8,13 @@ import {
   Platform,
   ScrollView,
 } from 'react-native'
+import RNPhoneInput from 'react-native-phone-number-input'
+import type PhoneInput from 'react-native-phone-number-input'
 import {AuthButton} from '@/components/auth/AuthButton'
 import {AuthInput} from '@/components/auth/AuthInput'
 import {TabSelector} from '@/components/auth/TabSelector'
+
+const PhoneInputComponent = RNPhoneInput as unknown as React.FC<any>
 
 export default function SignUpScreen() {
   const {isLoaded, signUp, setActive} = useSignUp()
@@ -18,11 +22,13 @@ export default function SignUpScreen() {
   const [signUpMethod, setSignUpMethod] = useState<'email' | 'phone'>('phone')
   const [emailAddress, setEmailAddress] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
+  const [formattedPhoneNumber, setFormattedPhoneNumber] = useState('')
 
   const [pendingVerification, setPendingVerification] = useState(false)
   const [code, setCode] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const phoneInput = useRef<PhoneInput>(null)
 
   // --- Handlers ---
 
@@ -38,7 +44,7 @@ export default function SignUpScreen() {
           strategy: 'email_code',
         })
       } else {
-        await signUp.create({phoneNumber})
+        await signUp.create({phoneNumber: formattedPhoneNumber})
         await signUp.preparePhoneNumberVerification()
       }
       setPendingVerification(true)
@@ -108,21 +114,51 @@ export default function SignUpScreen() {
           error={error ?? undefined}
         />
       ) : (
-        <AuthInput
-          label="Phone Number"
-          value={phoneNumber}
-          onChangeText={setPhoneNumber}
-          placeholder="+1..."
-          keyboardType="phone-pad"
-          autoComplete="tel"
-          error={error ?? undefined}
-        />
+        <>
+          <Text className="mb-1 font-['Inter'] text-[#F8F6F1] text-sm">
+            Phone Number
+          </Text>
+          <PhoneInputComponent
+            ref={phoneInput}
+            defaultValue={phoneNumber}
+            defaultCode="US"
+            layout="first"
+            onChangeText={(text: string) => {
+              setPhoneNumber(text)
+            }}
+            onChangeFormattedText={(text: string) => {
+              setFormattedPhoneNumber(text)
+            }}
+            withDarkTheme
+            withShadow
+            containerStyle={{
+              width: '100%',
+              backgroundColor: 'black',
+              borderColor: '#333333',
+              borderWidth: 1,
+              borderRadius: 6,
+            }}
+            textContainerStyle={{
+              backgroundColor: 'black',
+              paddingVertical: 0,
+            }}
+            codeTextStyle={{color: '#F8F6F1'}}
+            textInputStyle={{color: '#F8F6F1'}}
+          />
+          <Text className="mt-2 text-xs text-[#F8F6F1]/50 font-['Inter'] text-center">
+            Currently, we only support SMS authentication for US numbers.
+          </Text>
+        </>
       )}
       <AuthButton
         title="Sign Up"
         onPress={onSignUpPress}
         isLoading={loading}
-        disabled={signUpMethod === 'email' ? !emailAddress : !phoneNumber}
+        disabled={
+          signUpMethod === 'email'
+            ? !emailAddress
+            : !phoneInput.current?.isValidNumber(phoneNumber)
+        }
       />
     </>
   )

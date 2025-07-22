@@ -24,10 +24,12 @@ describe('User', () => {
 
     test('should return existing user if one exists', async () => {
       const t = convexTest(schema as any)
+      const clerkId = 'clerk_123'
+      const tokenIdentifier = `https|clerk_123`
       await t.run(async ctx => {
         await ctx.db.insert('users', {
-          tokenIdentifier: 'existing_user_token',
-          clerkId: 'clerk_123',
+          tokenIdentifier,
+          clerkId,
           email: 'existing@example.com',
           accountStatus: 'active',
         })
@@ -35,7 +37,8 @@ describe('User', () => {
 
       const asUser = t.withIdentity({
         email: 'existing@example.com',
-        tokenIdentifier: 'existing_user_token',
+        tokenIdentifier,
+        subject: clerkId,
       })
 
       const userId = await asUser.mutation(api.user.getOrCreateUser, {})
