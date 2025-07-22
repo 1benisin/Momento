@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {Text, View, StyleSheet, TouchableOpacity} from 'react-native'
+import {Text, View} from 'react-native'
 import LocationSearchInput from './LocationSearchInput'
 import MapViewModal from './MapViewModal'
 
@@ -27,7 +27,15 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
   )
   const [isMapVisible, setMapVisible] = useState(false)
 
-  const handleLocationSelect = (details: any) => {
+  // Use the same PlaceDetail type as in LocationSearchInput
+  const handleLocationSelect = (
+    details: {
+      formatted_address: string
+      name?: string
+      geometry: {location: {lat: number; lng: number}}
+      place_id: string
+    } | null,
+  ) => {
     if (!details) return
 
     const location: LocationData = {

@@ -916,3 +916,103 @@ export function Card({ children }) {
 ```
 
 **Last Updated:** 2024-12-19
+
+## Linting & Common Linting Issues
+
+### Linting Configuration
+
+We use ESLint with TypeScript and React Native plugins to enforce code quality and consistency. The configuration is in `eslint.config.mjs` and is tailored for Expo, React Native, and Convex projects.
+
+### Common Linting Issues & Best Practices
+
+#### 1. Asset Imports (Fonts, Images, etc.)
+
+- **Expo Best Practice:** Use `require()` for static asset imports (e.g., fonts, images) in Expo projects. ES module imports do not work for these file types and will cause build or type errors.
+
+```typescript
+// ✅ Good: Font loading in Expo
+const [loaded] = useFonts({
+  SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+})
+
+// ❌ Bad: ES import for font
+import SpaceMonoFont from '../assets/fonts/SpaceMono-Regular.ttf'
+```
+
+- **ESLint Exception:** Our ESLint config allows `require()` for asset file extensions (e.g., `.ttf`, `.png`).
+
+#### 2. Escaping Characters in JSX
+
+- **Best Practice:** Use JSX expressions for strings with apostrophes or quotes instead of HTML entities.
+
+```tsx
+// ✅ Good
+<Text>{"Don't have an account?"}</Text>
+
+// ❌ Bad
+<Text>Don&apos;t have an account?</Text>
+```
+
+- This approach is more readable and maintainable, and is preferred for all JSX text content.
+
+#### 3. require() Style Imports
+
+- **Rule:** Only use `require()` for static assets (see above). For all code modules, use ES imports.
+
+```typescript
+// ✅ Good: ES import for code
+import {MyComponent} from './MyComponent'
+
+// ✅ Good: require() for asset
+const logo = require('../assets/logo.png')
+
+// ❌ Bad: require() for code
+const MyComponent = require('./MyComponent')
+```
+
+#### 4. TypeScript 'any' Usage
+
+- **Rule:** Avoid `any` in all code. Use explicit types or `unknown` with type guards for error handling.
+
+```typescript
+// ✅ Good
+catch (err: unknown) {
+  if (err instanceof Error) {
+    // handle error
+  }
+}
+
+// ❌ Bad
+catch (err: any) {
+  // ...
+}
+```
+
+#### 5. Unused Variables and Styles
+
+- **Rule:** Remove all unused variables, imports, and styles. This keeps the codebase clean and avoids confusion.
+
+#### 6. React Hook Rules
+
+- **Rule:** Do not call hooks conditionally. Always call hooks at the top level of your component or custom hook.
+
+```tsx
+// ✅ Good
+if (someCondition) {
+  doSomething()
+}
+const value = useMyHook()
+
+// ❌ Bad
+if (someCondition) {
+  const value = useMyHook()
+}
+```
+
+---
+
+**See also:**
+
+- [Expo Asset System](https://docs.expo.dev/guides/assets/)
+- [Expo Font Loading](https://docs.expo.dev/guides/using-custom-fonts/)
+- [ESLint Configuration](../../eslint.config.mjs)

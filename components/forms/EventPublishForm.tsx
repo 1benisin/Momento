@@ -42,9 +42,12 @@ const EventPublishForm: React.FC<EventPublishFormProps> = ({event}) => {
       await publishEvent({id: event._id})
       Alert.alert('Success', 'Event published successfully!')
       router.back()
-    } catch (error: any) {
-      console.error(error)
-      Alert.alert('Error', error.message || 'Could not publish event.')
+    } catch (error: unknown) {
+      let message = 'An error occurred while publishing the event.'
+      if (error instanceof Error) {
+        message = error.message
+      }
+      Alert.alert('Error', message)
       // TODO: Display VerificationPromptBanner if error is due to verification
     }
   }

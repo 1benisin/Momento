@@ -74,6 +74,7 @@ export default function TabLayout() {
   const router = useRouter()
   const user = useQuery(api.user.me)
   const {signOut} = useAuth()
+  const headerShown = useClientOnlyValue(false, true)
 
   if (user === undefined) {
     devLog('[TabLayout] user is undefined, showing loading spinner')
@@ -126,8 +127,9 @@ export default function TabLayout() {
           tabs loadingView (no effectiveRole)
         </Text>
         <Text>
-          'No role found (both "Social" and "Host" profiles are missing). Please
-          contact support.'
+          {
+            "No role found (both 'Social' and 'Host' profiles are missing). Please contact support."
+          }
         </Text>
       </View>
     )
@@ -144,7 +146,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: useClientOnlyValue(false, true),
+        headerShown,
         headerRight: () => (
           <View className="flex-row items-center gap-4 pr-4">
             <Menu>
@@ -195,7 +197,7 @@ export default function TabLayout() {
       {allTabs.map(tab => (
         <Tabs.Screen
           key={tab.name}
-          name={tab.name as any}
+          name={tab.name as string}
           options={{
             title: tab.title,
             tabBarIcon: ({color}) => (

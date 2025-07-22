@@ -219,7 +219,7 @@ export default function SignInScreen() {
 
         <View className="mt-8 items-center">
           <Text className="text-[#F8F6F1] font-['Inter'] text-center">
-            Don't have an account?{' '}
+            {"Don't have an account?"}
             <Link href="/sign-up" asChild>
               <Text className="text-[#D4AF37]">Sign Up</Text>
             </Link>

@@ -10,6 +10,7 @@ import {useMutation} from 'convex/react'
 import {api} from '@/convex/_generated/api'
 import {devLog} from '@/utils/devLog'
 import {StripeProvider} from './StripeProvider'
+import {Id} from '@/convex/_generated/dataModel'
 
 interface PaymentSheetProps {
   eventId: string
@@ -25,7 +26,6 @@ export const PaymentSheetComponent: React.FC<PaymentSheetProps> = ({
   amount,
   currency,
   onSuccess,
-  onCancel,
   onError,
 }) => {
   const [loading, setLoading] = useState(false)
@@ -53,7 +53,7 @@ export const PaymentSheetComponent: React.FC<PaymentSheetProps> = ({
       })
 
       const {clientSecret} = await createPayment({
-        eventId: eventId as any,
+        eventId: eventId as Id<'events'>,
         amount,
         currency,
       })
@@ -79,9 +79,13 @@ export const PaymentSheetComponent: React.FC<PaymentSheetProps> = ({
 
       devLog('[PaymentSheet] Payment sheet initialized successfully')
       setIsSheetInitialized(true)
-    } catch (error: any) {
+    } catch (error: unknown) {
+      let message = 'Payment initialization failed.'
+      if (error instanceof Error) {
+        message = `Payment initialization failed: ${error.message}`
+      }
       devLog('[PaymentSheet] Error initializing payment', error)
-      onError(`Payment initialization failed: ${error.message}`)
+      onError(message)
     } finally {
       setLoading(false)
     }

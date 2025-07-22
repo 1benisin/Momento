@@ -1,4 +1,5 @@
 import React from 'react'
+import {View, TextInput} from 'react-native'
 import {render, fireEvent, waitFor} from '@testing-library/react-native'
 import SignUpScreen from '../sign-up'
 import {useSignUp} from '@clerk/clerk-expo'
@@ -9,34 +10,48 @@ jest.mock('@clerk/clerk-expo', () => ({
 }))
 
 jest.mock('react-native-phone-number-input', () => {
-  const React = require('react')
-  const {View, TextInput} = require('react-native')
-  const PhoneInput = React.forwardRef((props: any, ref: any) => {
-    const {onChangeText, onChangeFormattedText, defaultValue} = props
-    if (ref) {
-      ref.current = {
-        isValidNumber: (value: string) => {
-          // simple validation for testing
-          return value && value.length > 5
-        },
+  const PhoneNumberInput = React.forwardRef(
+    (
+      props: {
+        onChangeText?: (text: string) => void
+        onChangeFormattedText?: (text: string) => void
+        defaultValue?: string
+      },
+      ref: React.Ref<{isValidNumber: (value: string) => boolean}>,
+    ) => {
+      const {onChangeText, onChangeFormattedText, defaultValue} = props
+      if (ref) {
+        const refObj = ref as React.RefObject<{
+          isValidNumber: (value: string) => boolean
+        }>
+        if (refObj && 'current' in refObj) {
+          refObj.current = {
+            isValidNumber: (value: string) => {
+              // simple validation for testing
+              return !!value && value.length > 5
+            },
+          }
+        }
       }
-    }
-    return (
-      <View>
-        <TextInput
-          testID="phone-input"
-          defaultValue={defaultValue}
-          onChangeText={(text: string) => {
-            if (onChangeText) onChangeText(text)
-            if (onChangeFormattedText) onChangeFormattedText(`+1${text}`)
-          }}
-        />
-      </View>
-    )
-  })
+      return (
+        <View>
+          <TextInput
+            testID="phone-input"
+            defaultValue={defaultValue}
+            onChangeText={(text: string) => {
+              if (onChangeText) onChangeText(text)
+              if (onChangeFormattedText) onChangeFormattedText(`+1${text}`)
+            }}
+          />
+        </View>
+      )
+    },
+  )
+  PhoneNumberInput.displayName = 'PhoneNumberInput'
+
   return {
     __esModule: true,
-    default: PhoneInput,
+    default: PhoneNumberInput,
   }
 })
 

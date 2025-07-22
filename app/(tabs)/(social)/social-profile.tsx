@@ -24,7 +24,9 @@ export default function SocialProfileScreen() {
     <View className="flex-1 items-center justify-center">
       <Text className="text-xl font-bold">Social Profile</Text>
       <View className="my-7 h-px w-4/5 bg-gray-200" />
-      <Text>This is where the user's social profile will be displayed.</Text>
+      <Text>
+        {"This is where the user's social profile will be displayed."}
+      </Text>
 
       {!user?.hostProfile && (
         <View className="absolute bottom-12">

@@ -27,8 +27,9 @@ export default function VerificationPromptScreen() {
         Verification Required
       </Text>
       <Text className="mb-10 px-2.5 text-center text-base text-gray-500">
-        To ensure the safety of our community, you'll need to verify your
-        identity before you can publish an event.
+        {
+          "To ensure the safety of our community, you'll need to verify your identity before you can publish an event."
+        }
       </Text>
 
       <TouchableOpacity

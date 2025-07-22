@@ -64,6 +64,19 @@ export default [
       'react-native/no-raw-text': 'off',
       'react-native/no-inline-styles': 'off',
       'react-native/no-color-literals': 'off',
+      '@typescript-eslint/no-require-imports': [
+        'error',
+        {
+          allow: [
+            '\\.ttf$',
+            '\\.png$',
+            '\\.jpg$',
+            '\\.jpeg$',
+            '\\.gif$',
+            '\\.svg$',
+          ],
+        },
+      ],
     },
     settings: {
       react: {

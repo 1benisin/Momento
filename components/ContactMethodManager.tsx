@@ -16,6 +16,17 @@ type ContactMethodManagerProps = {
 
 type Flow = 'idle' | 'adding' | 'verifying'
 
+// Type guard for Clerk API errors
+type ClerkError = {errors: {message?: string}[]}
+function isClerkError(err: unknown): err is ClerkError {
+  return (
+    typeof err === 'object' &&
+    err !== null &&
+    'errors' in err &&
+    Array.isArray((err as {errors?: unknown}).errors)
+  )
+}
+
 const ContactMethodManager = ({methodType}: ContactMethodManagerProps) => {
   const {user, isLoaded} = useUser()
   const [flow, setFlow] = useState<Flow>('idle')
@@ -48,15 +59,15 @@ const ContactMethodManager = ({methodType}: ContactMethodManagerProps) => {
       }
       setVerifyingResource(resource)
       setFlow('verifying')
-    } catch (err: any) {
-      console.error(
-        'Error adding contact method:',
-        JSON.stringify(err, null, 2),
-      )
-      Alert.alert(
-        'Error',
-        err.errors?.[0]?.message || 'An unknown error occurred.',
-      )
+    } catch (err: unknown) {
+      let message = 'An unknown error occurred.'
+      if (isClerkError(err)) {
+        message = err.errors[0]?.message || message
+      } else if (err instanceof Error) {
+        message = err.message
+      }
+      console.error('Error adding contact method:', err)
+      Alert.alert('Error', message)
     } finally {
       setIsProcessing(false)
     }
@@ -97,15 +108,15 @@ const ContactMethodManager = ({methodType}: ContactMethodManagerProps) => {
           result.verification.status,
         )
       }
-    } catch (err: any) {
-      console.error(
-        'Error verifying contact method:',
-        JSON.stringify(err, null, 2),
-      )
-      Alert.alert(
-        'Error',
-        err.errors?.[0]?.message || 'An unknown error occurred.',
-      )
+    } catch (err: unknown) {
+      let message = 'An unknown error occurred.'
+      if (isClerkError(err)) {
+        message = err.errors[0]?.message || message
+      } else if (err instanceof Error) {
+        message = err.message
+      }
+      console.error('Error verifying contact method:', err)
+      Alert.alert('Error', message)
     } finally {
       setIsProcessing(false)
     }

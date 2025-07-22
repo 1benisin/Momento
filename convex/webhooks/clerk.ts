@@ -13,6 +13,7 @@ import {internal} from '../_generated/api'
 import type {WebhookEvent} from '@clerk/backend'
 import {Webhook} from 'svix'
 import {config} from '../lib/config'
+import type {ActionCtx} from '../_generated/server'
 
 async function validateRequest(
   req: Request,
@@ -43,7 +44,7 @@ async function validateRequest(
  * This function is called from the main webhook handler when a `user.created` or
  * `user.updated` event is received.
  */
-async function handleUserCreatedOrUpdated(ctx: any, event: WebhookEvent) {
+async function handleUserCreatedOrUpdated(ctx: ActionCtx, event: WebhookEvent) {
   if (event.type !== 'user.created' && event.type !== 'user.updated') {
     return
   }
@@ -97,7 +98,7 @@ async function handleUserCreatedOrUpdated(ctx: any, event: WebhookEvent) {
  * This function is called from the main webhook handler when a `user.deleted`
  * event is received.
  */
-async function handleUserDeleted(ctx: any, event: WebhookEvent) {
+async function handleUserDeleted(ctx: ActionCtx, event: WebhookEvent) {
   if (event.type !== 'user.deleted') {
     return
   }

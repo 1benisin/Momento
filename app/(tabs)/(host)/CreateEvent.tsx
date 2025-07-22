@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react'
 import {
   StyleSheet,
   ActivityIndicator,
-  Button,
   ScrollView,
   TouchableOpacity,
   Text,
@@ -84,20 +83,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
-  },
-  container: {
-    flex: 1,
-    padding: 20,
-  },
-  navigation: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
   },
 })
 

@@ -12,6 +12,9 @@ import {httpAction} from '../_generated/server'
 import {internal} from '../_generated/api'
 import {verifyWebhookSignature} from '../lib/stripe'
 import {devLog} from '../../utils/devLog'
+import type {ActionCtx} from '../_generated/server'
+import type {Stripe} from 'stripe'
+import type {Id} from '../_generated/dataModel'
 
 /**
  * Stripe webhook handler
@@ -72,12 +75,15 @@ export const stripeWebhook = httpAction(async (ctx, request) => {
     }
 
     return new Response('Webhook processed successfully', {status: 200})
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error'
+    const errorStack = error instanceof Error ? error.stack : undefined
     devLog('[Stripe Webhook] Error processing webhook', {
-      message: error.message,
-      stack: error.stack,
+      message: errorMessage,
+      stack: errorStack,
     })
-    if (error.message.includes('Invalid signature')) {
+    if (errorMessage.includes('Invalid signature')) {
       return new Response('Invalid signature', {status: 400})
     }
     return new Response('Internal server error', {status: 500})
@@ -86,17 +92,26 @@ export const stripeWebhook = httpAction(async (ctx, request) => {
 
 // --- Payment Intent Handlers ---
 
-async function handlePaymentIntentSucceeded(ctx: any, paymentIntent: any) {
+async function handlePaymentIntentSucceeded(
+  ctx: ActionCtx,
+  paymentIntent: Stripe.PaymentIntent,
+) {
   devLog('[Stripe] Payment Succeeded', {id: paymentIntent.id})
   // TODO: Fulfill the order, send confirmation email, etc.
 }
 
-async function handlePaymentIntentProcessing(ctx: any, paymentIntent: any) {
+async function handlePaymentIntentProcessing(
+  ctx: ActionCtx,
+  paymentIntent: Stripe.PaymentIntent,
+) {
   devLog('[Stripe] Payment Processing', {id: paymentIntent.id})
   // TODO: Update UI to show "Processing" state.
 }
 
-async function handlePaymentIntentFailed(ctx: any, paymentIntent: any) {
+async function handlePaymentIntentFailed(
+  ctx: ActionCtx,
+  paymentIntent: Stripe.PaymentIntent,
+) {
   devLog('[Stripe] Payment Failed', {
     id: paymentIntent.id,
     error: paymentIntent.last_payment_error?.message,
@@ -106,14 +121,17 @@ async function handlePaymentIntentFailed(ctx: any, paymentIntent: any) {
 
 // --- Identity Verification Handlers ---
 
-async function handleVerificationSessionVerified(ctx: any, session: any) {
+async function handleVerificationSessionVerified(
+  ctx: ActionCtx,
+  session: Stripe.Identity.VerificationSession,
+) {
   devLog('[Stripe] Identity Verified', {
     id: session.id,
     userId: session.metadata?.userId,
   })
   if (session.metadata?.userId) {
     await ctx.runMutation(internal.user.updateVerificationStatus, {
-      userId: session.metadata.userId,
+      userId: session.metadata.userId as Id<'users'>, // TODO: Convert string to proper Convex ID
       isVerified: true,
       sessionId: session.id,
       verificationData: session.verified_outputs,
@@ -121,7 +139,10 @@ async function handleVerificationSessionVerified(ctx: any, session: any) {
   }
 }
 
-async function handleVerificationSessionProcessing(ctx: any, session: any) {
+async function handleVerificationSessionProcessing(
+  ctx: ActionCtx,
+  session: Stripe.Identity.VerificationSession,
+) {
   devLog('[Stripe] Identity Processing', {
     id: session.id,
     userId: session.metadata?.userId,
@@ -129,7 +150,7 @@ async function handleVerificationSessionProcessing(ctx: any, session: any) {
   // TODO: Update UI to show "Verification in progress".
   if (session.metadata?.userId) {
     await ctx.runMutation(internal.user.updateVerificationStatus, {
-      userId: session.metadata.userId,
+      userId: session.metadata.userId as Id<'users'>, // TODO: Convert string to proper Convex ID
       isVerified: false,
       sessionId: session.id,
       verificationStatus: 'processing',
@@ -137,7 +158,10 @@ async function handleVerificationSessionProcessing(ctx: any, session: any) {
   }
 }
 
-async function handleVerificationSessionRequiresInput(ctx: any, session: any) {
+async function handleVerificationSessionRequiresInput(
+  ctx: ActionCtx,
+  session: Stripe.Identity.VerificationSession,
+) {
   devLog('[Stripe] Identity Requires Input', {
     id: session.id,
     userId: session.metadata?.userId,
@@ -145,7 +169,7 @@ async function handleVerificationSessionRequiresInput(ctx: any, session: any) {
   // TODO: Notify user to complete verification steps.
   if (session.metadata?.userId) {
     await ctx.runMutation(internal.user.updateVerificationStatus, {
-      userId: session.metadata.userId,
+      userId: session.metadata.userId as Id<'users'>, // TODO: Convert string to proper Convex ID
       isVerified: false,
       sessionId: session.id,
       verificationStatus: 'requires_input',
@@ -153,7 +177,10 @@ async function handleVerificationSessionRequiresInput(ctx: any, session: any) {
   }
 }
 
-async function handleVerificationSessionCanceled(ctx: any, session: any) {
+async function handleVerificationSessionCanceled(
+  ctx: ActionCtx,
+  session: Stripe.Identity.VerificationSession,
+) {
   devLog('[Stripe] Identity Canceled', {
     id: session.id,
     userId: session.metadata?.userId,
@@ -161,7 +188,7 @@ async function handleVerificationSessionCanceled(ctx: any, session: any) {
   // TODO: Update UI to reflect canceled verification.
   if (session.metadata?.userId) {
     await ctx.runMutation(internal.user.updateVerificationStatus, {
-      userId: session.metadata.userId,
+      userId: session.metadata.userId as Id<'users'>, // TODO: Convert string to proper Convex ID
       isVerified: false,
       sessionId: session.id,
       verificationStatus: 'canceled',

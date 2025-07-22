@@ -1,4 +1,4 @@
-import React, {useState, useMemo} from 'react'
+import React, {useState} from 'react'
 import {Text, View, TextInput, TouchableOpacity} from 'react-native'
 import {Doc, Id} from '@/convex/_generated/dataModel'
 import CustomTimePicker from './CustomTimePicker'
@@ -30,14 +30,6 @@ const EventItineraryForm: React.FC<EventItineraryFormProps> = ({
   const [showTimePickerIdx, setShowTimePickerIdx] = useState<number | null>(
     null,
   )
-
-  const pickerDate = useMemo(() => {
-    if (showTimePickerIdx === null) {
-      return new Date() // Default value, not used when picker is hidden
-    }
-    const item = (event.itinerary ?? [])[showTimePickerIdx]
-    return new Date(item?.start_time || Date.now())
-  }, [showTimePickerIdx, event.itinerary])
 
   const handleAddItem = () => {
     const newItem: ItineraryItem = {

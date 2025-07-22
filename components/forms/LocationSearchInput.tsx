@@ -1,4 +1,16 @@
 import React from 'react'
+// Minimal type for Google Places details used in this app
+interface PlaceDetail {
+  formatted_address: string
+  name?: string
+  geometry: {
+    location: {
+      lat: number
+      lng: number
+    }
+  }
+  place_id: string
+}
 import {View, TouchableOpacity} from 'react-native'
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete'
 import {Ionicons} from '@expo/vector-icons'
@@ -17,7 +29,7 @@ if (!GOOGLE_MAPS_API_KEY) {
 }
 
 interface LocationSearchInputProps {
-  onLocationSelect: (details: any) => void
+  onLocationSelect: (details: PlaceDetail | null) => void
   onPressPin: () => void
   renderKey: string
 }
