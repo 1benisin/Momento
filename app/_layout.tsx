@@ -10,31 +10,31 @@
  * 3.  Defining the core navigation logic in the `InitialLayout` component, which acts as the
  *     central "router" based on the user's authentication and onboarding state.
  */
-import '../global.css'
-import 'expo-dev-client'
-import FontAwesome from '@expo/vector-icons/FontAwesome'
 import {DarkTheme, DefaultTheme, ThemeProvider} from '@react-navigation/native'
-import {useFonts} from 'expo-font'
-import {Stack, useRouter, useSegments} from 'expo-router'
-import * as SplashScreen from 'expo-splash-screen'
 import {useEffect} from 'react'
-import 'react-native-reanimated'
-import 'react-native-get-random-values'
+import {ActivityIndicator, Text, View} from 'react-native'
+import FontAwesome from '@expo/vector-icons/FontAwesome'
 import {
+  ClerkLoaded,
+  ClerkLoading,
   ClerkProvider,
   useAuth,
-  ClerkLoading,
-  ClerkLoaded,
 } from '@clerk/clerk-expo'
 import {tokenCache} from '@clerk/clerk-expo/token-cache'
+import {ConvexReactClient, useMutation, useQuery} from 'convex/react'
 import {ConvexProviderWithClerk} from 'convex/react-clerk'
-import {ConvexReactClient, useQuery, useMutation} from 'convex/react'
-import {ActivityIndicator, View, Text} from 'react-native'
+import * as SplashScreen from 'expo-splash-screen'
+import 'expo-dev-client'
+import {useFonts} from 'expo-font'
+import {Stack, useRouter, useSegments} from 'expo-router'
+import 'react-native-get-random-values'
+import {MenuProvider} from 'react-native-popup-menu'
+import 'react-native-reanimated'
+import {StripeProvider} from '@/components/StripeProvider'
 import {api} from '@/convex/_generated/api'
 import {useColorScheme} from '@/hooks/useColorScheme'
-import {MenuProvider} from 'react-native-popup-menu'
 import {devLog} from '@/utils/devLog'
-import {StripeProvider} from '@/components/StripeProvider'
+import '../global.css'
 
 export {
   // Catch any errors thrown by the Layout component.

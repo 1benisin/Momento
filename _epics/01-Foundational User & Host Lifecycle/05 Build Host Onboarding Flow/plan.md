@@ -70,7 +70,6 @@ No changes are required for the data model. The `users` table already contains a
   - `app/(onboarding)/host/host-profile-setup.tsx`: A new screen containing a form for users to create their host profile. It will capture the host's name and bio.
   - `app/(onboarding)/host/verification-prompt.tsx`: A screen that appears after profile setup. It will explain that identity verification is mandatory for publishing events and will provide two options: "Verify Now" and "Do This Later."
 - **Components**:
-
   - `components/VerificationPromptBanner.tsx`: A reusable banner component that can be displayed on host-related screens (like the dashboard) for users who have not yet completed identity verification.
 
 - **Files to Modify**:

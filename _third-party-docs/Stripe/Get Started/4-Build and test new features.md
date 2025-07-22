@@ -52,35 +52,28 @@ You can debug and manage your Stripe integration from your browser using Workben
 Use the following views to manage the payment method feature:
 
 - **Overview**:
-
   - Make sure the new payment method uses the latest and most secure API version.
   - Monitor API requests for payment method fee calculations to confirm they function as expected.
   - Identify integration errors related to the payment method.
 
 - **Errors**:
-
   - Identify and categorize errors in payment method calculations or payment processing.
   - Track error frequency to understand impact and urgency.
 
 - **Inspector**:
-
   - Analyze API object configurations and troubleshoot issues in real-time.
 
 - **Logs**:
-
   - Filter API requests to make sure interactions align with expectations.
 
 - **Events**:
-
   - Filter events to verify logistical triggers.
   - Review event payloads to confirm correct back-end processing.
 
 - **Webhooks**:
-
   - Set up webhook endpoints or other destination types, such as Amazon EventBridge, for real-time updates on payment method status and payment confirmations.
 
 - **Shell and API Explorer**:
-
   - Simulate API requests and manage them using a command-line interface.
 
 ## Listen to real-time updates with event destinations

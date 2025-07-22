@@ -2,11 +2,10 @@
  * Stripe Identity verification functions
  * Handles identity verification for host onboarding
  */
-
-import {mutation, query} from './_generated/server'
 import {v} from 'convex/values'
-import {createVerificationSession, getVerificationSession} from './lib/stripe'
 import {devLog} from '../utils/devLog'
+import {mutation, query} from './_generated/server'
+import {createVerificationSession, getVerificationSession} from './lib/stripe'
 
 /**
  * Create a verification session for host identity verification

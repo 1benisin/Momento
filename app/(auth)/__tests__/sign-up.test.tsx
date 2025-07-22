@@ -1,8 +1,8 @@
+import {fireEvent, render, waitFor} from '@testing-library/react-native'
 import React from 'react'
-import {View, TextInput} from 'react-native'
-import {render, fireEvent, waitFor} from '@testing-library/react-native'
-import SignUpScreen from '../sign-up'
+import {TextInput, View} from 'react-native'
 import {useSignUp} from '@clerk/clerk-expo'
+import SignUpScreen from '../sign-up'
 
 // Mock the dependencies
 jest.mock('@clerk/clerk-expo', () => ({

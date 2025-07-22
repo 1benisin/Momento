@@ -55,11 +55,9 @@ sequenceDiagram
 ## 5. Step-by-Step Breakdown
 
 1.  **Initiating Decline**:
-
     - On the `InvitationDetailScreen`, the user taps the **"Decline"** button.
 
 2.  **Providing Feedback**:
-
     - This action immediately presents the `DeclineFeedbackModal`.
     - The modal asks for a reason, presenting a list of options:
       - "I'm busy that day"
@@ -71,7 +69,6 @@ sequenceDiagram
     - The user selects one reason.
 
 3.  **Backend Processing & Decision**:
-
     - The client calls a `declineInvitation` mutation, passing the `invitationId` and the chosen `reason`.
     - The backend first updates the `invitations` document, setting its `status` to `'declined'` and storing the `decline_reason`.
     - **Crucially, the backend then checks for the "nudge" condition:**
@@ -81,7 +78,6 @@ sequenceDiagram
       - Otherwise, it returns a standard success response.
 
 4.  **The Contextual Nudge**:
-
     - If the nudge condition is met, the UI dismisses the `DeclineFeedbackModal` and immediately presents the `ContextualNudgeModal`.
     - The modal's content is specific to the reason given:
       - _(For "Too far away")_: **"Tired of the commute?** You can set a max travel distance to get invitations closer to home."

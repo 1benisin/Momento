@@ -237,7 +237,7 @@ const [formData, setFormData] = useState<FormData>(initialData)
 
 ```typescript
 // ✅ Good: Use Convex for global state management
-import {useQuery, useMutation} from 'convex/react'
+import {useMutation, useQuery} from 'convex/react'
 
 export const useUserData = () => {
   return useQuery('users.getCurrentUser')
@@ -930,13 +930,13 @@ We use ESLint with TypeScript and React Native plugins to enforce code quality a
 - **Expo Best Practice:** Use `require()` for static asset imports (e.g., fonts, images) in Expo projects. ES module imports do not work for these file types and will cause build or type errors.
 
 ```typescript
+// ❌ Bad: ES import for font
+import SpaceMonoFont from '../assets/fonts/SpaceMono-Regular.ttf'
+
 // ✅ Good: Font loading in Expo
 const [loaded] = useFonts({
   SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
 })
-
-// ❌ Bad: ES import for font
-import SpaceMonoFont from '../assets/fonts/SpaceMono-Regular.ttf'
 ```
 
 - **ESLint Exception:** Our ESLint config allows `require()` for asset file extensions (e.g., `.ttf`, `.png`).

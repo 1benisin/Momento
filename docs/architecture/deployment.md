@@ -196,28 +196,28 @@ JWT_SECRET=
 
 ```typescript
 // scripts/validate-env.ts
-import { config } from "../convex/lib/config";
+import {config} from '../convex/lib/config'
 
 const requiredEnvVars = [
-  "NODE_ENV",
-  "FRONTEND_URL",
-  "CONVEX_DEPLOY_KEY",
-  "CLERK_SECRET_KEY",
-  "STRIPE_SECRET_KEY",
-  "POSTMARK_API_KEY",
-];
+  'NODE_ENV',
+  'FRONTEND_URL',
+  'CONVEX_DEPLOY_KEY',
+  'CLERK_SECRET_KEY',
+  'STRIPE_SECRET_KEY',
+  'POSTMARK_API_KEY',
+]
 
 export const validateEnvironment = () => {
-  const missing = requiredEnvVars.filter((varName) => !process.env[varName]);
+  const missing = requiredEnvVars.filter(varName => !process.env[varName])
 
   if (missing.length > 0) {
     throw new Error(
-      `Missing required environment variables: ${missing.join(", ")}`
-    );
+      `Missing required environment variables: ${missing.join(', ')}`,
+    )
   }
 
-  console.log("✅ Environment validation passed");
-};
+  console.log('✅ Environment validation passed')
+}
 ```
 
 ---
@@ -239,7 +239,7 @@ on:
     branches: [main]
 
 env:
-  NODE_VERSION: "18"
+  NODE_VERSION: '18'
 
 jobs:
   test:
@@ -252,7 +252,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "npm"
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
@@ -288,7 +288,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "npm"
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
@@ -316,7 +316,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "npm"
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
@@ -353,7 +353,7 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    - cron: "0 2 * * *" # Daily at 2 AM
+    - cron: '0 2 * * *' # Daily at 2 AM
 
 jobs:
   security-scan:
@@ -386,26 +386,26 @@ jobs:
 // scripts/deploy-blue-green.ts
 export const deployBlueGreen = async () => {
   // 1. Deploy new version to green environment
-  await deployToEnvironment("green");
+  await deployToEnvironment('green')
 
   // 2. Run health checks
-  const healthCheck = await runHealthChecks("green");
+  const healthCheck = await runHealthChecks('green')
 
   if (!healthCheck.success) {
-    console.log("❌ Health checks failed, rolling back");
-    await rollbackDeployment();
-    return;
+    console.log('❌ Health checks failed, rolling back')
+    await rollbackDeployment()
+    return
   }
 
   // 3. Switch traffic to green
-  await switchTraffic("green");
+  await switchTraffic('green')
 
   // 4. Monitor for issues
-  await monitorDeployment();
+  await monitorDeployment()
 
   // 5. Clean up blue environment
-  await cleanupEnvironment("blue");
-};
+  await cleanupEnvironment('blue')
+}
 ```
 
 #### Canary Deployment
@@ -414,31 +414,31 @@ export const deployBlueGreen = async () => {
 // scripts/deploy-canary.ts
 export const deployCanary = async () => {
   // 1. Deploy to canary environment
-  await deployToCanary();
+  await deployToCanary()
 
   // 2. Route small percentage of traffic
-  await routeTraffic(5); // 5% of traffic
+  await routeTraffic(5) // 5% of traffic
 
   // 3. Monitor metrics
-  const metrics = await monitorCanaryMetrics();
+  const metrics = await monitorCanaryMetrics()
 
   if (metrics.errorRate > 0.01) {
     // 1% error rate threshold
-    console.log("❌ Canary deployment failed, rolling back");
-    await rollbackCanary();
-    return;
+    console.log('❌ Canary deployment failed, rolling back')
+    await rollbackCanary()
+    return
   }
 
   // 4. Gradually increase traffic
-  await routeTraffic(25); // 25% of traffic
-  await monitorCanaryMetrics();
+  await routeTraffic(25) // 25% of traffic
+  await monitorCanaryMetrics()
 
-  await routeTraffic(50); // 50% of traffic
-  await monitorCanaryMetrics();
+  await routeTraffic(50) // 50% of traffic
+  await monitorCanaryMetrics()
 
   // 5. Full deployment
-  await routeTraffic(100); // 100% of traffic
-};
+  await routeTraffic(100) // 100% of traffic
+}
 ```
 
 ---
@@ -666,13 +666,13 @@ CMD ["node", "server.js"]
 
 ```yaml
 # docker-compose.yml
-version: "3.8"
+version: '3.8'
 
 services:
   app:
     build: .
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       - NODE_ENV=development
       - CONVEX_URL=${CONVEX_URL}
@@ -687,7 +687,7 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - '6379:6379'
     volumes:
       - redis_data:/data
 
@@ -698,7 +698,7 @@ services:
       POSTGRES_USER: momento
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -717,115 +717,115 @@ volumes:
 
 ```typescript
 // scripts/migrate.ts
-import { ConvexHttpClient } from "convex/browser";
-import { api } from "../convex/_generated/api";
+import {ConvexHttpClient} from 'convex/browser'
+import {api} from '../convex/_generated/api'
 
-const client = new ConvexHttpClient(process.env.CONVEX_URL!);
+const client = new ConvexHttpClient(process.env.CONVEX_URL!)
 
 export const runMigration = async (migrationName: string) => {
-  console.log(`Running migration: ${migrationName}`);
+  console.log(`Running migration: ${migrationName}`)
 
   try {
     switch (migrationName) {
-      case "add_user_verification_fields":
-        await migrateUserVerificationFields();
-        break;
-      case "add_event_categories":
-        await migrateEventCategories();
-        break;
-      case "add_payment_tracking":
-        await migratePaymentTracking();
-        break;
+      case 'add_user_verification_fields':
+        await migrateUserVerificationFields()
+        break
+      case 'add_event_categories':
+        await migrateEventCategories()
+        break
+      case 'add_payment_tracking':
+        await migratePaymentTracking()
+        break
       default:
-        throw new Error(`Unknown migration: ${migrationName}`);
+        throw new Error(`Unknown migration: ${migrationName}`)
     }
 
-    console.log(`✅ Migration ${migrationName} completed successfully`);
+    console.log(`✅ Migration ${migrationName} completed successfully`)
   } catch (error) {
-    console.error(`❌ Migration ${migrationName} failed:`, error);
-    throw error;
+    console.error(`❌ Migration ${migrationName} failed:`, error)
+    throw error
   }
-};
+}
 
 const migrateUserVerificationFields = async () => {
   // Add verification fields to existing users
-  const users = await client.query(api.users.listAll);
+  const users = await client.query(api.users.listAll)
 
   for (const user of users) {
     await client.mutation(api.users.updateVerificationFields, {
       userId: user._id,
       isVerified: false,
-      verificationStatus: "not_started",
-    });
+      verificationStatus: 'not_started',
+    })
   }
-};
+}
 ```
 
 #### Backup and Recovery
 
 ```typescript
 // scripts/backup.ts
-import { ConvexHttpClient } from "convex/browser";
-import { api } from "../convex/_generated/api";
+import {ConvexHttpClient} from 'convex/browser'
+import {api} from '../convex/_generated/api'
 
-const client = new ConvexHttpClient(process.env.CONVEX_URL!);
+const client = new ConvexHttpClient(process.env.CONVEX_URL!)
 
 export const createBackup = async () => {
-  console.log("Creating database backup...");
+  console.log('Creating database backup...')
 
-  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-  const backupName = `backup-${timestamp}`;
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+  const backupName = `backup-${timestamp}`
 
   try {
     // Export all data
-    const users = await client.query(api.users.listAll);
-    const events = await client.query(api.events.listAll);
-    const payments = await client.query(api.payments.listAll);
+    const users = await client.query(api.users.listAll)
+    const events = await client.query(api.events.listAll)
+    const payments = await client.query(api.payments.listAll)
 
     const backup = {
       timestamp: new Date().toISOString(),
-      version: "1.0",
+      version: '1.0',
       data: {
         users,
         events,
         payments,
       },
-    };
+    }
 
     // Save backup to S3
-    await saveBackupToS3(backupName, backup);
+    await saveBackupToS3(backupName, backup)
 
-    console.log(`✅ Backup created: ${backupName}`);
-    return backupName;
+    console.log(`✅ Backup created: ${backupName}`)
+    return backupName
   } catch (error) {
-    console.error("❌ Backup failed:", error);
-    throw error;
+    console.error('❌ Backup failed:', error)
+    throw error
   }
-};
+}
 
 export const restoreBackup = async (backupName: string) => {
-  console.log(`Restoring backup: ${backupName}`);
+  console.log(`Restoring backup: ${backupName}`)
 
   try {
     // Load backup from S3
-    const backup = await loadBackupFromS3(backupName);
+    const backup = await loadBackupFromS3(backupName)
 
     // Validate backup
     if (!backup.data || !backup.timestamp) {
-      throw new Error("Invalid backup format");
+      throw new Error('Invalid backup format')
     }
 
     // Restore data
-    await restoreUsers(backup.data.users);
-    await restoreEvents(backup.data.events);
-    await restorePayments(backup.data.payments);
+    await restoreUsers(backup.data.users)
+    await restoreEvents(backup.data.events)
+    await restorePayments(backup.data.payments)
 
-    console.log(`✅ Backup restored: ${backupName}`);
+    console.log(`✅ Backup restored: ${backupName}`)
   } catch (error) {
-    console.error("❌ Restore failed:", error);
-    throw error;
+    console.error('❌ Restore failed:', error)
+    throw error
   }
-};
+}
 ```
 
 ---
@@ -838,7 +838,7 @@ export const restoreBackup = async (backupName: string) => {
 
 ```typescript
 // lib/sentry.ts
-import * as Sentry from "@sentry/react-native";
+import * as Sentry from '@sentry/react-native'
 
 export const initSentry = () => {
   Sentry.init({
@@ -847,59 +847,59 @@ export const initSentry = () => {
     tracesSampleRate: 1.0,
     integrations: [
       new Sentry.ReactNativeTracing({
-        tracingOrigins: ["localhost", "your-api-url.com"],
+        tracingOrigins: ['localhost', 'your-api-url.com'],
       }),
     ],
-  });
-};
+  })
+}
 
 export const captureException = (error: Error, context?: any) => {
   Sentry.captureException(error, {
     extra: context,
-  });
-};
+  })
+}
 
 export const captureMessage = (
   message: string,
-  level: Sentry.SeverityLevel = "info"
+  level: Sentry.SeverityLevel = 'info',
 ) => {
-  Sentry.captureMessage(message, level);
-};
+  Sentry.captureMessage(message, level)
+}
 ```
 
 #### Performance Monitoring
 
 ```typescript
 // lib/performance.ts
-import { Performance } from "@sentry/react-native";
+import {Performance} from '@sentry/react-native'
 
 export const trackPerformance = (
   name: string,
-  operation: () => Promise<any>
+  operation: () => Promise<any>,
 ) => {
   const transaction = Performance.startTransaction({
     name,
-    op: "function",
-  });
+    op: 'function',
+  })
 
   return operation().finally(() => {
-    transaction.finish();
-  });
-};
+    transaction.finish()
+  })
+}
 
 export const trackApiCall = (
   endpoint: string,
-  operation: () => Promise<any>
+  operation: () => Promise<any>,
 ) => {
-  return trackPerformance(`API: ${endpoint}`, operation);
-};
+  return trackPerformance(`API: ${endpoint}`, operation)
+}
 
 export const trackDatabaseQuery = (
   query: string,
-  operation: () => Promise<any>
+  operation: () => Promise<any>,
 ) => {
-  return trackPerformance(`DB: ${query}`, operation);
-};
+  return trackPerformance(`DB: ${query}`, operation)
+}
 ```
 
 ### Infrastructure Monitoring
@@ -908,99 +908,99 @@ export const trackDatabaseQuery = (
 
 ```typescript
 // scripts/create-dashboards.ts
-import { CloudWatch } from "aws-sdk";
+import {CloudWatch} from 'aws-sdk'
 
-const cloudwatch = new CloudWatch();
+const cloudwatch = new CloudWatch()
 
 export const createDashboards = async () => {
   const dashboardConfig = {
-    DashboardName: "Momento-Production",
+    DashboardName: 'Momento-Production',
     DashboardBody: JSON.stringify({
       widgets: [
         {
-          type: "metric",
+          type: 'metric',
           properties: {
             metrics: [
-              ["AWS/ECS", "CPUUtilization", "ServiceName", "momento-api"],
-              ["AWS/ECS", "MemoryUtilization", "ServiceName", "momento-api"],
+              ['AWS/ECS', 'CPUUtilization', 'ServiceName', 'momento-api'],
+              ['AWS/ECS', 'MemoryUtilization', 'ServiceName', 'momento-api'],
             ],
             period: 300,
-            stat: "Average",
-            region: "us-east-1",
-            title: "ECS Service Metrics",
+            stat: 'Average',
+            region: 'us-east-1',
+            title: 'ECS Service Metrics',
           },
         },
         {
-          type: "metric",
+          type: 'metric',
           properties: {
             metrics: [
               [
-                "AWS/RDS",
-                "CPUUtilization",
-                "DBInstanceIdentifier",
-                "momento-db",
+                'AWS/RDS',
+                'CPUUtilization',
+                'DBInstanceIdentifier',
+                'momento-db',
               ],
               [
-                "AWS/RDS",
-                "DatabaseConnections",
-                "DBInstanceIdentifier",
-                "momento-db",
+                'AWS/RDS',
+                'DatabaseConnections',
+                'DBInstanceIdentifier',
+                'momento-db',
               ],
             ],
             period: 300,
-            stat: "Average",
-            region: "us-east-1",
-            title: "Database Metrics",
+            stat: 'Average',
+            region: 'us-east-1',
+            title: 'Database Metrics',
           },
         },
       ],
     }),
-  };
+  }
 
-  await cloudwatch.putDashboard(dashboardConfig).promise();
-};
+  await cloudwatch.putDashboard(dashboardConfig).promise()
+}
 ```
 
 #### Alerting Rules
 
 ```typescript
 // scripts/create-alerts.ts
-import { CloudWatch } from "aws-sdk";
+import {CloudWatch} from 'aws-sdk'
 
-const cloudwatch = new CloudWatch();
+const cloudwatch = new CloudWatch()
 
 export const createAlerts = async () => {
   const alerts = [
     {
-      AlarmName: "Momento-High-CPU",
-      MetricName: "CPUUtilization",
-      Namespace: "AWS/ECS",
-      Statistic: "Average",
+      AlarmName: 'Momento-High-CPU',
+      MetricName: 'CPUUtilization',
+      Namespace: 'AWS/ECS',
+      Statistic: 'Average',
       Period: 300,
       EvaluationPeriods: 2,
       Threshold: 80,
-      ComparisonOperator: "GreaterThanThreshold",
+      ComparisonOperator: 'GreaterThanThreshold',
       ActionsEnabled: true,
-      AlarmActions: ["arn:aws:sns:us-east-1:123456789012:Momento-Alerts"],
+      AlarmActions: ['arn:aws:sns:us-east-1:123456789012:Momento-Alerts'],
     },
     {
-      AlarmName: "Momento-High-Error-Rate",
-      MetricName: "HTTPCode_Target_5XX_Count",
-      Namespace: "AWS/ApplicationELB",
-      Statistic: "Sum",
+      AlarmName: 'Momento-High-Error-Rate',
+      MetricName: 'HTTPCode_Target_5XX_Count',
+      Namespace: 'AWS/ApplicationELB',
+      Statistic: 'Sum',
       Period: 300,
       EvaluationPeriods: 1,
       Threshold: 10,
-      ComparisonOperator: "GreaterThanThreshold",
+      ComparisonOperator: 'GreaterThanThreshold',
       ActionsEnabled: true,
-      AlarmActions: ["arn:aws:sns:us-east-1:123456789012:Momento-Alerts"],
+      AlarmActions: ['arn:aws:sns:us-east-1:123456789012:Momento-Alerts'],
     },
-  ];
+  ]
 
   for (const alert of alerts) {
-    await cloudwatch.putMetricAlarm(alert).promise();
+    await cloudwatch.putMetricAlarm(alert).promise()
   }
-};
+}
 ```
 
 ---
@@ -1034,26 +1034,26 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: "momento-app:latest"
-          format: "sarif"
-          output: "trivy-results.sarif"
+          image-ref: 'momento-app:latest'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
 
       - name: Upload Trivy scan results
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: "trivy-results.sarif"
+          sarif_file: 'trivy-results.sarif'
 ```
 
 #### Infrastructure Security
 
 ```typescript
 // scripts/security-scan.ts
-import { SecurityHub } from "aws-sdk";
+import {SecurityHub} from 'aws-sdk'
 
-const securityhub = new SecurityHub();
+const securityhub = new SecurityHub()
 
 export const runSecurityScan = async () => {
-  console.log("Running security scan...");
+  console.log('Running security scan...')
 
   try {
     // Get security findings
@@ -1062,40 +1062,40 @@ export const runSecurityScan = async () => {
         Filters: {
           RecordState: [
             {
-              Value: "ACTIVE",
-              Comparison: "EQUALS",
+              Value: 'ACTIVE',
+              Comparison: 'EQUALS',
             },
           ],
           SeverityLabel: [
             {
-              Value: "HIGH",
-              Comparison: "EQUALS",
+              Value: 'HIGH',
+              Comparison: 'EQUALS',
             },
             {
-              Value: "CRITICAL",
-              Comparison: "EQUALS",
+              Value: 'CRITICAL',
+              Comparison: 'EQUALS',
             },
           ],
         },
       })
-      .promise();
+      .promise()
 
     if (findings.Findings && findings.Findings.length > 0) {
-      console.log(`❌ Found ${findings.Findings.length} security issues`);
+      console.log(`❌ Found ${findings.Findings.length} security issues`)
 
       for (const finding of findings.Findings) {
-        console.log(`- ${finding.Title}: ${finding.Description}`);
+        console.log(`- ${finding.Title}: ${finding.Description}`)
       }
 
-      throw new Error("Security scan failed");
+      throw new Error('Security scan failed')
     }
 
-    console.log("✅ Security scan passed");
+    console.log('✅ Security scan passed')
   } catch (error) {
-    console.error("Security scan error:", error);
-    throw error;
+    console.error('Security scan error:', error)
+    throw error
   }
-};
+}
 ```
 
 ---
@@ -1108,21 +1108,21 @@ export const runSecurityScan = async () => {
 
 ```typescript
 // scripts/backup-scheduler.ts
-import { schedule } from "node-cron";
+import {schedule} from 'node-cron'
 
 export const scheduleBackups = () => {
   // Daily backup at 2 AM
-  schedule("0 2 * * *", async () => {
-    console.log("Starting daily backup...");
-    await createBackup();
-  });
+  schedule('0 2 * * *', async () => {
+    console.log('Starting daily backup...')
+    await createBackup()
+  })
 
   // Weekly backup on Sunday at 3 AM
-  schedule("0 3 * * 0", async () => {
-    console.log("Starting weekly backup...");
-    await createBackup();
-  });
-};
+  schedule('0 3 * * 0', async () => {
+    console.log('Starting weekly backup...')
+    await createBackup()
+  })
+}
 ```
 
 #### Recovery Procedures
@@ -1130,40 +1130,40 @@ export const scheduleBackups = () => {
 ```typescript
 // scripts/recovery.ts
 export const disasterRecovery = async (scenario: string) => {
-  console.log(`Starting disaster recovery for: ${scenario}`);
+  console.log(`Starting disaster recovery for: ${scenario}`)
 
   switch (scenario) {
-    case "database_failure":
-      await recoverDatabase();
-      break;
-    case "application_failure":
-      await recoverApplication();
-      break;
-    case "infrastructure_failure":
-      await recoverInfrastructure();
-      break;
+    case 'database_failure':
+      await recoverDatabase()
+      break
+    case 'application_failure':
+      await recoverApplication()
+      break
+    case 'infrastructure_failure':
+      await recoverInfrastructure()
+      break
     default:
-      throw new Error(`Unknown recovery scenario: ${scenario}`);
+      throw new Error(`Unknown recovery scenario: ${scenario}`)
   }
-};
+}
 
 const recoverDatabase = async () => {
   // 1. Stop application
-  await stopApplication();
+  await stopApplication()
 
   // 2. Restore from latest backup
-  const latestBackup = await getLatestBackup();
-  await restoreBackup(latestBackup);
+  const latestBackup = await getLatestBackup()
+  await restoreBackup(latestBackup)
 
   // 3. Verify data integrity
-  await verifyDataIntegrity();
+  await verifyDataIntegrity()
 
   // 4. Restart application
-  await startApplication();
+  await startApplication()
 
   // 5. Run health checks
-  await runHealthChecks();
-};
+  await runHealthChecks()
+}
 ```
 
 ---
@@ -1176,88 +1176,88 @@ const recoverDatabase = async () => {
 
 ```typescript
 // lib/redis.ts
-import Redis from "ioredis";
+import Redis from 'ioredis'
 
 const redis = new Redis({
   host: process.env.REDIS_HOST,
-  port: parseInt(process.env.REDIS_PORT || "6379"),
+  port: parseInt(process.env.REDIS_PORT || '6379'),
   password: process.env.REDIS_PASSWORD,
   retryDelayOnFailover: 100,
   maxRetriesPerRequest: 3,
-});
+})
 
 export const cache = {
   async get(key: string) {
     try {
-      const value = await redis.get(key);
-      return value ? JSON.parse(value) : null;
+      const value = await redis.get(key)
+      return value ? JSON.parse(value) : null
     } catch (error) {
-      console.error("Cache get error:", error);
-      return null;
+      console.error('Cache get error:', error)
+      return null
     }
   },
 
   async set(key: string, value: any, ttl: number = 3600) {
     try {
-      await redis.setex(key, ttl, JSON.stringify(value));
+      await redis.setex(key, ttl, JSON.stringify(value))
     } catch (error) {
-      console.error("Cache set error:", error);
+      console.error('Cache set error:', error)
     }
   },
 
   async del(key: string) {
     try {
-      await redis.del(key);
+      await redis.del(key)
     } catch (error) {
-      console.error("Cache delete error:", error);
+      console.error('Cache delete error:', error)
     }
   },
-};
+}
 ```
 
 #### Application Caching
 
 ```typescript
 // convex/lib/cache.ts
-import { cache } from "./redis";
+import {cache} from './redis'
 
 export const withCache = async <T>(
   key: string,
   operation: () => Promise<T>,
-  ttl: number = 3600
+  ttl: number = 3600,
 ): Promise<T> => {
   // Try to get from cache
-  const cached = await cache.get(key);
+  const cached = await cache.get(key)
   if (cached) {
-    return cached;
+    return cached
   }
 
   // Execute operation
-  const result = await operation();
+  const result = await operation()
 
   // Cache result
-  await cache.set(key, result, ttl);
+  await cache.set(key, result, ttl)
 
-  return result;
-};
+  return result
+}
 
 // Usage example
 export const getEventsForUser = query({
-  args: { userId: v.id("users") },
+  args: {userId: v.id('users')},
   handler: async (ctx, args) => {
     return withCache(
       `events:user:${args.userId}`,
       async () => {
         // Actual database query
         return await ctx.db
-          .query("events")
-          .withIndex("by_host", (q) => q.eq("hostId", args.userId))
-          .collect();
+          .query('events')
+          .withIndex('by_host', q => q.eq('hostId', args.userId))
+          .collect()
       },
-      1800 // 30 minutes
-    );
+      1800, // 30 minutes
+    )
   },
-});
+})
 ```
 
 ---
@@ -1270,107 +1270,107 @@ export const getEventsForUser = query({
 
 ```typescript
 // infrastructure/autoscaling.ts
-import { AutoScaling } from "aws-sdk";
+import {AutoScaling} from 'aws-sdk'
 
-const autoscaling = new AutoScaling();
+const autoscaling = new AutoScaling()
 
 export const configureAutoScaling = async () => {
   const config = {
-    AutoScalingGroupName: "momento-api-asg",
+    AutoScalingGroupName: 'momento-api-asg',
     MinSize: 2,
     MaxSize: 10,
     DesiredCapacity: 2,
     TargetGroupARNs: [
-      "arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/momento-api/1234567890123456",
+      'arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/momento-api/1234567890123456',
     ],
-    VPCZoneIdentifier: ["subnet-12345678", "subnet-87654321"],
-    HealthCheckType: "ELB",
+    VPCZoneIdentifier: ['subnet-12345678', 'subnet-87654321'],
+    HealthCheckType: 'ELB',
     HealthCheckGracePeriod: 300,
     Tags: [
       {
-        Key: "Name",
-        Value: "Momento API Instance",
+        Key: 'Name',
+        Value: 'Momento API Instance',
         PropagateAtLaunch: true,
       },
     ],
-  };
+  }
 
-  await autoscaling.createAutoScalingGroup(config).promise();
+  await autoscaling.createAutoScalingGroup(config).promise()
 
   // Configure scaling policies
   await autoscaling
     .putScalingPolicy({
-      AutoScalingGroupName: "momento-api-asg",
-      PolicyName: "ScaleUpPolicy",
-      PolicyType: "TargetTrackingScaling",
+      AutoScalingGroupName: 'momento-api-asg',
+      PolicyName: 'ScaleUpPolicy',
+      PolicyType: 'TargetTrackingScaling',
       TargetTrackingConfiguration: {
         PredefinedMetricSpecification: {
-          PredefinedMetricType: "ASGAverageCPUUtilization",
+          PredefinedMetricType: 'ASGAverageCPUUtilization',
         },
         TargetValue: 70.0,
       },
     })
-    .promise();
-};
+    .promise()
+}
 ```
 
 #### Load Balancing
 
 ```typescript
 // infrastructure/load-balancer.ts
-import { ELBv2 } from "aws-sdk";
+import {ELBv2} from 'aws-sdk'
 
-const elbv2 = new ELBv2();
+const elbv2 = new ELBv2()
 
 export const configureLoadBalancer = async () => {
   // Create Application Load Balancer
   const alb = await elbv2
     .createLoadBalancer({
-      Name: "momento-alb",
-      Subnets: ["subnet-12345678", "subnet-87654321"],
-      SecurityGroups: ["sg-12345678"],
-      Scheme: "internet-facing",
-      Type: "application",
+      Name: 'momento-alb',
+      Subnets: ['subnet-12345678', 'subnet-87654321'],
+      SecurityGroups: ['sg-12345678'],
+      Scheme: 'internet-facing',
+      Type: 'application',
     })
-    .promise();
+    .promise()
 
   // Create target group
   const targetGroup = await elbv2
     .createTargetGroup({
-      Name: "momento-api-tg",
-      Protocol: "HTTP",
+      Name: 'momento-api-tg',
+      Protocol: 'HTTP',
       Port: 3000,
-      VpcId: "vpc-12345678",
-      HealthCheckProtocol: "HTTP",
-      HealthCheckPath: "/health",
+      VpcId: 'vpc-12345678',
+      HealthCheckProtocol: 'HTTP',
+      HealthCheckPath: '/health',
       HealthCheckIntervalSeconds: 30,
       HealthCheckTimeoutSeconds: 5,
       HealthyThresholdCount: 2,
       UnhealthyThresholdCount: 2,
     })
-    .promise();
+    .promise()
 
   // Create listener
   await elbv2
     .createListener({
       LoadBalancerArn: alb.LoadBalancers![0].LoadBalancerArn,
-      Protocol: "HTTPS",
+      Protocol: 'HTTPS',
       Port: 443,
       DefaultActions: [
         {
-          Type: "forward",
+          Type: 'forward',
           TargetGroupArn: targetGroup.TargetGroups![0].TargetGroupArn,
         },
       ],
       Certificates: [
         {
           CertificateArn:
-            "arn:aws:acm:us-east-1:123456789012:certificate/12345678-1234-1234-1234-123456789012",
+            'arn:aws:acm:us-east-1:123456789012:certificate/12345678-1234-1234-1234-123456789012',
         },
       ],
     })
-    .promise();
-};
+    .promise()
+}
 ```
 
 ---

@@ -1,18 +1,18 @@
-import {useSignIn} from '@clerk/clerk-expo'
-import {Link} from 'expo-router'
 import React, {useState} from 'react'
 import {
-  Text,
-  View,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Text,
+  View,
 } from 'react-native'
+import {useSignIn} from '@clerk/clerk-expo'
+import type {SignInFirstFactor} from '@clerk/types'
+import {Link} from 'expo-router'
 import {AuthButton} from '@/components/auth/AuthButton'
 import {AuthInput} from '@/components/auth/AuthInput'
 import {TabSelector} from '@/components/auth/TabSelector'
 import {devLog} from '@/utils/devLog'
-import type {SignInFirstFactor} from '@clerk/types'
 
 function isClerkError(
   err: unknown,

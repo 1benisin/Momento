@@ -1,11 +1,11 @@
-import React, {useState, useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import {
-  View,
+  Modal,
+  Pressable,
   Text,
   TextInput,
-  Modal,
   TouchableOpacity,
-  Pressable,
+  View,
 } from 'react-native'
 
 interface CustomTimePickerProps {

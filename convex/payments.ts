@@ -2,15 +2,14 @@
  * Payment processing functions using Stripe
  * Handles payment intents, customer creation, and payment verification
  */
-
-import {mutation, query} from './_generated/server'
 import {v} from 'convex/values'
+import {devLog} from '../utils/devLog'
+import {mutation, query} from './_generated/server'
 import {
-  createPaymentIntent,
   createCustomer,
+  createPaymentIntent,
   getPaymentIntent,
 } from './lib/stripe'
-import {devLog} from '../utils/devLog'
 
 /**
  * Create a payment intent for event confirmation fee

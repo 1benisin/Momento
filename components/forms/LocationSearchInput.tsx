@@ -1,4 +1,10 @@
 import React from 'react'
+import {TouchableOpacity, View} from 'react-native'
+import {Ionicons} from '@expo/vector-icons'
+import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete'
+import Colors from '@/constants/Colors'
+import {devLog} from '@/utils/devLog'
+
 // Minimal type for Google Places details used in this app
 interface PlaceDetail {
   formatted_address: string
@@ -11,11 +17,6 @@ interface PlaceDetail {
   }
   place_id: string
 }
-import {View, TouchableOpacity} from 'react-native'
-import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete'
-import {Ionicons} from '@expo/vector-icons'
-import Colors from '@/constants/Colors'
-import {devLog} from '@/utils/devLog'
 
 // This will come from your environment variables
 const GOOGLE_MAPS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY

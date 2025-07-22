@@ -56,25 +56,21 @@ sequenceDiagram
 ## 5. Step-by-Step Breakdown
 
 1.  **Initiating the Report**:
-
     - User A navigates to User B's profile, their entry in the `MemoryBook`, or a message thread.
     - They tap the "..." menu and select the "Report" option.
 
 2.  **Guided Choice (Optional but Recommended)**:
-
     - To prevent misuse, the `ReportAndBlockModal` may appear first.
     - It educates the user, explaining that "Block" is for personal preference, while "Report" is for actual violations of community standards (e.g., harassment, safety concerns, misrepresentation).
     - User A confirms they need to file a formal report.
 
 3.  **The Guided Report Flow (`ReportUserFlow`)**:
-
     - The user is taken into a dedicated, multi-step reporting flow.
     - **Step 1: Categorize**: The user must select a category for the violation from a predefined list (e.g., "In-Person Misconduct," "Inappropriate Photos," "Spam or Scam," "Hate Speech").
     - **Step 2: Describe**: The user is required to provide details in a text area. The prompt encourages them to be specific: "Please describe what happened, including where and when."
     - **Step 3: Submit**: The user reviews their report and submits it. The UI clearly states that submitting the report will also automatically block the user.
 
 4.  **Backend Action**:
-
     - The client calls a `reportUser` Convex mutation with all the report details.
     - The backend executes a transaction with two primary objectives:
       1.  **Create Report Record**: A new document is created in the `reports` collection, containing the `reporterId`, `reportedId`, `reason`, `comments`, and `eventId` if the incident occurred at an event.

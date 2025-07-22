@@ -81,12 +81,10 @@ sequenceDiagram
 ### 5.1. Participant Experience
 
 1.  **Accessing the Gallery**:
-
     - After an event is over and the user has submitted feedback, a **"Photos"** tab becomes visible on the `EventDetailScreen` for that event.
     - The user taps this tab to navigate to the `SharedEventGalleryScreen`.
 
 2.  **Uploading Photos**:
-
     - On the `SharedEventGalleryScreen`, the user taps an "Upload" button.
     - The app requests permission (if needed) and opens the phone's native image library.
     - The user selects one or more photos.
@@ -95,7 +93,6 @@ sequenceDiagram
     - The UI updates to show the new photos in the gallery grid.
 
 3.  **Viewing and Downloading**:
-
     - The `SharedEventGalleryScreen` displays all `event_photos` with a `status` of `'visible'` as a grid of thumbnails.
     - The user can tap any photo to view it full-screen.
     - From the full-screen view, the user can tap a "Download" icon to save the image to their device.
@@ -111,7 +108,6 @@ sequenceDiagram
 ### 5.2. Host Experience
 
 1.  **Accessing the Gallery**:
-
     - The Host accesses the gallery for their event in the same way a participant does, via the "Photos" tab on the `EventDetailScreen`.
 
 2.  **Moderating Photos**:

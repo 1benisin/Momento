@@ -1,16 +1,11 @@
-/**
- * Payment Sheet component for Stripe payments
- * Handles payment processing using Stripe's Payment Sheet
- */
-
 import React, {useEffect, useState} from 'react'
-import {View, Text, Alert, ActivityIndicator, Pressable} from 'react-native'
+import {ActivityIndicator, Alert, Pressable, Text, View} from 'react-native'
 import {usePaymentSheet} from '@stripe/stripe-react-native'
 import {useMutation} from 'convex/react'
 import {api} from '@/convex/_generated/api'
+import {Id} from '@/convex/_generated/dataModel'
 import {devLog} from '@/utils/devLog'
 import {StripeProvider} from './StripeProvider'
-import {Id} from '@/convex/_generated/dataModel'
 
 interface PaymentSheetProps {
   eventId: string

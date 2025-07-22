@@ -1,6 +1,6 @@
-import {useRouter} from 'expo-router'
 import React from 'react'
-import {View, TouchableOpacity, Text} from 'react-native'
+import {Text, TouchableOpacity, View} from 'react-native'
+import {useRouter} from 'expo-router'
 
 export default function VerificationPromptScreen() {
   const router = useRouter()

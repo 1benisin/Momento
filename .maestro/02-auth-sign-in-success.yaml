@@ -2,24 +2,24 @@ appId: com.1benisin.Momento
 ---
 - launchApp:
     clearState: true
-- tapOn: "http://localhost:8081"
-- tapOn: "Continue"
+- tapOn: 'http://localhost:8081'
+- tapOn: 'Continue'
 - tapOn:
-    text: "Go home"
+    text: 'Go home'
     optional: true
 - extendedWaitUntil:
     visible:
-      id: "app-ready"
+      id: 'app-ready'
 - tapOn:
-    text: "+1..."
-- inputText: "+12015550100" # Clerk test phone number
-- tapOn: "Sign In"
+    text: '+1...'
+- inputText: '+12015550100' # Clerk test phone number
+- tapOn: 'Sign In'
 - extendedWaitUntil:
-    visible: "Verification Code"
+    visible: 'Verification Code'
     timeout: 10000
 - tapOn:
-    text: "Code..."
-- inputText: "424242" # Clerk universal verification code for test numbers
-- tapOn: "Verify"
-- assertVisible: "Tab One" # Verifies that we landed on the main screen
-- assertVisible: "Sign Out"
+    text: 'Code...'
+- inputText: '424242' # Clerk universal verification code for test numbers
+- tapOn: 'Verify'
+- assertVisible: 'Tab One' # Verifies that we landed on the main screen
+- assertVisible: 'Sign Out'

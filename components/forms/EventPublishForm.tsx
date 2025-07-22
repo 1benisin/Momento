@@ -1,8 +1,8 @@
 import React from 'react'
 import {Alert, Pressable, Text, View} from 'react-native'
 import {useMutation} from 'convex/react'
-import {api} from '@/convex/_generated/api'
 import {useRouter} from 'expo-router'
+import {api} from '@/convex/_generated/api'
 import {FrontendEvent} from './EventItineraryForm'
 
 interface EventPublishFormProps {

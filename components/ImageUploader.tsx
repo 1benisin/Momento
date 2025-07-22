@@ -1,15 +1,15 @@
 import React, {useState} from 'react'
 import {
-  Image,
-  View,
-  Text,
-  Alert,
-  Linking,
   ActivityIndicator,
+  Alert,
+  Image,
+  Linking,
   Pressable,
+  Text,
+  View,
 } from 'react-native'
-import * as ImagePicker from 'expo-image-picker'
 import {useMutation} from 'convex/react'
+import * as ImagePicker from 'expo-image-picker'
 import {api} from '../convex/_generated/api'
 
 interface ImageUploaderProps {

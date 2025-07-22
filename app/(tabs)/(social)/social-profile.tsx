@@ -1,5 +1,5 @@
-import {ActivityIndicator, TouchableOpacity, Text, View} from 'react-native'
 import React from 'react'
+import {ActivityIndicator, Text, TouchableOpacity, View} from 'react-native'
 import {useQuery} from 'convex/react'
 import {useRouter} from 'expo-router'
 import {api} from '@/convex/_generated/api'

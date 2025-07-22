@@ -54,14 +54,12 @@ sequenceDiagram
 ## 5. Step-by-Step Breakdown
 
 1.  **Accessing the Styling Screen**:
-
     - The user can initiate this flow from two primary locations:
       - Their main `ProfileTab`.
       - The `SettingsScreen`, under the "Participant" or "Social Profile" tab.
     - They tap an option labeled **"Style My Face Card"** (or similar), which navigates them to the `FaceCardStylingScreen`.
 
 2.  **Selecting a Style**:
-
     - The `FaceCardStylingScreen` displays a large preview of their current, unstyled Face Card photo.
     - Below the preview, a list or carousel shows the available customization options. These could include:
       - **AI Styles**: "Watercolor," "Oil Painting," "Pencil Sketch," "Retro Film," etc.
@@ -69,7 +67,6 @@ sequenceDiagram
     - The user taps on a style to select it.
 
 3.  **Generating the Preview**:
-
     - When an AI style is selected, the app shows a loading indicator while it processes the image.
     - The backend sends the user's base photo and the chosen style parameter to an external **AI Image Service**.
     - The service returns the newly generated image.

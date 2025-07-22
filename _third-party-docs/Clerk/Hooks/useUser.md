@@ -45,17 +45,17 @@ The following example uses the `useUser()` hook to access the <SDKLink href="/do
 
 ```tsx {{ filename: 'src/Example.tsx' }}
 export default function Example() {
-  const { isSignedIn, user, isLoaded } = useUser();
+  const {isSignedIn, user, isLoaded} = useUser()
 
   if (!isLoaded) {
-    return <div>Loading...</div>;
+    return <div>Loading...</div>
   }
 
   if (!isSignedIn) {
-    return <div>Sign in to view this page</div>;
+    return <div>Sign in to view this page</div>
   }
 
-  return <div>Hello {user.firstName}!</div>;
+  return <div>Hello {user.firstName}!</div>
 }
 ```
 

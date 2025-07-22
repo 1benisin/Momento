@@ -1,5 +1,5 @@
 ---
-title: "`<RedirectToSignUp />`"
+title: '`<RedirectToSignUp />`'
 description: The <RedirectToSignUp /> component will navigate to the sign up URL
   which has been configured in your application instance. The behavior will be
   just like a server-side (3xx) redirect, and will override the current location
@@ -14,7 +14,8 @@ The `<RedirectToSignUp />` component will navigate to the sign up URL which has 
 <Tabs items={["Next.js", "React", "Remix"]}>
 <CodeBlockTabs options={["App Router", "Pages Router"]}>
 <Tab>
-```tsx {{ filename: 'app/layout.tsx' }}
+
+````tsx {{ filename: 'app/layout.tsx' }}
 import { ClerkProvider, SignedIn, SignedOut, RedirectToSignUp } from '@clerk/nextjs'
 
       export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -134,3 +135,4 @@ If provided, this URL will always be redirected to after the user signs up. It's
 
 The values used to prefill the sign-up fields with.
 </Properties>
+````

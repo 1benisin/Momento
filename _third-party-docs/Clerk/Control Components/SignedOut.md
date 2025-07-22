@@ -1,5 +1,5 @@
 ---
-title: "`<SignedOut>`"
+title: '`<SignedOut>`'
 description: Conditionally render content only when a user is signed out.
 lastUpdated: 2025-07-08T15:25:49.000Z
 ---
@@ -11,7 +11,8 @@ The `<SignedOut>` component offers authentication checks as a cross-cutting conc
 <Tabs items={["Next.js", "React", "Astro", "Expo", "Remix", "Tanstack React Start", "Vue"]}>
 <Tab>
 <CodeBlockTabs options={["App Router", "Pages Router"]}>
-```tsx {{ filename: 'app/page.tsx' }}
+
+````tsx {{ filename: 'app/page.tsx' }}
 import React from 'react'
 import { ClerkProvider, SignedOut } from '@clerk/nextjs'
 
@@ -196,3 +197,4 @@ import { ClerkProvider, SignedOut } from '@clerk/nextjs'
 
   </Tab>
 </Tabs>
+````

@@ -1,5 +1,5 @@
 ---
-title: "`<SignInButton>`"
+title: '`<SignInButton>`'
 description: The <SignInButton> component is a button that links to the sign-in
   page or displays the sign-in modal.
 lastUpdated: 2025-07-08T15:25:49.000Z
@@ -86,7 +86,8 @@ The values used to prefill the sign-in fields with.
 
 <Tabs items={["Next.js", "React", "Astro", "Remix", "Tanstack React Start", "Vue"]}>
 <Tab>
-```jsx {{ filename: 'app/page.tsx' }}
+
+````jsx {{ filename: 'app/page.tsx' }}
 import { SignInButton } from '@clerk/nextjs'
 
     export default function Home() {
@@ -239,3 +240,4 @@ import { SignInButton } from '@clerk/nextjs'
 
   </Tab>
 </Tabs>
+````

@@ -2,7 +2,7 @@
 
 import type React from 'react'
 import {useState} from 'react'
-import {Text, TextInput, View, Pressable} from 'react-native'
+import {Pressable, Text, TextInput, View} from 'react-native'
 import {Eye, EyeOff} from 'lucide-react-native'
 
 interface AuthInputProps {

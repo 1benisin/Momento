@@ -8,13 +8,13 @@
  * @see https://docs.convex.dev/functions/http-actions
  * @see https://stripe.com/docs/webhooks
  */
-import {httpAction} from '../_generated/server'
-import {internal} from '../_generated/api'
-import {verifyWebhookSignature} from '../lib/stripe'
-import {devLog} from '../../utils/devLog'
-import type {ActionCtx} from '../_generated/server'
 import type {Stripe} from 'stripe'
+import {devLog} from '../../utils/devLog'
+import {internal} from '../_generated/api'
 import type {Id} from '../_generated/dataModel'
+import {httpAction} from '../_generated/server'
+import type {ActionCtx} from '../_generated/server'
+import {verifyWebhookSignature} from '../lib/stripe'
 
 /**
  * Stripe webhook handler

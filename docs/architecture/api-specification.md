@@ -22,8 +22,8 @@ All Convex functions are authenticated by default. The client-side Convex provid
 This is an illustrative example of how an event creation function would be defined.
 
 ```typescript
-import { mutation } from "./_generated/server";
-import { v } from "convex/values";
+import {v} from 'convex/values'
+import {mutation} from './_generated/server'
 
 export const createEvent = mutation({
   // Define input validation for the function's arguments
@@ -34,22 +34,22 @@ export const createEvent = mutation({
   },
   handler: async (ctx, args) => {
     // Get the identity of the calling user
-    const identity = await ctx.auth.getUserIdentity();
+    const identity = await ctx.auth.getUserIdentity()
     if (!identity) {
-      throw new Error("You must be logged in to create an event.");
+      throw new Error('You must be logged in to create an event.')
     }
-    const hostId = identity.subject; // This is the user's clerkId
+    const hostId = identity.subject // This is the user's clerkId
 
     // Insert the new event into the database
-    const eventId = await ctx.db.insert("events", {
+    const eventId = await ctx.db.insert('events', {
       hostId: hostId,
       title: args.title,
       description: args.description,
-      status: "draft",
+      status: 'draft',
       // ... other properties
-    });
+    })
 
-    return eventId;
+    return eventId
   },
-});
+})
 ```

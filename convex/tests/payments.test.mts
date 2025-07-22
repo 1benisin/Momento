@@ -1,7 +1,7 @@
 import {convexTest} from 'convex-test'
 import {vi} from 'vitest'
-import {api} from '../_generated/api'
 import * as stripe from '../lib/stripe'
+import {api} from '../_generated/api'
 import {Id} from '../_generated/dataModel'
 import schema from '../schema'
 

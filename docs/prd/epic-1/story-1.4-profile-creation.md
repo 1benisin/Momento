@@ -121,20 +121,20 @@ socialProfile: v.optional(
         state: v.string(),
         latitude: v.optional(v.number()),
         longitude: v.optional(v.number()),
-      })
+      }),
     ),
     interests: v.optional(v.array(v.string())),
     privacy_settings: v.optional(
       v.object({
-        profile_visibility: v.union(v.literal("public"), v.literal("private")),
+        profile_visibility: v.union(v.literal('public'), v.literal('private')),
         show_age: v.boolean(),
         show_location: v.boolean(),
         show_interests: v.boolean(),
-      })
+      }),
     ),
     // ... existing fields
-  })
-);
+  }),
+)
 ```
 
 ## Testing

@@ -8,12 +8,12 @@
  * @see https://docs.convex.dev/functions/http-actions
  * @see https://clerk.com/docs/users/sync-data
  */
-import {httpAction} from '../_generated/server'
-import {internal} from '../_generated/api'
 import type {WebhookEvent} from '@clerk/backend'
 import {Webhook} from 'svix'
-import {config} from '../lib/config'
+import {internal} from '../_generated/api'
+import {httpAction} from '../_generated/server'
 import type {ActionCtx} from '../_generated/server'
+import {config} from '../lib/config'
 
 async function validateRequest(
   req: Request,

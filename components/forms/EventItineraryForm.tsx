@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {Text, View, TextInput, TouchableOpacity} from 'react-native'
+import {Text, TextInput, TouchableOpacity, View} from 'react-native'
 import {Doc, Id} from '@/convex/_generated/dataModel'
 import CustomTimePicker from './CustomTimePicker'
 import LocationPicker, {LocationData} from './LocationPicker'

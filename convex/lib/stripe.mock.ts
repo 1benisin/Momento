@@ -1,4 +1,5 @@
 import {vi} from 'vitest'
+
 // Mock Stripe for testing
 export const stripe = {
   identity: {

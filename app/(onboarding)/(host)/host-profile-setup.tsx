@@ -1,14 +1,14 @@
-import {useRouter, Stack} from 'expo-router'
 import React, {useState} from 'react'
 import {
-  View,
-  TextInput,
-  TouchableOpacity,
   ActivityIndicator,
   Alert,
   Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native'
 import {useMutation} from 'convex/react'
+import {Stack, useRouter} from 'expo-router'
 import {api} from '../../../convex/_generated/api'
 
 export default function HostProfileSetupScreen() {

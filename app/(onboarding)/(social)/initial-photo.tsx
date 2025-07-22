@@ -1,11 +1,11 @@
 import React, {useState} from 'react'
-import {View, Text, Alert, SafeAreaView, TouchableOpacity} from 'react-native'
-import {useRouter} from 'expo-router'
+import {Alert, SafeAreaView, Text, TouchableOpacity, View} from 'react-native'
 import {useMutation} from 'convex/react'
+import {useRouter} from 'expo-router'
+import {Id} from '@/convex/_generated/dataModel'
+import {devLog} from '@/utils/devLog'
 import ImageUploader from '../../../components/ImageUploader'
 import {api} from '../../../convex/_generated/api'
-import {devLog} from '@/utils/devLog'
-import {Id} from '@/convex/_generated/dataModel'
 
 export default function InitialPhotoScreen() {
   const router = useRouter()

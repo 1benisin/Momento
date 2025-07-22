@@ -1,12 +1,11 @@
 import React from 'react'
-import {ActivityIndicator, TouchableOpacity, Text, View} from 'react-native'
-import {useQuery, useMutation} from 'convex/react'
+import {ActivityIndicator, Text, TouchableOpacity, View} from 'react-native'
+import {useMutation, useQuery} from 'convex/react'
 import {useRouter} from 'expo-router'
-
-import {api} from '@/convex/_generated/api'
 import ModeSwitcher from '@/components/ModeSwitcher'
-import {UserRole} from '@/convex/schema'
 import {SignOutButton} from '@/components/SignOutButton'
+import {api} from '@/convex/_generated/api'
+import {UserRole} from '@/convex/schema'
 
 const SettingsScreen = () => {
   const user = useQuery(api.user.me)

@@ -8,7 +8,6 @@
  * @see https://docs.convex.dev/functions/http-actions
  */
 import {httpRouter} from 'convex/server'
-
 // Import webhook handlers from their respective files.
 import {handleClerkWebhook} from './webhooks/clerk'
 import {stripeWebhook} from './webhooks/stripe'

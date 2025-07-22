@@ -47,22 +47,29 @@ This document outlines the detailed implementation plan for professional host fe
 #### Data Model Updates
 
 **New Fields in `hostProfile`:**
+
 ```typescript
-hostProfile: v.optional(v.object({
-  // Existing fields...
-  host_type: v.string(), // 'passion', 'community', 'professional'
-  business_goals: v.optional(v.object({
-    target_income: v.number(), // Target hourly rate
-    events_per_week: v.number(), // Target event frequency
-    target_event_cost: v.number(), // Typical event cost per participant
-  })),
-  performance_metrics: v.optional(v.object({
-    total_events: v.number(),
-    average_rating: v.number(),
-    total_participants: v.number(),
-    repeat_customer_rate: v.number(),
-  })),
-}))
+hostProfile: v.optional(
+  v.object({
+    // Existing fields...
+    host_type: v.string(), // 'passion', 'community', 'professional'
+    business_goals: v.optional(
+      v.object({
+        target_income: v.number(), // Target hourly rate
+        events_per_week: v.number(), // Target event frequency
+        target_event_cost: v.number(), // Typical event cost per participant
+      }),
+    ),
+    performance_metrics: v.optional(
+      v.object({
+        total_events: v.number(),
+        average_rating: v.number(),
+        total_participants: v.number(),
+        repeat_customer_rate: v.number(),
+      }),
+    ),
+  }),
+)
 ```
 
 #### Implementation Tasks
@@ -76,6 +83,7 @@ hostProfile: v.optional(v.object({
 #### Enhanced Onboarding Flow
 
 **New Questions for Professional Hosts:**
+
 - Target income per hour ($50-100 range)
 - Preferred event frequency (2-5 events per week)
 - Typical event cost per participant
@@ -94,10 +102,11 @@ hostProfile: v.optional(v.object({
 #### Event Performance Tracking
 
 **New Collections:**
+
 ```typescript
 event_instances: defineTable({
-  eventId: v.id("events"),
-  template_id: v.optional(v.id("event_templates")),
+  eventId: v.id('events'),
+  template_id: v.optional(v.id('event_templates')),
   instance_number: v.number(), // 1st, 2nd, 3rd time hosting this event
   performance_metrics: v.object({
     attendance_rate: v.number(),
@@ -126,6 +135,7 @@ event_instances: defineTable({
 #### Basic Dashboard (All Hosts)
 
 **Features:**
+
 - Event history with attendance rates
 - Basic ratings and feedback overview
 - Recent activity and upcoming events
@@ -134,6 +144,7 @@ event_instances: defineTable({
 #### Advanced Dashboard (Professional Hosts)
 
 **Additional Features:**
+
 - Revenue tracking and income analysis
 - Customer insights and participant demographics
 - Event performance trends and patterns
@@ -155,9 +166,10 @@ event_instances: defineTable({
 #### Template System
 
 **New Collections:**
+
 ```typescript
 event_templates: defineTable({
-  hostId: v.id("users"),
+  hostId: v.id('users'),
   title: v.string(),
   description: v.string(),
   estimated_cost: v.number(),
@@ -196,6 +208,7 @@ event_templates: defineTable({
 #### Success Metrics System
 
 **Enhanced Event Tracking:**
+
 - Track ratings and feedback for each event instance
 - Identify which event formats perform best
 - Monitor repeat customer rates and satisfaction
@@ -223,6 +236,7 @@ event_templates: defineTable({
 #### External Calendar Sync
 
 **Features:**
+
 - Google Calendar integration
 - Outlook calendar support
 - Availability management and conflict detection
@@ -243,6 +257,7 @@ event_templates: defineTable({
 #### Advanced Analytics
 
 **Features:**
+
 - Performance reviews and analysis
 - Quality standards monitoring
 - Feedback loop optimization
@@ -263,6 +278,7 @@ event_templates: defineTable({
 #### Participant Insights
 
 **Features:**
+
 - Customer retention tracking
 - Participant demographics analysis
 - Repeat customer management
@@ -460,21 +476,25 @@ export const trackEventPerformance = mutation({
 ## Timeline Summary
 
 ### Month 1-2: Foundation
+
 - Enhanced host profile schema
 - Professional host onboarding
 - Basic analytics foundation
 
 ### Month 3-4: Core Features
+
 - Enhanced host dashboard (basic and advanced)
 - Event templates and recurring events
 - Event performance tracking
 
 ### Month 5-6: Advanced Features
+
 - Calendar integration
 - Quality control and optimization
 - Customer management
 
 ### Success Criteria
+
 - 80% professional host retention
 - 80% achieve income targets
 - 4.5+ average event ratings
@@ -484,4 +504,4 @@ export const trackEventPerformance = mutation({
 
 **Last Updated:** 2024-12-19
 
-This roadmap provides a comprehensive implementation plan for professional host features, ensuring they deliver immediate value while building toward a sophisticated platform that supports professional event hosting businesses. 
+This roadmap provides a comprehensive implementation plan for professional host features, ensuring they deliver immediate value while building toward a sophisticated platform that supports professional event hosting businesses.

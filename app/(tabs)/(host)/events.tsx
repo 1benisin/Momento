@@ -1,9 +1,9 @@
 import React, {useMemo} from 'react'
-import {View, Text, TouchableOpacity, FlatList} from 'react-native'
-import {useRouter} from 'expo-router'
-import {useQuery} from 'convex/react'
-import {api} from '@/convex/_generated/api'
+import {FlatList, Text, TouchableOpacity, View} from 'react-native'
 import {FontAwesome} from '@expo/vector-icons'
+import {useQuery} from 'convex/react'
+import {useRouter} from 'expo-router'
+import {api} from '@/convex/_generated/api'
 import {Doc} from '@/convex/_generated/dataModel'
 
 const HostEventsScreen = () => {

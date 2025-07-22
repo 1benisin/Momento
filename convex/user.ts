@@ -1,14 +1,14 @@
 import {v} from 'convex/values'
-import {
-  internalMutation,
-  query,
-  internalQuery,
-  QueryCtx,
-  mutation,
-} from './_generated/server'
-import {Doc} from './_generated/dataModel'
-import {AccountStatuses, UserRoles, userRoleValidator, UserRole} from './schema'
 import {devLog} from '../utils/devLog'
+import {Doc} from './_generated/dataModel'
+import {
+  QueryCtx,
+  internalMutation,
+  internalQuery,
+  mutation,
+  query,
+} from './_generated/server'
+import {AccountStatuses, UserRole, UserRoles, userRoleValidator} from './schema'
 
 /**
  * Retrieves the database record for the currently authenticated user.

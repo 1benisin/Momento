@@ -1,5 +1,5 @@
 ---
-title: "`<SignOutButton>`"
+title: '`<SignOutButton>`'
 description: The `<SignOutButton>` component is a button that signs a user out.
 lastUpdated: 2025-07-08T15:25:49.000Z
 ---
@@ -60,7 +60,8 @@ The full URL or path to navigate after successful sign-out.
 
 <Tabs items={["Next.js", "React", "Astro", "Remix", "Tanstack React Start", "Vue"]}>
 <Tab>
-```jsx {{ filename: 'app/page.tsx' }}
+
+````jsx {{ filename: 'app/page.tsx' }}
 import { SignOutButton } from '@clerk/nextjs'
 
     export default function Home() {
@@ -296,3 +297,4 @@ In the following example, the `sessionId` is retrieved from the [`useAuth()`](/d
 
   </Tab>
 </Tabs>
+````

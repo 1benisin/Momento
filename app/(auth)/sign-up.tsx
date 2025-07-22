@@ -1,13 +1,13 @@
-import {useSignUp} from '@clerk/clerk-expo'
-import {Link} from 'expo-router'
-import React, {useState, useRef} from 'react'
+import React, {useRef, useState} from 'react'
 import {
-  Text,
-  View,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Text,
+  View,
 } from 'react-native'
+import {useSignUp} from '@clerk/clerk-expo'
+import {Link} from 'expo-router'
 import RNPhoneInput from 'react-native-phone-number-input'
 import type PhoneInput from 'react-native-phone-number-input'
 import {AuthButton} from '@/components/auth/AuthButton'

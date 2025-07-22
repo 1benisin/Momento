@@ -1,6 +1,6 @@
-import {useRouter} from 'expo-router'
 import React, {useState} from 'react'
-import {View, TouchableOpacity, ActivityIndicator, Text} from 'react-native'
+import {ActivityIndicator, Text, TouchableOpacity, View} from 'react-native'
+import {useRouter} from 'expo-router'
 
 export default function RoleSelectionScreen() {
   const router = useRouter()

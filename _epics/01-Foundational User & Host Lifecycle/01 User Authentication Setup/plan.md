@@ -19,23 +19,23 @@ _To implement this story correctly, you MUST reference the following specific se
 ```yaml
 # Project-Specific Documentation
 - file: /_docs/FEATURES.md
-  section: "Phone-First Authentication & US-Only Launch"
-  why: "Defines the US-only requirement, which will be configured within Clerk."
+  section: 'Phone-First Authentication & US-Only Launch'
+  why: 'Defines the US-only requirement, which will be configured within Clerk.'
 - file: /_docs/DATA_MODELS.md
-  section: "users Collection"
-  why: "The user record will be simplified, linking to the Clerk user via a clerkId."
+  section: 'users Collection'
+  why: 'The user record will be simplified, linking to the Clerk user via a clerkId.'
 
 # External Documentation
 - url: https://clerk.com/docs/convex/get-started-with-convex
-  why: "Primary guide for the Convex and Clerk integration."
+  why: 'Primary guide for the Convex and Clerk integration.'
 - url: https://clerk.com/docs/references/expo/overview
-  why: "API reference for the Clerk Expo SDK (@clerk/clerk-expo)."
+  why: 'API reference for the Clerk Expo SDK (@clerk/clerk-expo).'
 - url: https://clerk.com/docs/custom-flows/overview
   why: "Since Clerk's pre-built UI components are not fully supported on native Expo yet, we must build our own UI using their hooks."
 - url: https://docs.expo.dev/versions/latest/sdk/secure-store/
-  why: "Used by the Clerk SDK to securely cache JWTs on the device."
+  why: 'Used by the Clerk SDK to securely cache JWTs on the device.'
 - url: https://docs.convex.dev/auth/clerk
-  why: "Convex documentation for the Clerk integration."
+  why: 'Convex documentation for the Clerk integration.'
 ```
 
 ### Integration Points
@@ -120,7 +120,6 @@ _The developer AI's primary goal is to enable these user flows._
 ### D. Implementation Tasks
 
 - [ ] **Task 1: Setup Clerk & Convex Backend**
-
   - [ ] 1.1 Create a new application in the Clerk Dashboard and enable Phone Number (SMS) sign-in.
   - [ ] 1.2 Create a Convex JWT template in Clerk and get the Issuer URL.
   - [ ] 1.3 Create `convex/auth.config.ts` and add the provider configuration using the Issuer URL from Clerk.
@@ -128,20 +127,17 @@ _The developer AI's primary goal is to enable these user flows._
   - [ ] 1.5 Run `npx convex dev` to sync the auth configuration.
 
 - [ ] **Task 2: Update Convex Schema & Create User Sync Function**
-
   - [ ] 2.1 Remove the old auth-related fields (`otp_hash`, `otp_expires_at`, etc.) from the `users` table in `convex/schema.ts`.
   - [ ] 2.2 Add `clerkId: v.string()` to the `users` table and index it.
   - [ ] 2.3 Create a new mutation, e.g., `user:store`, that runs on the first authenticated action. This function gets the user's identity from `ctx.auth.getUserIdentity()` and creates a corresponding document in the `users` table.
 
 - [ ] **Task 3: Configure Frontend Providers**
-
   - [ ] 3.1 Install `@clerk/clerk-expo` and `expo-secure-store`.
   - [ ] 3.2 Create a `tokenCache.ts` file as recommended by Clerk Expo docs.
   - [ ] 3.3 In the root `app/_layout.tsx`, wrap the entire app with `<ClerkProvider>` and `<ConvexProviderWithClerk>`.
   - [ ] 3.4 Pass the `tokenCache` and your `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` to the `<ClerkProvider>`.
 
 - [ ] **Task 4: Build Authentication Screens**
-
   - [ ] 4.1 Create the `(auth)` route group with a `_layout.tsx` that redirects signed-in users away from the auth screens.
   - [ ] 4.2 Build `app/(auth)/sign-up.tsx` using the `useSignUp` hook to handle the phone number input and OTP verification steps.
   - [ ] 4.3 Build `app/(auth)/sign-in.tsx` using the `useSignIn` hook.
@@ -159,34 +155,34 @@ _The developer AI's primary goal is to enable these user flows._
 // This is an internal mutation to sync Clerk users to our DB.
 
 export const store = internalMutation({
-  handler: async (ctx) => {
+  handler: async ctx => {
     // 1. Get the Clerk user identity.
-    const identity = await ctx.auth.getUserIdentity();
+    const identity = await ctx.auth.getUserIdentity()
     if (!identity) {
-      throw new ConvexError("Called store user without authentication present");
+      throw new ConvexError('Called store user without authentication present')
     }
 
     // 2. Check if we've already stored this user.
     const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
-      .unique();
+      .query('users')
+      .withIndex('by_clerk_id', q => q.eq('clerkId', identity.subject))
+      .unique()
 
     // 3. If the user document already exists, we're done.
     if (user !== null) {
-      return user._id;
+      return user._id
     }
 
     // 4. If it's a new user, create a new document in our `users` table.
-    const userId = await ctx.db.insert("users", {
+    const userId = await ctx.db.insert('users', {
       clerkId: identity.subject, // `subject` is the Clerk User ID
       phone_number: identity.phoneNumber, // get phone number from token
-      status: "pending_onboarding",
-    });
+      status: 'pending_onboarding',
+    })
 
-    return userId;
+    return userId
   },
-});
+})
 ```
 
 ---

@@ -1,21 +1,21 @@
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {
-  View,
-  Text,
-  Pressable,
-  TextInput,
   ActivityIndicator,
-  Image,
   Alert,
+  Image,
+  Pressable,
   ScrollView,
+  Text,
+  TextInput,
+  View,
 } from 'react-native'
 import {useUser} from '@clerk/clerk-expo'
-import {useRouter} from 'expo-router'
 import {useMutation, useQuery} from 'convex/react'
-import {api} from '@/convex/_generated/api'
-import {SignOutButton} from '@/components/SignOutButton'
-import {AccountStatuses} from '@/convex/schema'
+import {useRouter} from 'expo-router'
 import ContactMethodManager from '@/components/ContactMethodManager'
+import {SignOutButton} from '@/components/SignOutButton'
+import {api} from '@/convex/_generated/api'
+import {AccountStatuses} from '@/convex/schema'
 
 const AccountScreen = () => {
   const {user, isLoaded} = useUser()

@@ -1,21 +1,21 @@
-import React, {useState, useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import {
-  StyleSheet,
   ActivityIndicator,
   ScrollView,
-  TouchableOpacity,
+  StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native'
-import {useLocalSearchParams} from 'expo-router'
 import {useQuery} from 'convex/react'
-import {api} from '@/convex/_generated/api'
-import {Id} from '@/convex/_generated/dataModel'
+import {useLocalSearchParams} from 'expo-router'
 import EventDetailsForm from '@/components/forms/EventDetailsForm'
 import EventItineraryForm, {
   FrontendEvent,
 } from '@/components/forms/EventItineraryForm'
 import EventPublishForm from '@/components/forms/EventPublishForm'
+import {api} from '@/convex/_generated/api'
+import {Id} from '@/convex/_generated/dataModel'
 
 const CreateEventScreen = () => {
   const {eventId} = useLocalSearchParams()

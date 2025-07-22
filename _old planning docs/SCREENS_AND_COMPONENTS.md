@@ -61,7 +61,6 @@ The following screens from the previous design are now **DEPRECATED** as their f
 This section describes the various paths for a user to create a `hostProfile`.
 
 - **Primary Host Onboarding Flow**: This is the path for a new user who selects "I want to host events" on the `RoleSelectionScreen`.
-
   - **`HostTypeSelectionScreen`**: (Optional but recommended) A screen that asks if they are hosting as an "Individual" or for a "Business/Organization". This helps tailor the next step.
   - **`HostProfileSetupScreen`**: A form for entering host details. For `Community Hosts`, this will include fields like business address and website. For `User Hosts`, it's simpler, focusing on their host name and bio.
   - **`HostOnboardingCompleteScreen`**: A final screen congratulating the user, directing them to Host Mode, and providing a strong CTA to begin identity verification.
@@ -140,12 +139,10 @@ _This is the view for `Host-Only` and `Hybrid` users who are in "Host Mode." It 
 To provide a clear and organized experience, all user management functions are centralized in a custom-built account screen. This approach gives us full native control over the UI while still leveraging Clerk's powerful backend hooks for security and data management.
 
 - **Custom User Icon**:
-
   - **Location**: Placed in the header of the main `(tabs)` layout.
   - **Functionality**: On press, it navigates the user directly to the main `AccountScreen`.
 
 - **`AccountScreen` (`/account`)**:
-
   - **Purpose**: This screen is our custom, native replacement for Clerk's web-based `<UserProfile />`. It serves as the secure hub for core identity and security management, built using Clerk's hooks like `useUser()`. Its responsibilities include:
     - Displaying user information (name, email, phone).
     - Providing forms to update profile details (e.g., `user.update()`).
@@ -155,7 +152,6 @@ To provide a clear and organized experience, all user management functions are c
   - **File Path**: `app/(tabs)/account.tsx`.
 
 - **`SettingsScreen` (`/settings`)**:
-
   - **Purpose**: This remains our fully custom, native screen for all Momento-specific settings and preferences, accessible from the `AccountScreen`. Its content is context-aware and changes based on the user's `active_role`.
   - **File Path**: `app/(tabs)/settings.tsx`.
   - **Core Layout & Universal Sections (Always Visible)**:

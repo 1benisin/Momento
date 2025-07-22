@@ -62,7 +62,6 @@ User profiles will contain three categories of information:
 To provide a clear and robust user experience, we divide settings into two distinct areas, accessed via a menu from the custom user icon in the app header:
 
 1.  **Profile & Security (Custom Built)**: This destination is a dedicated, custom-built screen that serves as the single source of truth for core account and security management. While it gives us full native UI control, it is powered entirely by Clerk's hooks (`useUser`, etc.). Its responsibilities include:
-
     - Updating profile information (name, etc.) via `user.update()`.
     - Managing and verifying the user's email address and phone number.
     - Providing a path to change passwords and manage multi-factor authentication (MFA).
@@ -73,7 +72,6 @@ To provide a clear and robust user experience, we divide settings into two disti
 To give users full control over their account lifecycle while encouraging user retention, Momento provides both a "pause" and a "delete" option.
 
 - **Pause Account (Hibernation Mode)**: This is a non-permanent way for a user to take a break.
-
   - **Functionality**: When paused, a user's `status` in the database is set to `'paused'`. This makes them socially invisible. They will not receive any new invitations or notifications (except for critical security alerts), and their profile will not appear in any public discovery feeds.
   - **User Experience**: A paused user can still log in, view their Memory Book, and exchange messages with existing connections. However, they cannot engage in any new social activities. A persistent banner with a "Reactivate Account" button will be displayed, making it easy to return.
 
@@ -487,15 +485,12 @@ To build a safe and trustworthy community, users will have access to a multi-tie
 ### A Three-Tiered System
 
 1.  **Preference Signal: "Don't Connect Again"**
-
     - **Functionality:** This is a private, lightweight signal to the matching algorithm. It is the inverse of the "Connect Again" feature. The user is indicating a preference to not be placed in future events with a specific person. This feature governs interactions between participants who have met at an event.
     - **User Experience:** This is a "soft block." The two users can still see each other in their Memory Books and message one another. It simply tells our system to avoid future pairings. This is handled via the `connections` table.
 
 2.  **Safety Control: "Block"**
-
     - **Functionality:** This is a hard stop for all direct interaction between two users.
     - **User Experience:** When User A blocks User B, the action is silent (User B is not notified).
-
       - User A and User B are immediately and mutually removed from each other's Memory Book.
       - All messaging capabilities between them are disabled.
       - The system will permanently prevent them from being matched in any future event. When one user blocks another, neither user will be able to see the other's profile, content, or receive messages from them.
@@ -518,7 +513,6 @@ To build a safe and trustworthy community, users will have access to a multi-tie
 To ensure users can always get help, Momento provides clear channels for contacting support, accessible to both logged-in and locked-out users.
 
 - **Authenticated Support:**
-
   - **Access Point:** Logged-in users can access the `HelpCenterScreen` from their settings.
   - **Process:** From here, they can open a structured support ticket. The system automatically attaches their user ID and other diagnostic metadata, allowing the support team to quickly understand the context of the issue. This is the standard path for general questions, bug reports, and payment issues.
 
@@ -537,11 +531,9 @@ The system distinguishes between several scenarios, each with a different impact
 1.  **The Cancellation Flow:** A confirmed attendee can cancel their spot from the `EventDetailScreen`. They will be presented with a `ParticipantCancelModal` that clearly explains the consequences of their action before they confirm.
 
 2.  **Early Cancellation (Outside 24 hours of event start)**
-
     - **Outcome:** No penalty to their internal rating. The system will attempt to fill the vacant spot by sending a new, time-sensitive "Last-Minute Invitation" to another well-matched user. This invitation will have a short expiry (e.g., 1-2 hours) to ensure the spot is filled quickly.
 
 3.  **Late Cancellation (Within 24 hours of event start)**
-
     - **Outcome:** A **moderate penalty** is applied to the user's `absentee_rating`. This is seen as less reliable than an early cancellation. The spot will not be filled.
 
 4.  **Dynamic Duo Cancellations:** If one member of an active Duo cancels their attendance (either early or late), it does not affect the other member. The remaining partner is still confirmed and can attend the event as planned.
@@ -579,12 +571,10 @@ While hosts are encouraged to see their events through, sometimes cancellations 
 To ensure accountability, reports will trigger specific, escalating actions.
 
 1.  **Light Report:**
-
     - **Trigger:** A single report for a low-severity issue.
     - **Consequence:** Triggers a **Mandatory Verification** check. The user's account is temporarily limited (cannot be invited to new events) until they successfully verify their identity.
 
 2.  **Serious Report:**
-
     - **Trigger:** A report for a high-severity issue (e.g., in-person misconduct) or an accumulation of multiple reports.
     - **Consequence:** Triggers an immediate **Temporary Suspension** (e.g., 30-day ban from attending events). To be reinstated, the user must complete both **Mandatory Verification** and a mandatory **Behavioral Coaching Module** (a guided walkthrough on community standards).
 

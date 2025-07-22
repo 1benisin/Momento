@@ -21,7 +21,6 @@
 ## Tasks
 
 - [x] 1.0 Backend Setup
-
   - [x] 1.1 In `convex/schema.ts`, modify the `users` table schema:
     - [x] 1.1.1 Add `phone_number: v.string()` and `status: v.string()`.
     - [x] 1.1.2 Add the `socialProfile` object as defined in `plan.md`, including `first_name`, `bio`, and `photos` array.
@@ -37,7 +36,6 @@
   - [x] 1.4 In `convex/http.ts`, update the Clerk webhook to correctly pass data to the modified `store` user mutation.
 
 - [x] 2.0 Frontend Component Development
-
   - [x] 2.1 Install required packages: `npx expo install expo-image-picker expo-camera`.
   - [x] 2.2 Create the `components/ImageUploader.tsx` component.
     - [x] 2.2.1 Implement UI to allow picking from the photo library or taking a new photo.
@@ -46,7 +44,6 @@
     - [x] 2.2.4 Implement clear UI states for loading (e.g., a spinner while uploading) and errors (e.g., a toast message on failure).
 
 - [x] 3.0 Onboarding Screens Implementation
-
   - [x] 3.1 Create the `app/(onboarding)/` route group and its `_layout.tsx`.
     - [x] 3.1.1 The layout should manage the state of the onboarding flow to prevent users from navigating to steps out of order.
   - [x] 3.2 Build the `app/(onboarding)/profile-setup.tsx` screen.

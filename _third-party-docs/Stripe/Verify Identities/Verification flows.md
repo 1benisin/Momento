@@ -70,11 +70,11 @@ VerificationSession verificationSession = VerificationSession.create(params);
 ```
 
 ```node
-const stripe = require("stripe")("<<secret key>>");
+const stripe = require('stripe')('<<secret key>>')
 
 const verificationSession = await stripe.identity.verificationSessions.create({
-  verification_flow: "<<identityVerificationFlow>>",
-});
+  verification_flow: '<<identityVerificationFlow>>',
+})
 ```
 
 ```python
@@ -158,16 +158,16 @@ VerificationSession verificationSession = VerificationSession.create(params);
 ```
 
 ```node
-const stripe = require("stripe")("<<secret key>>");
+const stripe = require('stripe')('<<secret key>>')
 
 const verificationSession = await stripe.identity.verificationSessions.create({
-  verification_flow: "<<identityVerificationFlow>>",
+  verification_flow: '<<identityVerificationFlow>>',
   provided_details: {
-    phone: "5555551212",
-    email: "user@domain.com",
+    phone: '5555551212',
+    email: 'user@domain.com',
   },
-  client_reference_id: "reference-token",
-});
+  client_reference_id: 'reference-token',
+})
 ```
 
 ```python

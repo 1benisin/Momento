@@ -72,7 +72,7 @@ export default defineSchema({
     // ...
   }),
   // ...
-});
+})
 ```
 
 ## 4. Backend Implementation (`convex/`)
@@ -86,13 +86,11 @@ export default defineSchema({
 ## 5. Frontend Implementation (`app/`, `components/`)
 
 - **Files to Create**:
-
   - `app/(tabs)/account.tsx`: A new, custom screen for all user account management, built with Clerk hooks.
   - `app/(tabs)/settings.tsx`: A new, fully custom screen for all Momento-specific preferences, linked from the account screen. For this story, a placeholder screen is sufficient.
   - `app/(auth)/forgot-password.tsx`: A new screen to manage the two-step password reset flow (request code, submit new password).
 
 - **Files to Modify**:
-
   - **`app/_layout.tsx`**: Wrap the root layout with Clerk's control components (`<ClerkLoading>`, `<ClerkLoaded>`, `<SignedIn>`, `<SignedOut>`) to manage loading and authentication states.
   - **`app/(auth)/sign-up.tsx` & `sign-in.tsx`**: Refactor to include a tabbed or segmented control UI, allowing users to switch between "Email" and "Phone" methods. Implement forms and state management for the email/password and verification code flows using Clerk's headless hooks.
   - **`app/(tabs)/_layout.tsx`**: Implement a custom user icon in the header that navigates to the `/account` screen.
@@ -104,24 +102,20 @@ export default defineSchema({
 ## 6. Step-by-Step Task Breakdown
 
 1.  **Backend Setup**:
-
     1.  Modify `convex/schema.ts`: Make `phone_number` optional and add the optional `email` field to the `users` table.
     2.  Update `convex/user.ts`: Adjust the `createUser` internal mutation to handle the new schema.
     3.  Enhance `convex/http.ts`: Make the Clerk webhook handler idempotent for `user.created` and `user.updated` events.
 
 2.  **Frontend Foundational Changes**:
-
     1.  Update `app/_layout.tsx`: Wrap the root layout with the necessary Clerk provider and control components (`<ClerkLoading>`, `<SignedIn>`, etc.).
     2.  Update `app/(tabs)/_layout.tsx`: Add a custom user icon to the header that navigates to `/account`.
 
 3.  **Implement Authentication Flow**:
-
     1.  Refactor `app/(auth)/sign-in.tsx`: Implement the new tabbed UI for Email/Phone login.
     2.  Refactor `app/(auth)/sign-up.tsx`: Implement the new tabbed UI and the multi-step email verification flow.
     3.  Create `app/(auth)/forgot-password.tsx` to handle the password reset user flow.
 
 4.  **Implement User Management Screens**:
-
     1.  Create `app/(tabs)/account.tsx` and build a custom UI integrating the `UserInfo` and `SignOutButton` components.
     2.  Create a placeholder `app/(tabs)/settings.tsx` and add a navigation link to it from the `account.tsx` screen.
 

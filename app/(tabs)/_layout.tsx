@@ -1,21 +1,20 @@
 import React from 'react'
+import {ActivityIndicator, Text, View} from 'react-native'
 import {FontAwesome} from '@expo/vector-icons'
+import {useAuth} from '@clerk/clerk-expo'
+import {useQuery} from 'convex/react'
 import {Tabs, useRouter} from 'expo-router'
-import {View, ActivityIndicator, Text} from 'react-native'
 import {
   Menu,
-  MenuOptions,
   MenuOption,
+  MenuOptions,
   MenuTrigger,
 } from 'react-native-popup-menu'
-
 import Colors from '@/constants/Colors'
-import {useColorScheme} from '@/hooks/useColorScheme'
-import {useClientOnlyValue} from '@/hooks/useClientOnlyValue'
-import {useQuery} from 'convex/react'
 import {api} from '@/convex/_generated/api'
-import {UserRole, AccountStatuses} from '@/convex/schema'
-import {useAuth} from '@clerk/clerk-expo'
+import {AccountStatuses, UserRole} from '@/convex/schema'
+import {useClientOnlyValue} from '@/hooks/useClientOnlyValue'
+import {useColorScheme} from '@/hooks/useColorScheme'
 import {devLog} from '@/utils/devLog'
 
 function TabBarIcon(props: {

@@ -1,7 +1,7 @@
+import {ActivityIndicator, Image, Text, View} from 'react-native'
 import {useUser} from '@clerk/clerk-expo'
 import {useQuery} from 'convex/react'
 import {api} from '@/convex/_generated/api'
-import {Text, View, ActivityIndicator, Image} from 'react-native'
 
 export default function UserInfo() {
   const {user, isLoaded} = useUser()

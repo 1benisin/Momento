@@ -1,5 +1,5 @@
 import React from 'react'
-import {View, TouchableOpacity, useColorScheme, Text} from 'react-native'
+import {Text, TouchableOpacity, View, useColorScheme} from 'react-native'
 import Colors from '@/constants/Colors'
 import {UserRole} from '@/convex/schema'
 

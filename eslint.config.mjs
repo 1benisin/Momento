@@ -1,12 +1,12 @@
 // eslint.config.mjs
-import globals from 'globals'
 import tseslintPlugin from '@typescript-eslint/eslint-plugin'
 import tseslintParser from '@typescript-eslint/parser'
+import prettierConfig from 'eslint-config-prettier'
+import prettier from 'eslint-plugin-prettier'
 import pluginReact from 'eslint-plugin-react'
 import pluginReactHooks from 'eslint-plugin-react-hooks'
 import pluginReactNative from 'eslint-plugin-react-native'
-import prettier from 'eslint-plugin-prettier'
-import prettierConfig from 'eslint-config-prettier'
+import globals from 'globals'
 
 export default [
   {

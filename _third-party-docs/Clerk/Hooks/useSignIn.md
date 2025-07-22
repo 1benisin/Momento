@@ -37,7 +37,8 @@ The following example uses the `useSignIn()` hook to access the <SDKLink href="/
 
 <Tabs items={['React', 'Next.js']}>
 <Tab>
-```tsx {{ filename: 'src/pages/SignInPage.tsx' }}
+
+````tsx {{ filename: 'src/pages/SignInPage.tsx' }}
 import { useSignIn } from "@clerk/clerk-react";
 
     export default function SignInPage() {
@@ -78,3 +79,4 @@ import { useSignIn } from "@clerk/clerk-react";
 ### Create a custom sign-in flow with `useSignIn()`
 
 The `useSignIn()` hook can also be used to build fully custom sign-in flows, if Clerk's prebuilt components don't meet your specific needs or if you require more control over the authentication flow. Different sign-in flows include email and password, email and phone codes, email links, and multifactor (MFA). To learn more about using the `useSignIn()` hook to create custom flows, see the [custom flow guides](/docs/custom-flows/overview).
+````

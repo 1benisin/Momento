@@ -1,15 +1,15 @@
-import {useUser} from '@clerk/clerk-expo'
-import {useRouter} from 'expo-router'
 import React, {useState} from 'react'
 import {
-  View,
-  Text,
-  TextInput,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Text,
+  TextInput,
   TouchableOpacity,
+  View,
 } from 'react-native'
+import {useUser} from '@clerk/clerk-expo'
+import {useRouter} from 'expo-router'
 
 export default function ProfileSetupScreen() {
   const {user} = useUser()

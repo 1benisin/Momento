@@ -50,7 +50,6 @@ To facilitate unique matching, users provide:
 Settings are divided into two distinct areas:
 
 1. **Profile & Security (Custom Built)**: Powered by Clerk's hooks, handles:
-
    - Updating profile information via `user.update()`
    - Managing and verifying email address and phone number
    - Password changes and multi-factor authentication (MFA)

@@ -1,11 +1,11 @@
 import React, {useState} from 'react'
 import {
-  View,
-  Text,
-  Pressable,
-  TextInput,
   ActivityIndicator,
   Alert,
+  Pressable,
+  Text,
+  TextInput,
+  View,
 } from 'react-native'
 import {useUser} from '@clerk/clerk-expo'
 import type {EmailAddressResource, PhoneNumberResource} from '@clerk/types'

@@ -1,7 +1,7 @@
 import React from 'react'
-import {View, ActivityIndicator, TouchableOpacity, Text} from 'react-native'
-import {Stack, useRouter} from 'expo-router'
+import {ActivityIndicator, Text, TouchableOpacity, View} from 'react-native'
 import {useQuery} from 'convex/react'
+import {Stack, useRouter} from 'expo-router'
 import {api} from '@/convex/_generated/api'
 
 export default function HostDashboardScreen() {

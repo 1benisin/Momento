@@ -146,13 +146,11 @@ convex/
 ### Backend Function Types
 
 1. **Queries** (`query`): Read-only functions for fetching data
-
    - Real-time by default
    - Optimized for performance
    - Example: `getNearbyEvents`, `getUserProfile`
 
 2. **Mutations** (`mutation`): Functions that modify database state
-
    - Atomic operations
    - Data consistency guaranteed
    - Example: `createEvent`, `updateUserProfile`

@@ -1,6 +1,6 @@
-import {useAuth} from '@clerk/clerk-expo'
 import React from 'react'
 import {Pressable, Text} from 'react-native'
+import {useAuth} from '@clerk/clerk-expo'
 import {useMutation} from 'convex/react'
 import {api} from '../convex/_generated/api'
 import {devLog} from '../utils/devLog'

@@ -1583,32 +1583,33 @@ Now that you have the Node.js SDK installed, you can create a subscription [Prod
 This sample uses the default keys of your Stripe user [account](https://docs.stripe.com/get-started/account/activate.md) for your _sandbox_ environment. Only you can see these values.
 
 ```node
-const stripe = require("stripe")("{{keys.secret}}");
+const stripe = require('stripe')('{{keys.secret}}')
 
 stripe.products
   .create({
-    name: "Starter Subscription",
-    description: "$12/Month subscription",
+    name: 'Starter Subscription',
+    description: '$12/Month subscription',
   })
-  .then((product) => {
+  .then(product => {
     stripe.prices
       .create({
         unit_amount: 1200,
-        currency: "usd",
+        currency: 'usd',
         recurring: {
-          interval: "month",
+          interval: 'month',
         },
         product: product.id,
       })
-      .then((price) => {
+      .then(price => {
         console.log(
-          "Success! Here is your starter subscription product id: " + product.id
-        );
+          'Success! Here is your starter subscription product id: ' +
+            product.id,
+        )
         console.log(
-          "Success! Here is your starter subscription price id: " + price.id
-        );
-      });
-  });
+          'Success! Here is your starter subscription price id: ' + price.id,
+        )
+      })
+  })
 ```
 
 Save the file as `create_price.js`. From the command line, `cd` to the directory containing the file you just saved and run:

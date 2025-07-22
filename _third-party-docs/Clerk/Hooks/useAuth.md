@@ -100,7 +100,8 @@ The following example demonstrates how to use the `useAuth()` hook to access the
 
 <Tabs items={['React', 'Next.js']}>
 <Tab>
-```tsx {{ filename: 'src/pages/ExternalDataPage.tsx' }}
+
+````tsx {{ filename: 'src/pages/ExternalDataPage.tsx' }}
 import { useAuth } from "@clerk/clerk-react";
 
     export default function ExternalDataPage() {
@@ -183,3 +184,4 @@ import { useAuth } from "@clerk/clerk-react";
 
   </Tab>
 </Tabs>
+````

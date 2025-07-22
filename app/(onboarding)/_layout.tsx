@@ -1,7 +1,7 @@
-import {Stack} from 'expo-router'
+import {ActivityIndicator, Text, View} from 'react-native'
 import {useQuery} from 'convex/react'
+import {Stack} from 'expo-router'
 import {api} from '@/convex/_generated/api'
-import {ActivityIndicator, View, Text} from 'react-native'
 
 /**
  * This component contains the core routing logic for the onboarding flow.

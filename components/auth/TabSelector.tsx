@@ -1,5 +1,5 @@
 import type React from 'react'
-import {View, Text, Pressable} from 'react-native'
+import {Pressable, Text, View} from 'react-native'
 
 interface TabSelectorProps {
   tabs: string[]

@@ -2,7 +2,6 @@
  * Stripe integration for payment processing and identity verification
  * Provides server-side Stripe functionality for the Momento platform
  */
-
 import Stripe from 'stripe'
 import {config} from './config'
 

@@ -19,7 +19,6 @@ This task list breaks down the implementation of the Hybrid User Mode-Switching 
 ## Tasks
 
 - [ ] **1.0 Implement Backend Mutations**
-
   - [ ] 1.1 In `convex/user.ts`, create a new mutation named `setActiveRole`.
     - [ ] It should accept one argument: `role: v.union(v.literal("social"), v.literal("host"))`.
     - [ ] Inside the mutation, get the current user's identity.
@@ -31,7 +30,6 @@ This task list breaks down the implementation of the Hybrid User Mode-Switching 
     - [ ] As part of the same update, set `active_role` to `'host'` to ensure the user is switched to the new context upon completion.
 
 - [ ] **2.0 Create the ModeSwitcher Component**
-
   - [ ] 2.1 Create a new file at `components/ModeSwitcher.tsx`.
   - [ ] 2.2 Build a segmented control with two options: "Social" and "Host".
   - [ ] 2.3 The component should accept `currentRole` and `onRoleChange` as props.
@@ -39,7 +37,6 @@ This task list breaks down the implementation of the Hybrid User Mode-Switching 
   - [ ] 2.5 When a new segment is tapped, call the `onRoleChange` function with the corresponding role (`'social'` or `'host'`).
 
 - [ ] **3.0 Integrate ModeSwitcher into Settings Screen**
-
   - [ ] 3.1 Open `app/(tabs)/settings.tsx`.
   - [ ] 3.2 Use the `useQuery` hook to fetch the current user's data.
   - [ ] 3.3 Conditionally render the `<ModeSwitcher />` component only if `user.socialProfile` and `user.hostProfile` both exist.
@@ -47,7 +44,6 @@ This task list breaks down the implementation of the Hybrid User Mode-Switching 
   - [ ] 3.5 Create a handler function for the `onRoleChange` prop that calls the `setActiveRole` mutation using the `useMutation` hook.
 
 - [ ] **4.0 Implement Core Role-Based Navigation**
-
   - [ ] 4.1 Open `app/(tabs)/_layout.tsx`.
   - [ ] 4.2 Fetch the current user data using `useQuery`. Make sure to include `active_role`, `socialProfile`, and `hostProfile`.
   - [ ] 4.3 Implement a loading state (e.g., return `<ActivityIndicator />`) while the user data is loading to prevent UI flashing.
@@ -61,7 +57,6 @@ This task list breaks down the implementation of the Hybrid User Mode-Switching 
     - **Gotcha**: Ensure the `(social)/events` and `(host)/events` tabs point to the correct files within their respective route groups.
 
 - [ ] **5.0 Implement "Add-a-Role" CTAs**
-
   - [ ] 5.1 In `app/(tabs)/(social)/social-profile.tsx`:
     - [ ] Fetch the current user's data.
     - [ ] If `!user.hostProfile`, render a "Become a Host" button.

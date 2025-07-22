@@ -324,7 +324,7 @@ describe('Stripe Integration', () => {
 #### Example E2E Test
 
 ```typescript
-import {device, element, by, expect} from 'detox'
+import {by, device, element, expect} from 'detox'
 
 describe('User Registration Flow', () => {
   beforeAll(async () => {

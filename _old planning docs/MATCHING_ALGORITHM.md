@@ -36,7 +36,6 @@ The algorithm operates using a **"Concentric Circles"** strategy. Instead of eva
 The foundation of the graph is the strength of its connections. We calculate a `PotentialConnectionScore(A, B)` for every possible one-way pairing. This score, from 0 to 1, represents the likelihood of User A being interested in User B.
 
 1.  **Categorical Compatibility (The Prerequisite)**
-
     - Does User B's `gender` appear in User A's `interested_in` array?
     - If `NO`, the `PotentialConnectionScore` is **0**. If `YES`, we proceed.
 
@@ -79,27 +78,22 @@ This iterative process repeats, ensuring the system only "settles" for a good gr
 Once the ideal group is selected, the system does a "reverse lookup" to explain the match to each user. It constructs a human-readable `match_reason` by analyzing the strongest signals that led to their inclusion. The hierarchy, from most compelling to most practical, is:
 
 1.  **Paired Invitation (The "Perfect Pair"):** The highest-tier reason, reserved for "Dynamic Duos".
-
     - **Trigger:** The invitation is for a Duo.
     - **Example:** _"We found an event that bridges your love for **Hiking** with David's interest in **Japanese Cuisine**."_
 
 2.  **Strong Social Signals (The "Inside Track"):** This is the next highest tier, based on a user's direct feedback on people.
-
     - **Trigger:** The group includes a user they've flagged with **"Connect Again,"** or the event is hosted by someone they've previously given a **5-star rating.**
     - **Example:** _"Someone you wanted to connect with again will be at this event!"_
 
 3.  **High Chemistry Potential (The "People Connection"):** The core reason when the user is a key part of the social graph's chemistry.
-
     - **Trigger:** The user's combined incoming and outgoing `PotentialConnectionScore`s are particularly high within the chosen group.
     - **Example:** _"We think you'll really connect with the people at this event."_
 
 4.  **Event & Interest Match (The "Vibe Check"):** For when the event itself is an ideal match for their tastes.
-
     - **Trigger:** High vector similarity between the event and the user's `positive_interest_vector` or explicit `interests`.
     - **Example:** _"This seems right up your alley! It's similar to the '[Liked Event Card Title]' experience you were interested in."_
 
 5.  **Logistical Perfection (The "Perfect Fit"):** This is most powerful when an event perfectly matches a user's restrictive preferences.
-
     - **Trigger:** The event aligns perfectly with the user's set **distance, price, and timing/availability** preferences.
     - **Example:** _"An event that fits your schedule and budget, right in your neighborhood!"_
 
@@ -118,20 +112,17 @@ A user's interests are not static. To prevent an "invite rut" where a user is on
 ### Primary Evolution Mechanisms
 
 1.  **The "Discover your Interests" Feed:**
-
     - The primary tool for the **initial discovery** of a user's "Interest Personas." The experience is divided into two phases to efficiently build a user's profile.
     - **Phase 1: Broad Exploration (Calibration):** The user swipes on a diverse, curated set of past event cards. This builds a broad picture of their potential interests.
     - **Phase 2: Persona Discovery & Refinement:** After the calibration phase, the backend runs a clustering algorithm on the user's liked event vectors. It identifies 1-3 distinct clusters and creates a separate `positive_persona_vector` for each. The feed then shifts to showing events similar to these new personas, helping to refine them.
     - While this is the main tool for persona discovery, it is the starting point. The system gives significantly more weight to the implicit signals below for long-term persona evolution.
 
 2.  **The "Discover your Type" Feed:**
-
     - This is the primary tool for understanding a user's "type" and is the engine that builds their `person_attraction_vector`. Users browse a feed of profiles filtered by their `interested_in` preferences.
     - An affirmative swipe ("I'd like to create a memory with them") is a powerful signal. It updates the user's `person_attraction_vector`, making our understanding of their type more and more accurate over time.
     - To gather this data efficiently, the algorithm operates in two distinct phases:
 
     - **Phase 1: Broad Exploration (First ~30 Swipes)**
-
       - **Goal:** To quickly establish a baseline `person_attraction_vector` by exposing the user to a wide range of profiles.
       - **Algorithm:** The system presents a deliberately diverse set of profiles that match the user's `interested_in` criteria. This is not random; the system ensures diversity across several axes (e.g., Interest Personas, age, vectorized bio) to cover the possibility space. At this stage, `internal_attractiveness_rating` is not used, as the goal is to learn from the user's raw preferences.
 
@@ -142,11 +133,9 @@ A user's interests are not static. To prevent an "invite rut" where a user is on
         - **20% Exploration:** To prevent an echo chamber, the algorithm introduces "serendipity" by showing profiles that are slightly outside the user's core calculated type but are popular with other users who share similar tastes.
 
 3.  **Post-Event Ratings & Attendance (Strongest Signal):**
-
     - When a user attends an event and rates it highly (e.g., 4-5 stars), the system strongly "nudges" the most relevant `positive_persona_vector` closer to that event's vector. This is a powerful, verifying signal because it reflects real-world behavior, not just a casual swipe.
 
 4.  **"Event DNA" Selections (Strong Signal):**
-
     - When a user chooses to showcase a past event on their public profile, it's a powerful endorsement. The system gives the vector of this event a higher weight when calculating and refining the user's Interest Personas.
 
 5.  **Explicit Decline Reasons:**
@@ -177,7 +166,6 @@ To respect user preferences without creating rigid filters, we introduce a "pena
 This is the evolution of the system, designed to capture the multi-faceted nature of a user's personality (e.g., someone who loves both skydiving and quiet wine tasting).
 
 1.  **Automatic Persona Clustering:**
-
     - During onboarding, instead of averaging all liked card vectors, the backend will run a simple clustering algorithm (like K-Means) on them.
     - If the algorithm identifies distinct groups (e.g., high-energy vs. low-energy events), it will create a separate averaged vector for each cluster.
 

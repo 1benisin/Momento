@@ -1,8 +1,8 @@
-import React, {useState, useEffect} from 'react'
-import {Modal, View, Button, SafeAreaView, StyleSheet, Text} from 'react-native'
-import MapView, {Region} from 'react-native-maps'
+import React, {useEffect, useState} from 'react'
+import {Button, Modal, SafeAreaView, StyleSheet, Text, View} from 'react-native'
 import {Ionicons} from '@expo/vector-icons'
 import * as Location from 'expo-location'
+import MapView, {Region} from 'react-native-maps'
 
 interface MapViewModalProps {
   visible: boolean

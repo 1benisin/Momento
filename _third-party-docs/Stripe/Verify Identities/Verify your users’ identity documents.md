@@ -139,19 +139,19 @@ Start by adding a verify button to your page:
 Start by adding a verify button to your page:
 
 ```jsx
-import React from "react";
+import React from 'react'
 
 class VerifyButton extends React.Component {
   render() {
-    return <button role="link">Verify</button>;
+    return <button role="link">Verify</button>
   }
 }
 
 const App = () => {
-  return <VerifyButton />;
-};
+  return <VerifyButton />
+}
 
-export default App;
+export default App
 ```
 
 ## Show the document upload modal
@@ -343,41 +343,41 @@ Content-Type: application/json
     <button id="verify-button">Verify</button>
 
     <script type="text/javascript">
-      var verifyButton = document.getElementById("verify-button");
+      var verifyButton = document.getElementById('verify-button')
 
-      verifyButton.addEventListener("click", function () {
+      verifyButton.addEventListener('click', function () {
         // Get the VerificationSession client secret using the server-side
         // endpoint you created in step 3.
-        fetch("/create-verification-session", {
-          method: "POST",
+        fetch('/create-verification-session', {
+          method: 'POST',
         })
           .then(function (response) {
-            return response.json();
+            return response.json()
           })
           .catch(function (error) {
-            console.error("Error:", error);
-          });
-      });
+            console.error('Error:', error)
+          })
+      })
     </script>
   </body>
 </html>
 ```
 
 ```jsx
-import React from "react";
-import { loadStripe } from "@stripe/stripe-js";
+import React from 'react'
+import {loadStripe} from '@stripe/stripe-js'
 
 class VerifyButton extends React.Component {}
 
 // Make sure to call `loadStripe` outside of a component’s render to avoid
 // recreating the `Stripe` object on every render.
-const stripePromise = loadStripe("<<publishable key>>");
+const stripePromise = loadStripe('<<publishable key>>')
 
 const App = () => {
-  return <VerifyButton stripePromise={stripePromise} />;
-};
+  return <VerifyButton stripePromise={stripePromise} />
+}
 
-export default App;
+export default App
 ```
 
 ### Event error codes
@@ -579,19 +579,19 @@ Start by adding a verify button to your page:
 Start by adding a verify button to your page:
 
 ```jsx
-import React from "react";
+import React from 'react'
 
 class VerifyButton extends React.Component {
   render() {
-    return <button role="link">Verify</button>;
+    return <button role="link">Verify</button>
   }
 }
 
 const App = () => {
-  return <VerifyButton />;
-};
+  return <VerifyButton />
+}
 
-export default App;
+export default App
 ```
 
 ## Redirect to Stripe Identity
@@ -783,41 +783,41 @@ Content-Type: application/json
     <button id="verify-button">Verify</button>
 
     <script type="text/javascript">
-      var verifyButton = document.getElementById("verify-button");
+      var verifyButton = document.getElementById('verify-button')
 
-      verifyButton.addEventListener("click", function () {
+      verifyButton.addEventListener('click', function () {
         // Get the VerificationSession client secret using the server-side
         // endpoint you created in step 3.
-        fetch("/create-verification-session", {
-          method: "POST",
+        fetch('/create-verification-session', {
+          method: 'POST',
         })
           .then(function (response) {
-            return response.json();
+            return response.json()
           })
           .catch(function (error) {
-            console.error("Error:", error);
-          });
-      });
+            console.error('Error:', error)
+          })
+      })
     </script>
   </body>
 </html>
 ```
 
 ```jsx
-import React from "react";
-import { loadStripe } from "@stripe/stripe-js";
+import React from 'react'
+import {loadStripe} from '@stripe/stripe-js'
 
 class VerifyButton extends React.Component {}
 
 // Make sure to call `loadStripe` outside of a component’s render to avoid
 // recreating the `Stripe` object on every render.
-const stripePromise = loadStripe("<<publishable key>>");
+const stripePromise = loadStripe('<<publishable key>>')
 
 const App = () => {
-  return <VerifyButton stripePromise={stripePromise} />;
-};
+  return <VerifyButton stripePromise={stripePromise} />
+}
 
-export default App;
+export default App
 ```
 
 ### Test the redirect

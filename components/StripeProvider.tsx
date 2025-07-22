@@ -2,7 +2,6 @@
  * Stripe Provider component for payment processing
  * Wraps the app with Stripe configuration and provides payment functionality
  */
-
 import React, {createContext, useContext, useEffect, useState} from 'react'
 import {StripeProvider as StripeProviderBase} from '@stripe/stripe-react-native'
 import {devLog} from '@/utils/devLog'
