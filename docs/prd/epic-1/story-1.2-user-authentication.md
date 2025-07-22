@@ -2,19 +2,19 @@
 
 ## Status
 
-In Progress
+Ready for QA
 
 ## Story
 
 **As a** new user,
-**I want** to sign up using SMS or email/password authentication,
+**I want** to sign up using SMS or email authentication,
 **so that** I can create my account and access the Momento platform.
 
 ## Acceptance Criteria
 
 1. Sign-up screen implemented with clean, intuitive interface for both authentication options
 2. SMS authentication working for US phone numbers with verification code delivery
-3. Email/password authentication with proper validation and password requirements
+3. Email authentication with proper validation
 4. Clerk integration configured with user creation and profile setup
 5. Error handling and user feedback system implemented
 6. Session management with secure token storage and persistence

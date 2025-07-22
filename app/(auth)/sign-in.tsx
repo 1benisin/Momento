@@ -11,6 +11,19 @@ import {
 import {AuthButton} from '@/components/auth/AuthButton'
 import {AuthInput} from '@/components/auth/AuthInput'
 import {TabSelector} from '@/components/auth/TabSelector'
+import {devLog} from '@/utils/devLog'
+import type {SignInFirstFactor} from '@clerk/types'
+
+function isClerkError(
+  err: unknown,
+): err is {errors: {code?: string; longMessage?: string}[]} {
+  return (
+    typeof err === 'object' &&
+    err !== null &&
+    'errors' in err &&
+    Array.isArray((err as {errors?: unknown}).errors)
+  )
+}
 
 export default function SignInScreen() {
   const {signIn, setActive, isLoaded} = useSignIn()
@@ -35,20 +48,22 @@ export default function SignInScreen() {
       const identifier = signInMethod === 'email' ? emailAddress : phoneNumber
       const {supportedFirstFactors} = await signIn.create({identifier})
 
-      const firstFactor: any = supportedFirstFactors?.find(f => {
-        return signInMethod === 'email'
-          ? f.strategy === 'email_code'
-          : f.strategy === 'phone_code'
-      })
+      const firstFactor = supportedFirstFactors?.find(
+        (f: SignInFirstFactor) => {
+          return signInMethod === 'email'
+            ? f.strategy === 'email_code'
+            : f.strategy === 'phone_code'
+        },
+      )
 
       if (firstFactor) {
-        if (signInMethod === 'email') {
+        if (signInMethod === 'email' && 'emailAddressId' in firstFactor) {
           const {emailAddressId} = firstFactor
           await signIn.prepareFirstFactor({
             strategy: 'email_code',
             emailAddressId,
           })
-        } else {
+        } else if ('phoneNumberId' in firstFactor) {
           const {phoneNumberId} = firstFactor
           await signIn.prepareFirstFactor({
             strategy: 'phone_code',
@@ -61,15 +76,19 @@ export default function SignInScreen() {
           `This account does not have a verified ${signInMethod}. Please try another method.`,
         )
       }
-    } catch (err: any) {
-      console.error('Error signing in:', JSON.stringify(err, null, 2))
+    } catch (err: unknown) {
+      devLog('Error signing in:', JSON.stringify(err, null, 2))
       const defaultMessage = 'An error occurred during sign in.'
-      if (err.errors?.[0]?.code === 'form_identifier_not_found') {
-        setError(
-          `We couldn't find an account with that ${signInMethod}. Please sign up.`,
-        )
+      if (isClerkError(err)) {
+        if (err.errors?.[0]?.code === 'form_identifier_not_found') {
+          setError(
+            `We couldn't find an account with that ${signInMethod}. Please sign up.`,
+          )
+        } else {
+          setError(err.errors?.[0]?.longMessage || defaultMessage)
+        }
       } else {
-        setError(err.errors?.[0]?.longMessage || defaultMessage)
+        setError(defaultMessage)
       }
     } finally {
       setLoading(false)
@@ -92,9 +111,13 @@ export default function SignInScreen() {
           'Could not complete sign in. Please check the code and try again.',
         )
       }
-    } catch (err: any) {
-      console.error('Error verifying code:', JSON.stringify(err, null, 2))
-      setError(err.errors?.[0]?.longMessage || 'Invalid verification code.')
+    } catch (err: unknown) {
+      devLog('Error verifying code:', JSON.stringify(err, null, 2))
+      if (isClerkError(err)) {
+        setError(err.errors?.[0]?.longMessage || 'Invalid verification code.')
+      } else {
+        setError('Invalid verification code.')
+      }
     } finally {
       setLoading(false)
     }

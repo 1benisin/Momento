@@ -13,8 +13,21 @@ import type PhoneInput from 'react-native-phone-number-input'
 import {AuthButton} from '@/components/auth/AuthButton'
 import {AuthInput} from '@/components/auth/AuthInput'
 import {TabSelector} from '@/components/auth/TabSelector'
+import {devLog} from '@/utils/devLog'
 
-const PhoneInputComponent = RNPhoneInput as unknown as React.FC<any>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const RNPhoneInputAny = RNPhoneInput as any
+
+function isClerkError(
+  err: unknown,
+): err is {errors: {code?: string; longMessage?: string}[]} {
+  return (
+    typeof err === 'object' &&
+    err !== null &&
+    'errors' in err &&
+    Array.isArray((err as {errors?: unknown}).errors)
+  )
+}
 
 export default function SignUpScreen() {
   const {isLoaded, signUp, setActive} = useSignUp()
@@ -48,11 +61,15 @@ export default function SignUpScreen() {
         await signUp.preparePhoneNumberVerification()
       }
       setPendingVerification(true)
-    } catch (err: any) {
-      console.error('Error signing up:', JSON.stringify(err, null, 2))
-      setError(
-        err.errors?.[0]?.longMessage || 'An error occurred during sign up.',
-      )
+    } catch (err: unknown) {
+      devLog('Error signing up:', JSON.stringify(err, null, 2))
+      if (isClerkError(err)) {
+        setError(
+          err.errors?.[0]?.longMessage || 'An error occurred during sign up.',
+        )
+      } else {
+        setError('An error occurred during sign up.')
+      }
     } finally {
       setLoading(false)
     }
@@ -78,9 +95,13 @@ export default function SignUpScreen() {
           'Could not complete sign up. Please check the code and try again.',
         )
       }
-    } catch (err: any) {
-      console.error('Error verifying code:', JSON.stringify(err, null, 2))
-      setError(err.errors?.[0]?.longMessage || 'Invalid verification code.')
+    } catch (err: unknown) {
+      devLog('Error verifying code:', JSON.stringify(err, null, 2))
+      if (isClerkError(err)) {
+        setError(err.errors?.[0]?.longMessage || 'Invalid verification code.')
+      } else {
+        setError('Invalid verification code.')
+      }
     } finally {
       setLoading(false)
     }
@@ -118,7 +139,7 @@ export default function SignUpScreen() {
           <Text className="mb-1 font-['Inter'] text-[#F8F6F1] text-sm">
             Phone Number
           </Text>
-          <PhoneInputComponent
+          <RNPhoneInputAny
             ref={phoneInput}
             defaultValue={phoneNumber}
             defaultCode="US"

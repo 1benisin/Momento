@@ -89,8 +89,7 @@ const LocationSearchInput: React.FC<LocationSearchInputProps> = ({
         />
         <TouchableOpacity
           onPress={onPressPin}
-          className="absolute right-2.5 top-2.5 z-[1100] bg-transparent"
-        >
+          className="absolute right-2.5 top-2.5 z-[1100] bg-transparent">
           <Ionicons name="map-outline" size={24} color={Colors.light.tint} />
         </TouchableOpacity>
       </View>
