@@ -96,12 +96,10 @@ You can begin exploring Stripe APIs using the [Stripe Shell](https://docs.stripe
 Whenever you make a call to Stripe APIs, Stripe creates and stores API and [Events](https://docs.stripe.com/api/events.md) objects for your Stripe [user account](https://docs.stripe.com/get-started/account.md). The API key you specify for the request determines whether the objects are stored in a sandbox environment or in live mode. For example, the last request used your API secret key, so Stripe stored the objects in a sandbox.
 
 - To view the API request log:
-
   - Open the [Logs](https://dashboard.stripe.com/test/workbench/logs) page.
   - Click **200 OK POST /v1 customers**.
 
 - To view the Event log:
-
   - Open the [Events](https://dashboard.stripe.com/test/workbench/events) page.
   - Click **jane.smith@email.com is a new customer**.
 

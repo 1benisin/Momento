@@ -51,18 +51,18 @@ This document outlines the coding standards, development practices, and architec
 ```typescript
 // ✅ Good: Explicit type definitions
 interface UserProfile {
-  id: string;
-  firstName: string;
-  lastName?: string;
-  email: string;
-  createdAt: Date;
+  id: string
+  firstName: string
+  lastName?: string
+  email: string
+  createdAt: Date
 }
 
 // ❌ Bad: Implicit any types
 const user = {
-  id: "123",
-  name: "John",
-};
+  id: '123',
+  name: 'John',
+}
 ```
 
 #### Function Signatures
@@ -79,11 +79,11 @@ const updateUser = async (
   updates: Partial<User>,
 ): Promise<User> => {
   // implementation
-};
+}
 
 // ❌ Bad: Missing type annotations
 function processUser(user) {
-  return user.id;
+  return user.id
 }
 ```
 
@@ -92,14 +92,14 @@ function processUser(user) {
 ```typescript
 // ✅ Good: Proper error handling with types
 try {
-  const result = await riskyOperation();
-  return result;
+  const result = await riskyOperation()
+  return result
 } catch (error) {
   if (error instanceof NetworkError) {
-    devLog("Network error occurred", { error: error.message });
-    throw new UserFriendlyError("Connection failed. Please try again.");
+    devLog('Network error occurred', {error: error.message})
+    throw new UserFriendlyError('Connection failed. Please try again.')
   }
-  throw error;
+  throw error
 }
 ```
 
@@ -145,29 +145,29 @@ export const UserCard: React.FC<UserCardProps> = ({
 ```typescript
 // ✅ Good: Custom hook with proper typing
 export const useUserProfile = (userId: string) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        setLoading(true);
-        const userData = await getUserProfile(userId);
-        setUser(userData);
+        setLoading(true)
+        const userData = await getUserProfile(userId)
+        setUser(userData)
       } catch (err) {
-        setError(err as Error);
-        devLog("Failed to fetch user profile", { userId, error: err });
+        setError(err as Error)
+        devLog('Failed to fetch user profile', {userId, error: err})
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchUser();
-  }, [userId]);
+    fetchUser()
+  }, [userId])
 
-  return { user, loading, error };
-};
+  return {user, loading, error}
+}
 ```
 
 ### Naming Conventions
@@ -229,23 +229,23 @@ components/
 
 ```typescript
 // ✅ Good: Use useState for local component state
-const [isLoading, setIsLoading] = useState(false);
-const [formData, setFormData] = useState<FormData>(initialData);
+const [isLoading, setIsLoading] = useState(false)
+const [formData, setFormData] = useState<FormData>(initialData)
 ```
 
 #### Global State
 
 ```typescript
 // ✅ Good: Use Convex for global state management
-import { useQuery, useMutation } from "convex/react";
+import {useMutation, useQuery} from 'convex/react'
 
 export const useUserData = () => {
-  return useQuery("users.getCurrentUser");
-};
+  return useQuery('users.getCurrentUser')
+}
 
 export const useUpdateUser = () => {
-  return useMutation("users.updateProfile");
-};
+  return useMutation('users.updateProfile')
+}
 ```
 
 #### Context Usage
@@ -273,20 +273,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 // ✅ Good: Proper Convex function structure
 // convex/users.ts
 export const getUserProfile = query({
-  args: { userId: v.string() },
+  args: {userId: v.string()},
   handler: async (ctx, args) => {
     const user = await ctx.db
-      .query("users")
-      .filter((q) => q.eq(q.field("_id"), args.userId))
-      .first();
+      .query('users')
+      .filter(q => q.eq(q.field('_id'), args.userId))
+      .first()
 
     if (!user) {
-      throw new Error("User not found");
+      throw new Error('User not found')
     }
 
-    return user;
+    return user
   },
-});
+})
 ```
 
 #### Error Handling
@@ -584,18 +584,18 @@ describe('User Profile Flow', () => {
 // ✅ Good: Centralized test data
 export const mockUsers = {
   john: {
-    id: "1",
-    firstName: "John",
-    lastName: "Doe",
-    email: "john@example.com",
+    id: '1',
+    firstName: 'John',
+    lastName: 'Doe',
+    email: 'john@example.com',
   },
   jane: {
-    id: "2",
-    firstName: "Jane",
-    lastName: "Smith",
-    email: "jane@example.com",
+    id: '2',
+    firstName: 'Jane',
+    lastName: 'Smith',
+    email: 'jane@example.com',
   },
-};
+}
 ```
 
 ---
@@ -620,7 +620,7 @@ export const createUser = async (
   options?: CreateUserOptions,
 ): Promise<User> => {
   // implementation
-};
+}
 ```
 
 #### Component Documentation
@@ -638,13 +638,9 @@ export const createUser = async (
  * />
  * ```
  */
-export const UserCard: React.FC<UserCardProps> = ({
-  user,
-  onPress,
-  variant,
-}) => {
+export const UserCard: React.FC<UserCardProps> = ({user, onPress, variant}) => {
   // implementation
-};
+}
 ````
 
 ### README Standards
@@ -675,23 +671,23 @@ export const UserCard: React.FC<UserCardProps> = ({
 ```typescript
 // ✅ Good: Use React.memo for expensive components
 export const ExpensiveComponent = React.memo<ExpensiveComponentProps>(
-  ({ data }) => {
+  ({data}) => {
     // Expensive rendering logic
   },
-);
+)
 
 // ✅ Good: Use useMemo for expensive calculations
 const expensiveValue = useMemo(() => {
-  return data.filter((item) => item.isActive).map((item) => item.value);
-}, [data]);
+  return data.filter(item => item.isActive).map(item => item.value)
+}, [data])
 
 // ✅ Good: Use useCallback for function props
 const handlePress = useCallback(
   (id: string) => {
-    onItemPress(id);
+    onItemPress(id)
   },
   [onItemPress],
-);
+)
 ```
 
 #### List Optimization
@@ -718,14 +714,14 @@ const handlePress = useCallback(
 // ✅ Good: Implement proper caching
 export const useUserData = (userId: string) => {
   return useQuery(
-    "users.getUser",
-    { userId },
+    'users.getUser',
+    {userId},
     {
       staleTime: 5 * 60 * 1000, // 5 minutes
       cacheTime: 10 * 60 * 1000, // 10 minutes
     },
-  );
-};
+  )
+}
 ```
 
 #### Image Optimization
@@ -759,17 +755,17 @@ export const createUser = mutation({
   handler: async (ctx, args) => {
     // Validate email format
     if (!isValidEmail(args.email)) {
-      throw new Error("Invalid email format");
+      throw new Error('Invalid email format')
     }
 
     // Validate password strength
     if (!isStrongPassword(args.password)) {
-      throw new Error("Password does not meet requirements");
+      throw new Error('Password does not meet requirements')
     }
 
     // Continue with user creation
   },
-});
+})
 ```
 
 #### Authentication
@@ -797,11 +793,11 @@ export const updateUserProfile = mutation({
 
 ```typescript
 // ✅ Good: Use environment variables for secrets
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-const clerkSecretKey = process.env.CLERK_SECRET_KEY;
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY
+const clerkSecretKey = process.env.CLERK_SECRET_KEY
 
 // ❌ Bad: Hardcoded secrets
-const apiKey = "sk_test_1234567890";
+const apiKey = 'sk_test_1234567890'
 ```
 
 #### Data Sanitization
@@ -811,9 +807,9 @@ const apiKey = "sk_test_1234567890";
 export const sanitizeUserInput = (input: string): string => {
   return input
     .trim()
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-    .substring(0, 1000); // Limit length
-};
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .substring(0, 1000) // Limit length
+}
 ```
 
 ---
@@ -826,16 +822,16 @@ export const sanitizeUserInput = (input: string): string => {
 
 ```typescript
 // ✅ Good: Use devLog for consistent logging
-import { devLog } from "../utils/devLog";
+import {devLog} from '../utils/devLog'
 
 // Informational logging
-devLog("User profile updated", { userId, changes });
+devLog('User profile updated', {userId, changes})
 
 // Error logging
-devLog("Failed to create event", { error: error.message, eventData });
+devLog('Failed to create event', {error: error.message, eventData})
 
 // Debug logging
-devLog("API response received", { endpoint, responseTime, dataSize });
+devLog('API response received', {endpoint, responseTime, dataSize})
 ```
 
 #### Log Levels
@@ -847,4 +843,176 @@ devLog("API response received", { endpoint, responseTime, dataSize });
 
 ---
 
+## Styling with NativeWind
+
+This project uses [NativeWind](https://www.nativewind.dev/) for styling, which brings the power of Tailwind CSS to React Native. All new styling should be implemented using NativeWind's utility classes via the `className` prop. The use of `StyleSheet.create` is deprecated and should be migrated to NativeWind where possible.
+
+### Core Principles
+
+- **Utility-First:** Use utility classes for all styling. This promotes consistency and reduces the need for custom CSS.
+- **Co-location:** Styles are co-located with the component markup, making them easier to manage and understand.
+- **Design System:** All colors, fonts, spacing, and other design tokens are defined in `tailwind.config.js`. This file is the single source of truth for the app's visual identity, and it should be updated to reflect any changes to the design system defined in `/docs/design`.
+
+### Light and Dark Mode
+
+NativeWind has built-in support for dark mode. To apply a style only in dark mode, use the `dark:` prefix.
+
+```tsx
+<View className="bg-off-white dark:bg-deep-ink">
+  <Text className="text-deep-ink dark:text-off-white">Hello World</Text>
+</View>
+```
+
+The color scheme is managed by the `useColorScheme` hook, and NativeWind automatically applies the correct styles.
+
+### Styling Custom Components
+
+If you need to style a component that does not have a `className` prop, you can wrap it with the `styled` Higher-Order Component (HOC) from NativeWind.
+
+```tsx
+import {styled} from 'nativewind'
+import SomeThirdPartyComponent from 'some-library'
+
+const StyledThirdPartyComponent = styled(SomeThirdPartyComponent)
+
+// Now you can use className
+;<StyledThirdPartyComponent className="p-4 bg-gold" />
+```
+
+### Creating Reusable Components
+
+If you find yourself repeating the same set of utility classes on multiple elements, it is a strong signal that you should extract that element into a reusable component.
+
+**Don't do this:**
+
+```tsx
+<View className="p-4 bg-gold rounded-lg">
+  <Text>Card 1</Text>
+</View>
+<View className="p-4 bg-gold rounded-lg">
+  <Text>Card 2</Text>
+</View>
+```
+
+**Do this:**
+
+```tsx
+// components/Card.tsx
+export function Card({ children }) {
+  return (
+    <View className="p-4 bg-gold rounded-lg">
+      {children}
+    </View>
+  );
+}
+
+// Usage
+<Card>
+  <Text>Card 1</Text>
+</Card>
+<Card>
+  <Text>Card 2</Text>
+</Card>
+```
+
 **Last Updated:** 2024-12-19
+
+## Linting & Common Linting Issues
+
+### Linting Configuration
+
+We use ESLint with TypeScript and React Native plugins to enforce code quality and consistency. The configuration is in `eslint.config.mjs` and is tailored for Expo, React Native, and Convex projects.
+
+### Common Linting Issues & Best Practices
+
+#### 1. Asset Imports (Fonts, Images, etc.)
+
+- **Expo Best Practice:** Use `require()` for static asset imports (e.g., fonts, images) in Expo projects. ES module imports do not work for these file types and will cause build or type errors.
+
+```typescript
+// ❌ Bad: ES import for font
+import SpaceMonoFont from '../assets/fonts/SpaceMono-Regular.ttf'
+
+// ✅ Good: Font loading in Expo
+const [loaded] = useFonts({
+  SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+})
+```
+
+- **ESLint Exception:** Our ESLint config allows `require()` for asset file extensions (e.g., `.ttf`, `.png`).
+
+#### 2. Escaping Characters in JSX
+
+- **Best Practice:** Use JSX expressions for strings with apostrophes or quotes instead of HTML entities.
+
+```tsx
+// ✅ Good
+<Text>{"Don't have an account?"}</Text>
+
+// ❌ Bad
+<Text>Don&apos;t have an account?</Text>
+```
+
+- This approach is more readable and maintainable, and is preferred for all JSX text content.
+
+#### 3. require() Style Imports
+
+- **Rule:** Only use `require()` for static assets (see above). For all code modules, use ES imports.
+
+```typescript
+// ✅ Good: ES import for code
+import {MyComponent} from './MyComponent'
+
+// ✅ Good: require() for asset
+const logo = require('../assets/logo.png')
+
+// ❌ Bad: require() for code
+const MyComponent = require('./MyComponent')
+```
+
+#### 4. TypeScript 'any' Usage
+
+- **Rule:** Avoid `any` in all code. Use explicit types or `unknown` with type guards for error handling.
+
+```typescript
+// ✅ Good
+catch (err: unknown) {
+  if (err instanceof Error) {
+    // handle error
+  }
+}
+
+// ❌ Bad
+catch (err: any) {
+  // ...
+}
+```
+
+#### 5. Unused Variables and Styles
+
+- **Rule:** Remove all unused variables, imports, and styles. This keeps the codebase clean and avoids confusion.
+
+#### 6. React Hook Rules
+
+- **Rule:** Do not call hooks conditionally. Always call hooks at the top level of your component or custom hook.
+
+```tsx
+// ✅ Good
+if (someCondition) {
+  doSomething()
+}
+const value = useMyHook()
+
+// ❌ Bad
+if (someCondition) {
+  const value = useMyHook()
+}
+```
+
+---
+
+**See also:**
+
+- [Expo Asset System](https://docs.expo.dev/guides/assets/)
+- [Expo Font Loading](https://docs.expo.dev/guides/using-custom-fonts/)
+- [ESLint Configuration](../../eslint.config.mjs)

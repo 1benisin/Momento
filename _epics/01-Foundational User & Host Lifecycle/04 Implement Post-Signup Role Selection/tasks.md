@@ -14,7 +14,6 @@
 ## Tasks
 
 - [ ] 1.0 Create the Role Selection Screen
-
   - [ ] 1.1 Create a new file at `app/(onboarding)/role-selection.tsx`.
   - [ ] 1.2 Import `React`, `View`, `Text`, `Button`, `StyleSheet` from React Native, and `useRouter` from `expo-router`.
   - [ ] 1.3 Lay out the component with a title, such as "How would you like to start?".
@@ -25,13 +24,11 @@
   - [ ] 1.8 Ensure the "Host Events" button is not pressable or triggers an alert stating it's "Coming Soon."
 
 - [ ] 2.0 Update the Onboarding Navigator
-
   - [ ] 2.1 Open the file `app/(onboarding)/_layout.tsx`.
   - [ ] 2.2 Inside the `<Stack>` component, add a new screen definition: `<Stack.Screen name="role-selection" options={{ headerShown: false }} />`.
   - [ ] 2.3 Ensure it is placed alongside the other screen definitions for `profile-setup` and `initial-photo`.
 
 - [ ] 3.0 Update the Root Navigation Logic
-
   - [ ] 3.1 Open the root layout file `app/_layout.tsx`.
   - [ ] 3.2 Locate the `InitialLayout` component and the `useEffect` hook within it.
   - [ ] 3.3 Find the condition `if (userData.status === UserStatuses.PENDING_ONBOARDING)`.

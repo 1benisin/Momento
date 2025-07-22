@@ -52,17 +52,14 @@ sequenceDiagram
 ## 5. Step-by-Step Breakdown
 
 1.  **Accessing the Help Center**:
-
     - The user navigates to the main `SettingsScreen`.
     - Within the "Account" tab, they find and tap on the **`HelpCenterScreen`** option.
 
 2.  **Initiating Contact**:
-
     - The `HelpCenterScreen` may contain FAQs or links to documentation. It will feature a clear call-to-action button such as **"Contact Support"**.
     - The user taps this button to open the support ticket submission form.
 
 3.  **Submitting the Ticket**:
-
     - The user is presented with a structured form containing the following fields:
       - **`reply_to_email`**: An email address field, pre-filled with the user's account email if available.
       - **`category`**: A dropdown/picker for classifying the issue (e.g., "Payment Question," "Technical Problem," "Report a Bug," "General Feedback"). This helps with routing.
@@ -71,7 +68,6 @@ sequenceDiagram
     - The user fills out the form and taps **"Submit"**.
 
 4.  **Backend Processing**:
-
     - The client calls a `createSupportTicket` Convex mutation, passing along the form data.
     - The backend performs the following actions:
       1.  **Create Ticket**: It creates a new document in the `support_tickets` collection.

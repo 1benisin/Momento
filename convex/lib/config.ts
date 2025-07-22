@@ -23,35 +23,35 @@ export const config = {
     mapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY!,
   },
   app: {
-    debugLogs: process.env.EXPO_PUBLIC_DEBUG_LOGS === "true",
-    environment: process.env.NODE_ENV || "development",
+    debugLogs: process.env.EXPO_PUBLIC_DEBUG_LOGS === 'true',
+    environment: process.env.NODE_ENV || 'development',
   },
-};
+}
 
 // Validate required environment variables
 const validateConfig = () => {
   const requiredVars = [
-    { key: "stripe.secretKey", value: config.stripe.secretKey },
-    { key: "stripe.webhookSecret", value: config.stripe.webhookSecret },
-    { key: "stripe.publishableKey", value: config.stripe.publishableKey },
-    { key: "clerk.secretKey", value: config.clerk.secretKey },
-    { key: "clerk.publishableKey", value: config.clerk.publishableKey },
-    { key: "clerk.issuerUrl", value: config.clerk.issuerUrl },
-    { key: "clerk.webhookSecret", value: config.clerk.webhookSecret },
-    { key: "convex.deployment", value: config.convex.deployment },
-    { key: "convex.url", value: config.convex.url },
-    { key: "google.mapsApiKey", value: config.google.mapsApiKey },
-  ];
+    {key: 'stripe.secretKey', value: config.stripe.secretKey},
+    {key: 'stripe.webhookSecret', value: config.stripe.webhookSecret},
+    {key: 'stripe.publishableKey', value: config.stripe.publishableKey},
+    {key: 'clerk.secretKey', value: config.clerk.secretKey},
+    {key: 'clerk.publishableKey', value: config.clerk.publishableKey},
+    {key: 'clerk.issuerUrl', value: config.clerk.issuerUrl},
+    {key: 'clerk.webhookSecret', value: config.clerk.webhookSecret},
+    {key: 'convex.deployment', value: config.convex.deployment},
+    {key: 'convex.url', value: config.convex.url},
+    {key: 'google.mapsApiKey', value: config.google.mapsApiKey},
+  ]
 
-  const missing = requiredVars.filter(({ value }) => !value);
+  const missing = requiredVars.filter(({value}) => !value)
 
   if (missing.length > 0) {
-    const missingKeys = missing.map(({ key }) => key).join(", ");
-    throw new Error(`Missing required environment variables: ${missingKeys}`);
+    const missingKeys = missing.map(({key}) => key).join(', ')
+    throw new Error(`Missing required environment variables: ${missingKeys}`)
   }
-};
+}
 
 // Validate configuration on module load
-validateConfig();
+validateConfig()
 
-export default config;
+export default config

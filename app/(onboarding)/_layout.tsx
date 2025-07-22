@@ -1,7 +1,7 @@
-import { Stack } from "expo-router";
-import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
-import { ActivityIndicator, View, Text } from "react-native";
+import {ActivityIndicator, Text, View} from 'react-native'
+import {useQuery} from 'convex/react'
+import {Stack} from 'expo-router'
+import {api} from '@/convex/_generated/api'
 
 /**
  * This component contains the core routing logic for the onboarding flow.
@@ -9,21 +9,21 @@ import { ActivityIndicator, View, Text } from "react-native";
  * based on their `onboardingState` from the database.
  */
 function OnboardingFlow() {
-  const userData = useQuery(api.user.me);
+  const userData = useQuery(api.user.me)
   // Only show loading spinner while user data is loading
   if (!userData) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" />
-        <Text style={{ marginTop: 16, color: "gray" }}>
+        <Text className="mt-4 text-gray-500">
           onboarding loadingView (waiting for userData)
         </Text>
       </View>
-    );
+    )
   }
 
   // Once data is loaded, allow navigation between onboarding screens freely
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return <Stack screenOptions={{headerShown: false}} />
 }
 
 /**
@@ -31,5 +31,5 @@ function OnboardingFlow() {
  * It wraps the core logic in a component that can use hooks.
  */
 export default function OnboardingLayout() {
-  return <OnboardingFlow />;
+  return <OnboardingFlow />
 }

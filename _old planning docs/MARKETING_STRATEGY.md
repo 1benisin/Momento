@@ -37,13 +37,11 @@ To attract high-quality hosts, the strategy will focus on framing Momento as a c
 ### Target Host Profiles
 
 1.  **The Hospitality Host (Filling Seats & Spaces):**
-
     - **Who:** Restaurants, wine bars, breweries, cafes.
     - **Goal:** Monetize their physical space during off-peak hours.
     - **Examples:** A restaurant offering a "Chef's Table" tasting menu; a wine bar hosting a "Sommelier's Introduction to Natural Wines."
 
 2.  **The Skills-Based Host (Supplementing Income):**
-
     - **Who:** Individuals with a teachable passion or professional skill (e.g., dance instructors, artists, chefs).
     - **Goal:** Create a new, flexible revenue stream by monetizing their expertise.
     - **Examples:** A dance instructor hosting a "Beginner's Salsa Social"; a pottery artist running a "Make Your Own Mug" workshop.

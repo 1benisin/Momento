@@ -102,7 +102,6 @@ This is a more detailed view of the recommended structure for our source code.
 This structure is designed for clarity, scalability, and maintainability.
 
 1.  **Clear Separation of Concerns**: The top-level directories create a very clear distinction between different parts of the application:
-
     - `app/`: UI and routing (what the user sees).
     - `convex/`: All backend logic and database schema. This is the standard and required convention for Convex.
     - `components/`: Reusable, presentation-only UI elements.
@@ -110,12 +109,10 @@ This structure is designed for clarity, scalability, and maintainability.
     - `_docs/` & `_epics/`: Project planning and documentation.
 
 2.  **Convention-Driven (Expo & Convex)**: This structure fully embraces the conventions of our key technologies.
-
     - **Expo Router**: The `app/` directory is the heart of Expo's file-system-based routing. Grouping routes with `(parentheses)` is the standard way to create layout routes without adding segments to the URL, which is perfect for organizing flows like `(tabs)` and `(auth)`.
     - **Convex**: The `convex/` directory is where Convex expects to find all backend functions and the schema. This clear boundary makes it easy to reason about what code runs on the server vs. the client.
 
 3.  **Scalable Component Architecture**: Splitting `components/` into `core`, `layout`, and `domain` prevents it from becoming a messy, flat folder as the project grows.
-
     - `core` components are completely generic and could be used in any project.
     - `layout` components help maintain a consistent structure across screens.
     - `domain` components are specific to Momento's features. This makes them easy to find and reuse.

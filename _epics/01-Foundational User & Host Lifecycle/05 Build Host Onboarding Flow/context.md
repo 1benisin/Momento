@@ -58,13 +58,11 @@ To ensure the safety and trust of the community, all hosts must be verified befo
 This flow is for users who want to create and manage events.
 
 4.  **`HostProfileSetupScreen`**: The user is prompted to create their public-facing `hostProfile`.
-
     - **UI**: The form may differ slightly based on an initial question (e.g., "Are you hosting for a business?").
     - **Inputs**: `host_name`, `host_bio`, and potentially `website_url` for businesses.
     - `->` User completes the form and proceeds.
 
 5.  **`VerificationPromptScreen`**: The user is informed about the mandatory identity verification step.
-
     - **UI**: Explains that verification via Stripe Identity is required to publish an event.
     - **Actions**:
       - **"Verify Now"**: Launches the verification flow immediately.
@@ -144,7 +142,6 @@ This flow is for users who want to create and manage events.
 This section describes the various paths for a user to create a `hostProfile`.
 
 - **Primary Host Onboarding Flow**: This is the path for a new user who selects "I want to host events" on the `RoleSelectionScreen`.
-
   - **`HostTypeSelectionScreen`**: (Optional but recommended) A screen that asks if they are hosting as an "Individual" or for a "Business/Organization". This helps tailor the next step.
   - **`HostProfileSetupScreen`**: A form for entering host details. For `Community Hosts`, this will include fields like business address and website. For `User Hosts`, it's simpler, focusing on their host name and bio.
   - **`HostOnboardingCompleteScreen`**: A final screen congratulating the user, directing them to Host Mode, and providing a strong CTA to begin identity verification.

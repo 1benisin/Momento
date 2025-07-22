@@ -56,12 +56,10 @@ sequenceDiagram
 ## 5. Step-by-Step Breakdown
 
 1.  **Initiating Cancellation**:
-
     - The user navigates to the `EventDetailScreen` for an upcoming event they are confirmed for.
     - They tap a button prominently labeled **"Can't Make It?"** or **"Cancel My Spot"**.
 
 2.  **Confirmation and Policy Display**:
-
     - Tapping the button launches a confirmation modal.
     - The modal's content is dynamic based on the time remaining until the event:
       - **Policy Reminder**: It clearly states that the **$5 Confirmation Fee is non-refundable**.
@@ -69,11 +67,9 @@ sequenceDiagram
       - **Late Cancellation (< 24 hours before start)**: The message is more direct. _"This is a late cancellation. Your $5 fee is non-refundable and this will be noted to help us build a reliable community. Are you sure?"_
 
 3.  **Confirming the Action**:
-
     - The user must tap a final "Confirm Cancellation" button to proceed.
 
 4.  **Backend Processing**:
-
     - The client calls a `cancelAttendance` Convex mutation.
     - The backend performs the following actions:
       1.  **Updates `attendance` status**: The `status` field on the user's `attendance` document for this event is updated to either `'cancelled_early'` or `'cancelled_late'`.

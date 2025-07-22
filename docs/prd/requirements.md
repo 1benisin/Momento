@@ -2,7 +2,7 @@
 
 ## Functional Requirements
 
-**FR1:** The system shall provide unified authentication supporting US-only sign-up via SMS or email/password using Clerk integration.
+**FR1:** The system shall provide unified authentication supporting US-only sign-up via SMS or email using Clerk integration.
 
 **FR2:** The system shall implement post-signup role selection allowing users to choose between participant and host modes with tailored onboarding flows.
 

@@ -1,5 +1,5 @@
 ---
-title: "`<SignedIn>`"
+title: '`<SignedIn>`'
 description: Conditionally render content only when a user is signed in.
 lastUpdated: 2025-07-08T15:25:49.000Z
 ---
@@ -16,7 +16,8 @@ The `<SignedIn>` component offers authentication checks as a cross-cutting conce
 <Tabs items={["Next.js", "React", "Astro", "Expo", "Remix", "Tanstack React Start", "Vue"]}>
 <Tab>
 <CodeBlockTabs options={["App Router", "Pages Router"]}>
-```tsx {{ filename: 'app/page.tsx' }}
+
+````tsx {{ filename: 'app/page.tsx' }}
 import React from 'react'
 import { ClerkProvider, SignedIn } from '@clerk/nextjs'
 
@@ -208,3 +209,4 @@ import { ClerkProvider, SignedIn } from '@clerk/nextjs'
 
   </Tab>
 </Tabs>
+````

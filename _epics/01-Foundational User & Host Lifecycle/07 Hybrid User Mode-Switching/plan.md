@@ -70,7 +70,6 @@ No changes are required. The necessary field, `active_role`, was added to the `u
 ### 5. Frontend Implementation (`app/`, `components/`)
 
 - **Files to Create**:
-
   - `components/ModeSwitcher.tsx`: A new reusable component, likely a segmented control, to allow Hybrid Users to toggle between "Social" and "Host" modes. It will display the current `active_role` and call the `setActiveRole` mutation on change.
 
 - **Files to Modify**:

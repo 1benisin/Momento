@@ -21,11 +21,9 @@ As a new user who has just created an account, I want to be presented with a cle
 This story introduces a new route and updates the primary navigation logic.
 
 - **File to Create:**
-
   - `app/(onboarding)/role-selection.tsx`: This will be the new screen component. It should be a simple presentational component with two buttons or cards that navigate to the respective onboarding flows.
 
 - **Files to Modify:**
-
   - `app/_layout.tsx`: The `InitialLayout` component's `useEffect` hook needs to be modified.
     - **Current Logic:** If a user is `isSignedIn` and their `userData.status` is `PENDING_ONBOARDING`, they are immediately routed to `/(onboarding)/profile-setup` or `/(onboarding)/initial-photo`.
     - **New Logic:** If a user is `isSignedIn` and `userData.status` is `PENDING_ONBOARDING`, they must _always_ be routed to `/(onboarding)/role-selection` first. The concept of "completing" onboarding will now be handled within the respective onboarding flows (Participant or Host).

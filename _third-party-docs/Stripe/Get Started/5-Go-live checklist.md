@@ -13,13 +13,11 @@ If you are a developer, or had a developer perform an integration for you, you s
   If you’re using a strongly typed language (Go, Java, TypeScript, .NET), the server-side library pins the API version based on the library version being used. If you’re not familiar with how Stripe manages versioning, please see the [versioning docs](https://docs.stripe.com/sdks.md#server-side-libraries).
 
   To make sure everything is in sync:
-
   - Upgrade to the latest API version in [Workbench](https://dashboard.stripe.com/workbench) within the Dashboard
   - For dynamic languages (Node.js, PHP, Python, Ruby): [set the API version](https://docs.stripe.com/sdks.md#server-side-libraries) in the server-side library
   - For strongly typed languages (Go, Java, TypeScript, .NET): [upgrade to the latest version](https://docs.stripe.com/sdks.md#server-side-libraries) of your chosen library
 
 - We’ve created several [test values](https://docs.stripe.com/testing.md) you can use to replicate various states and responses. Beyond these options, perform your due diligence, testing your integration with:
-
   - Incomplete data
   - Invalid data
   - Duplicate data (for example, retry the same request to see what happens)
@@ -38,7 +36,6 @@ If you are a developer, or had a developer perform an integration for you, you s
 - Your Stripe account can have both test and live [webhook endpoints](https://docs.stripe.com/webhooks.md). If you’re using webhooks, make sure you’ve defined live endpoints in your Stripe account. Then confirm that the live endpoint functions exactly the same as your test endpoint.
 
   While examining your webhooks status, also take a moment to check that your production endpoint:
-
   - Gracefully handles delayed webhook notifications
   - Gracefully handles duplicate webhook notifications
   - Does not require event notifications to occur in a specific order

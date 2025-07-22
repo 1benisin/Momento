@@ -198,33 +198,33 @@ public class Server {
 ```javascript
 // This example sets up an endpoint using the Express framework.
 
-const express = require("express");
-const app = express();
-const stripe = require("stripe")("<<secret key>>");
+const express = require('express')
+const app = express()
+const stripe = require('stripe')('<<secret key>>')
 
-app.post("/create-checkout-session", async (req, res) => {
+app.post('/create-checkout-session', async (req, res) => {
   const session = await stripe.checkout.sessions.create({
     line_items: [
       {
         price_data: {
-          currency: "usd",
+          currency: 'usd',
           product_data: {
-            name: "T-shirt",
+            name: 'T-shirt',
           },
           unit_amount: 2000,
         },
         quantity: 1,
       },
     ],
-    mode: "payment",
-    success_url: "http://localhost:4242/success",
-    cancel_url: "http://localhost:4242/cancel",
-  });
+    mode: 'payment',
+    success_url: 'http://localhost:4242/success',
+    cancel_url: 'http://localhost:4242/cancel',
+  })
 
-  res.redirect(303, session.url);
-});
+  res.redirect(303, session.url)
+})
 
-app.listen(4242, () => console.log(`Listening on port ${4242}!`));
+app.listen(4242, () => console.log(`Listening on port ${4242}!`))
 ```
 
 ```go
@@ -483,25 +483,25 @@ Session session = Session.create(params);
 ```
 
 ```node
-const stripe = require("stripe")("<<secret key>>");
+const stripe = require('stripe')('<<secret key>>')
 
 const session = await stripe.checkout.sessions.create({
   line_items: [
     {
       price_data: {
-        currency: "usd",
+        currency: 'usd',
         product_data: {
-          name: "T-shirt",
+          name: 'T-shirt',
         },
         unit_amount: 2000,
       },
       quantity: 1,
     },
   ],
-  mode: "payment",
-  success_url: "http://localhost:4242/success.html",
-  cancel_url: "http://localhost:4242/cancel.html",
-});
+  mode: 'payment',
+  success_url: 'http://localhost:4242/success.html',
+  cancel_url: 'http://localhost:4242/cancel.html',
+})
 ```
 
 ```python
@@ -673,11 +673,11 @@ Product product = Product.create(params);
 ```
 
 ```node
-const stripe = require("stripe")("<<secret key>>");
+const stripe = require('stripe')('<<secret key>>')
 
 const product = await stripe.products.create({
-  name: "T-shirt",
-});
+  name: 'T-shirt',
+})
 ```
 
 ```python
@@ -739,13 +739,13 @@ Price price = Price.create(params);
 ```
 
 ```node
-const stripe = require("stripe")("<<secret key>>");
+const stripe = require('stripe')('<<secret key>>')
 
 const price = await stripe.prices.create({
-  product: "<<product>>",
+  product: '<<product>>',
   unit_amount: 2000,
-  currency: "usd",
-});
+  currency: 'usd',
+})
 ```
 
 ```python
@@ -842,19 +842,19 @@ Session session = Session.create(params);
 ```
 
 ```node
-const stripe = require("stripe")("<<secret key>>");
+const stripe = require('stripe')('<<secret key>>')
 
 const session = await stripe.checkout.sessions.create({
-  mode: "payment",
+  mode: 'payment',
   line_items: [
     {
-      price: "{{PRICE_ID}}",
+      price: '{{PRICE_ID}}',
       quantity: 1,
     },
   ],
-  success_url: "https://example.com/success?session_id={CHECKOUT_SESSION_ID}",
-  cancel_url: "https://example.com/cancel",
-});
+  success_url: 'https://example.com/success?session_id={CHECKOUT_SESSION_ID}',
+  cancel_url: 'https://example.com/cancel',
+})
 ```
 
 ```python
@@ -959,20 +959,20 @@ Session session = Session.create(params);
 ```
 
 ```node
-const stripe = require("stripe")("<<secret key>>");
+const stripe = require('stripe')('<<secret key>>')
 
 const session = await stripe.checkout.sessions.create({
-  customer_email: "customer@example.com",
+  customer_email: 'customer@example.com',
   line_items: [
     {
-      price: "<<price>>",
+      price: '<<price>>',
       quantity: 1,
     },
   ],
-  mode: "payment",
-  success_url: "https://example.com/success",
-  cancel_url: "https://example.com/cancel",
-});
+  mode: 'payment',
+  success_url: 'https://example.com/success',
+  cancel_url: 'https://example.com/cancel',
+})
 ```
 
 ```python
@@ -1251,35 +1251,35 @@ public class Server {
 
 ```javascript
 // This example sets up an endpoint using the Express framework.
-const express = require("express");
-const app = express();
+const express = require('express')
+const app = express()
 
-const stripe = require("stripe")("<<secret key>>");
+const stripe = require('stripe')('<<secret key>>')
 
-app.post("/create-checkout-session", async (req, res) => {
+app.post('/create-checkout-session', async (req, res) => {
   const session = await stripe.checkout.sessions.create({
     line_items: [
       {
         price_data: {
-          currency: "usd",
+          currency: 'usd',
           product_data: {
-            name: "T-shirt",
+            name: 'T-shirt',
           },
           unit_amount: 2000,
         },
         quantity: 1,
       },
     ],
-    mode: "payment",
-    ui_mode: "embedded",
+    mode: 'payment',
+    ui_mode: 'embedded',
     return_url:
-      "https://example.com/checkout/return?session_id={CHECKOUT_SESSION_ID}",
-  });
+      'https://example.com/checkout/return?session_id={CHECKOUT_SESSION_ID}',
+  })
 
-  res.send({ clientSecret: session.client_secret });
-});
+  res.send({clientSecret: session.client_secret})
+})
 
-app.listen(4242, () => console.log(`Listening on port ${4242}!`));
+app.listen(4242, () => console.log(`Listening on port ${4242}!`))
 ```
 
 ```go
@@ -1422,25 +1422,25 @@ Create an asynchronous `fetchClientSecret` function that makes a request to your
 ```javascript
 // Initialize Stripe.js
 
-initialize();
+initialize()
 
 // Fetch Checkout Session and retrieve the client secret
 async function initialize() {
   const fetchClientSecret = async () => {
-    const response = await fetch("/create-checkout-session", {
-      method: "POST",
-    });
-    const { clientSecret } = await response.json();
-    return clientSecret;
-  };
+    const response = await fetch('/create-checkout-session', {
+      method: 'POST',
+    })
+    const {clientSecret} = await response.json()
+    return clientSecret
+  }
 
   // Initialize Checkout
   const checkout = await stripe.initEmbeddedCheckout({
     fetchClientSecret,
-  });
+  })
 
   // Mount Checkout
-  checkout.mount("#checkout");
+  checkout.mount('#checkout')
 }
 ```
 
@@ -1455,28 +1455,28 @@ To use the Embedded Checkout component, create an `EmbeddedCheckoutProvider`. Ca
 Create an asynchronous `fetchClientSecret` function that makes a request to your server to create the Checkout Session and retrieve the client secret. Pass this function into the `options` prop accepted by the provider.
 
 ```jsx
-import * as React from "react";
-import { loadStripe } from "@stripe/stripe-js";
+import * as React from 'react'
 import {
-  EmbeddedCheckoutProvider,
   EmbeddedCheckout,
-} from "@stripe/react-stripe-js";
+  EmbeddedCheckoutProvider,
+} from '@stripe/react-stripe-js'
+import {loadStripe} from '@stripe/stripe-js'
 
 // Make sure to call `loadStripe` outside of a component’s render to avoid
 // recreating the `Stripe` object on every render.
-const stripePromise = loadStripe("pk_test_123");
+const stripePromise = loadStripe('pk_test_123')
 
 const App = () => {
   const fetchClientSecret = useCallback(() => {
     // Create a Checkout Session
-    return fetch("/create-checkout-session", {
-      method: "POST",
+    return fetch('/create-checkout-session', {
+      method: 'POST',
     })
-      .then((res) => res.json())
-      .then((data) => data.clientSecret);
-  }, []);
+      .then(res => res.json())
+      .then(data => data.clientSecret)
+  }, [])
 
-  const options = { fetchClientSecret };
+  const options = {fetchClientSecret}
 
   return (
     <div id="checkout">
@@ -1484,8 +1484,8 @@ const App = () => {
         <EmbeddedCheckout />
       </EmbeddedCheckoutProvider>
     </div>
-  );
-};
+  )
+}
 ```
 
 Checkout renders in an iframe that securely sends payment information to Stripe over an HTTPS connection.
@@ -1552,15 +1552,15 @@ get("/session-status", (request, response) -> {
 ```
 
 ```javascript
-app.get("/session_status", async (req, res) => {
-  const session = await stripe.checkout.sessions.retrieve(req.query.session_id);
+app.get('/session_status', async (req, res) => {
+  const session = await stripe.checkout.sessions.retrieve(req.query.session_id)
 
   res.send({
     status: session.status,
     payment_status: session.payment_status,
     customer_email: session.customer_details.email,
-  });
-});
+  })
+})
 ```
 
 ```go
@@ -1594,10 +1594,10 @@ public class SessionStatusController : Controller
 ```
 
 ```javascript
-const session = await fetch(`/session_status?session_id=${session_id}`);
-if (session.status == "open") {
+const session = await fetch(`/session_status?session_id=${session_id}`)
+if (session.status == 'open') {
   // Remount embedded Checkout
-} else if (session.status == "complete") {
+} else if (session.status == 'complete') {
   // Show success page
   // Optionally use session.payment_status or session.customer_email
   // to customize the success page
@@ -1725,11 +1725,11 @@ Product product = Product.create(params);
 ```
 
 ```node
-const stripe = require("stripe")("<<secret key>>");
+const stripe = require('stripe')('<<secret key>>')
 
 const product = await stripe.products.create({
-  name: "T-shirt",
-});
+  name: 'T-shirt',
+})
 ```
 
 ```python
@@ -1791,13 +1791,13 @@ Price price = Price.create(params);
 ```
 
 ```node
-const stripe = require("stripe")("<<secret key>>");
+const stripe = require('stripe')('<<secret key>>')
 
 const price = await stripe.prices.create({
-  product: "<<product>>",
+  product: '<<product>>',
   unit_amount: 2000,
-  currency: "usd",
-});
+  currency: 'usd',
+})
 ```
 
 ```python
@@ -1894,19 +1894,19 @@ Session session = Session.create(params);
 ```
 
 ```node
-const stripe = require("stripe")("<<secret key>>");
+const stripe = require('stripe')('<<secret key>>')
 
 const session = await stripe.checkout.sessions.create({
-  mode: "payment",
+  mode: 'payment',
   line_items: [
     {
-      price: "{{PRICE_ID}}",
+      price: '{{PRICE_ID}}',
       quantity: 1,
     },
   ],
-  ui_mode: "embedded",
-  return_url: "https://example.com/return",
-});
+  ui_mode: 'embedded',
+  return_url: 'https://example.com/return',
+})
 ```
 
 ```python
@@ -2011,20 +2011,20 @@ Session session = Session.create(params);
 ```
 
 ```node
-const stripe = require("stripe")("<<secret key>>");
+const stripe = require('stripe')('<<secret key>>')
 
 const session = await stripe.checkout.sessions.create({
-  customer_email: "customer@example.com",
+  customer_email: 'customer@example.com',
   line_items: [
     {
-      price: "<<price>>",
+      price: '<<price>>',
       quantity: 1,
     },
   ],
-  mode: "payment",
-  ui_mode: "embedded",
-  return_url: "https://example.com/return",
-});
+  mode: 'payment',
+  ui_mode: 'embedded',
+  return_url: 'https://example.com/return',
+})
 ```
 
 ```python
@@ -2174,35 +2174,35 @@ app.listen(3000, () => {
 ```
 
 ```javascript
-const express = require("express");
-const app = express();
+const express = require('express')
+const app = express()
 
-app.post("/create-checkout-session", async (req, res) => {
+app.post('/create-checkout-session', async (req, res) => {
   const session = await stripe.checkout.sessions.create({
     line_items: [
       {
         price_data: {
-          currency: "usd",
+          currency: 'usd',
           product_data: {
-            name: "T-shirt",
+            name: 'T-shirt',
           },
           unit_amount: 2000,
         },
         quantity: 1,
       },
     ],
-    mode: "payment",
-    ui_mode: "custom",
+    mode: 'payment',
+    ui_mode: 'custom',
     // The URL of your payment completion page
-    return_url: "https://example.com/return?session_id={CHECKOUT_SESSION_ID}",
-  });
+    return_url: 'https://example.com/return?session_id={CHECKOUT_SESSION_ID}',
+  })
 
-  res.json({ checkoutSessionClientSecret: session.client_secret });
-});
+  res.json({checkoutSessionClientSecret: session.client_secret})
+})
 
 app.listen(3000, () => {
-  console.log("Running on port 3000");
-});
+  console.log('Running on port 3000')
+})
 ```
 
 ```ruby
@@ -2441,7 +2441,7 @@ Initialize stripe.js.
 ```js
 // Set your publishable key: remember to change this to your live publishable key in production
 // See your keys here: https://dashboard.stripe.com/apikeys
-const stripe = Stripe("<<publishable key>>");
+const stripe = Stripe('<<publishable key>>')
 ```
 
 Install [React Stripe.js](https://www.npmjs.com/package/@stripe/react-stripe-js) and the [Stripe.js loader](https://www.npmjs.com/package/@stripe/stripe-js) from the npm public registry. You need at least version 3.6.0 for React Stripe.js and version 7.0.0 for the Stripe.js loader.
@@ -2453,8 +2453,9 @@ npm install --save @stripe/react-stripe-js@^3.6.0 @stripe/stripe-js@^7.0.0
 Initialize a `stripe` instance on your front end with your publishable key.
 
 ```javascript
-import { loadStripe } from "@stripe/stripe-js";
-const stripe = loadStripe("<<publishable key>>");
+import {loadStripe} from '@stripe/stripe-js'
+
+const stripe = loadStripe('<<publishable key>>')
 ```
 
 ## Initialize Checkout
@@ -2469,16 +2470,16 @@ This lets you turn on new features with minimal code changes. For example, addin
 
 ```javascript
 const fetchClientSecret = () => {
-  return fetch("/create-checkout-session", { method: "POST" })
-    .then((response) => response.json())
-    .then((json) => json.checkoutSessionClientSecret);
-};
-stripe.initCheckout({ fetchClientSecret }).then((checkout) => {
-  const checkoutContainer = document.getElementById("checkout-container");
-  checkoutContainer.append(JSON.stringify(checkout.lineItems, null, 2));
-  checkoutContainer.append(document.createElement("br"));
-  checkoutContainer.append(`Total: ${checkout.session().total.total.amount}`);
-});
+  return fetch('/create-checkout-session', {method: 'POST'})
+    .then(response => response.json())
+    .then(json => json.checkoutSessionClientSecret)
+}
+stripe.initCheckout({fetchClientSecret}).then(checkout => {
+  const checkoutContainer = document.getElementById('checkout-container')
+  checkoutContainer.append(JSON.stringify(checkout.lineItems, null, 2))
+  checkoutContainer.append(document.createElement('br'))
+  checkoutContainer.append(`Total: ${checkout.session().total.total.amount}`)
+})
 ```
 
 ```html
@@ -2496,40 +2497,40 @@ Use the `Checkout` object as the container for your prices. We recommend reading
 This lets you enable features with minimal code changes. For example, adding [manual currency prices](https://docs.stripe.com/payments/currencies/localize-prices/manual-currency-prices.md) requires no UI changes if you display the `total`.
 
 ```jsx
-import React from "react";
-import { CheckoutProvider } from "@stripe/react-stripe-js";
-import CheckoutForm from "./CheckoutForm";
+import React from 'react'
+import {CheckoutProvider} from '@stripe/react-stripe-js'
+import CheckoutForm from './CheckoutForm'
 
 const fetchClientSecret = () => {
-  return fetch("/create-checkout-session", { method: "POST" })
-    .then((response) => response.json())
-    .then((json) => json.checkoutSessionClientSecret);
-};
+  return fetch('/create-checkout-session', {method: 'POST'})
+    .then(response => response.json())
+    .then(json => json.checkoutSessionClientSecret)
+}
 
 const App = () => {
   return (
-    <CheckoutProvider stripe={stripe} options={{ fetchClientSecret }}>
+    <CheckoutProvider stripe={stripe} options={{fetchClientSecret}}>
       <CheckoutForm />
     </CheckoutProvider>
-  );
-};
+  )
+}
 
-export default App;
+export default App
 ```
 
 ```jsx
-import React from "react";
-import { useCheckout } from "@stripe/react-stripe-js";
+import React from 'react'
+import {useCheckout} from '@stripe/react-stripe-js'
 
 const CheckoutForm = () => {
-  const checkout = useCheckout();
+  const checkout = useCheckout()
   return (
     <pre>
       {JSON.stringify(checkout.lineItems, null, 2)}
       // A formatted total amount Total: {checkout.total.total.amount}
     </pre>
-  );
-};
+  )
+}
 ```
 
 ## Collect customer email
@@ -2551,24 +2552,24 @@ Depending on the design of your checkout form, you can call `updateEmail` in the
 ```
 
 ```javascript
-stripe.initCheckout({ fetchClientSecret }).then((checkout) => {
-  const emailInput = document.getElementById("email");
-  const emailErrors = document.getElementById("email-errors");
+stripe.initCheckout({fetchClientSecret}).then(checkout => {
+  const emailInput = document.getElementById('email')
+  const emailErrors = document.getElementById('email-errors')
 
-  emailInput.addEventListener("input", () => {
+  emailInput.addEventListener('input', () => {
     // Clear any validation errors
-    emailErrors.textContent = "";
-  });
+    emailErrors.textContent = ''
+  })
 
-  emailInput.addEventListener("blur", () => {
-    const newEmail = emailInput.value;
-    checkout.updateEmail(newEmail).then((result) => {
+  emailInput.addEventListener('blur', () => {
+    const newEmail = emailInput.value
+    checkout.updateEmail(newEmail).then(result => {
       if (result.error) {
-        emailErrors.textContent = result.error.message;
+        emailErrors.textContent = result.error.message
       }
-    });
-  });
-});
+    })
+  })
+})
 ```
 
 If you already pass in an existing [customer_email](https://docs.stripe.com/api/checkout/sessions/create.md#create_checkout_session-customer_email) or [Customer](https://docs.stripe.com/api/checkout/sessions/create.md#create_checkout_session-customer) with a valid email set when creating the Checkout Session, you can skip this step.
@@ -2583,26 +2584,26 @@ Depending on the design of your checkout form, you can call `updateEmail` in the
 - Before transitioning to the next step, such as clicking a **Save** button, if your form includes multiple steps.
 
 ```jsx
-import React from "react";
-import { useCheckout } from "@stripe/react-stripe-js";
+import React from 'react'
+import {useCheckout} from '@stripe/react-stripe-js'
 
 const EmailInput = () => {
-  const checkout = useCheckout();
-  const [email, setEmail] = React.useState("");
-  const [error, setError] = React.useState(null);
+  const checkout = useCheckout()
+  const [email, setEmail] = React.useState('')
+  const [error, setError] = React.useState(null)
 
   const handleBlur = () => {
-    checkout.updateEmail(email).then((result) => {
+    checkout.updateEmail(email).then(result => {
       if (result.error) {
-        setError(result.error);
+        setError(result.error)
       }
-    });
-  };
+    })
+  }
 
-  const handleChange = (e) => {
-    setError(null);
-    setEmail(e.target.value);
-  };
+  const handleChange = e => {
+    setError(null)
+    setEmail(e.target.value)
+  }
   return (
     <div>
       <input
@@ -2613,10 +2614,10 @@ const EmailInput = () => {
       />
       {error && <div>{error.message}</div>}
     </div>
-  );
-};
+  )
+}
 
-export default EmailInput;
+export default EmailInput
 ```
 
 ## Collect payment details
@@ -2630,8 +2631,8 @@ First, create a container DOM element to mount the [Payment Element](https://doc
 ```
 
 ```javascript
-const paymentElement = checkout.createPaymentElement();
-paymentElement.mount("#payment-element");
+const paymentElement = checkout.createPaymentElement()
+paymentElement.mount('#payment-element')
 ```
 
 See the [Stripe.js docs](https://docs.stripe.com/js/custom_checkout/create_payment_element#custom_checkout_create_payment_element-options) to view what options are supported.
@@ -2641,19 +2642,19 @@ You can [customize the appearance](https://docs.stripe.com/payments/checkout/cus
 Mount the [Payment Element](https://docs.stripe.com/payments/payment-element.md) component within the [CheckoutProvider](https://docs.stripe.com/js/custom_checkout/react/checkout_provider).
 
 ```jsx
-import React from "react";
-import { PaymentElement, useCheckout } from "@stripe/react-stripe-js";
+import React from 'react'
+import {PaymentElement, useCheckout} from '@stripe/react-stripe-js'
 
 const CheckoutForm = () => {
-  const checkout = useCheckout();
+  const checkout = useCheckout()
   return (
     <form>
-      <PaymentElement options={{ layout: "accordion" }} />
+      <PaymentElement options={{layout: 'accordion'}} />
     </form>
-  );
-};
+  )
+}
 
-export default CheckoutForm;
+export default CheckoutForm
 ```
 
 See the [Stripe.js docs](https://docs.stripe.com/js/custom_checkout/create_payment_element#custom_checkout_create_payment_element-options) to view what options are supported.
@@ -2670,42 +2671,42 @@ Render a “pay” button that calls [confirm](https://docs.stripe.com/js/custom
 ```
 
 ```js
-stripe.initCheckout({ fetchClientSecret }).then((checkout) => {
-  const button = document.getElementById("pay-button");
-  const errors = document.getElementById("confirm-errors");
-  button.addEventListener("click", () => {
+stripe.initCheckout({fetchClientSecret}).then(checkout => {
+  const button = document.getElementById('pay-button')
+  const errors = document.getElementById('confirm-errors')
+  button.addEventListener('click', () => {
     // Clear any validation errors
-    errors.textContent = "";
+    errors.textContent = ''
 
-    checkout.confirm().then((result) => {
-      if (result.type === "error") {
-        errors.textContent = result.error.message;
+    checkout.confirm().then(result => {
+      if (result.type === 'error') {
+        errors.textContent = result.error.message
       }
-    });
-  });
-});
+    })
+  })
+})
 ```
 
 Render a “pay” button that calls [confirm](https://docs.stripe.com/js/custom_checkout/confirm) from [useCheckout](https://docs.stripe.com/js/custom_checkout/react/use_checkout) to submit the payment.
 
 ```jsx
-import React from "react";
-import { useCheckout } from "@stripe/react-stripe-js";
+import React from 'react'
+import {useCheckout} from '@stripe/react-stripe-js'
 
 const PayButton = () => {
-  const { confirm } = useCheckout();
-  const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState(null);
+  const {confirm} = useCheckout()
+  const [loading, setLoading] = React.useState(false)
+  const [error, setError] = React.useState(null)
 
   const handleClick = () => {
-    setLoading(true);
-    confirm().then((result) => {
-      if (result.type === "error") {
-        setError(result.error);
+    setLoading(true)
+    confirm().then(result => {
+      if (result.type === 'error') {
+        setError(result.error)
       }
-      setLoading(false);
-    });
-  };
+      setLoading(false)
+    })
+  }
 
   return (
     <div>
@@ -2714,10 +2715,10 @@ const PayButton = () => {
       </button>
       {error && <div>{error.message}</div>}
     </div>
-  );
-};
+  )
+}
 
-export default PayButton;
+export default PayButton
 ```
 
 ## Test your integration
@@ -2785,11 +2786,11 @@ Product product = Product.create(params);
 ```
 
 ```node
-const stripe = require("stripe")("<<secret key>>");
+const stripe = require('stripe')('<<secret key>>')
 
 const product = await stripe.products.create({
-  name: "T-shirt",
-});
+  name: 'T-shirt',
+})
 ```
 
 ```python
@@ -2851,13 +2852,13 @@ Price price = Price.create(params);
 ```
 
 ```node
-const stripe = require("stripe")("<<secret key>>");
+const stripe = require('stripe')('<<secret key>>')
 
 const price = await stripe.prices.create({
-  product: "<<product>>",
+  product: '<<product>>',
   unit_amount: 2000,
-  currency: "usd",
-});
+  currency: 'usd',
+})
 ```
 
 ```python
@@ -2954,19 +2955,19 @@ Session session = Session.create(params);
 ```
 
 ```node
-const stripe = require("stripe")("<<secret key>>");
+const stripe = require('stripe')('<<secret key>>')
 
 const session = await stripe.checkout.sessions.create({
-  ui_mode: "custom",
-  mode: "payment",
+  ui_mode: 'custom',
+  mode: 'payment',
   line_items: [
     {
-      price: "{{PRICE_ID}}",
+      price: '{{PRICE_ID}}',
       quantity: 1,
     },
   ],
-  return_url: "https://example.com/return?session_id={CHECKOUT_SESSION_ID}",
-});
+  return_url: 'https://example.com/return?session_id={CHECKOUT_SESSION_ID}',
+})
 ```
 
 ```python
@@ -3071,20 +3072,20 @@ Session session = Session.create(params);
 ```
 
 ```node
-const stripe = require("stripe")("<<secret key>>");
+const stripe = require('stripe')('<<secret key>>')
 
 const session = await stripe.checkout.sessions.create({
-  customer_email: "customer@example.com",
-  ui_mode: "custom",
-  mode: "payment",
+  customer_email: 'customer@example.com',
+  ui_mode: 'custom',
+  mode: 'payment',
   line_items: [
     {
-      price: "{{PRICE_ID}}",
+      price: '{{PRICE_ID}}',
       quantity: 1,
     },
   ],
-  return_url: "https://example.com/return?session_id={CHECKOUT_SESSION_ID}",
-});
+  return_url: 'https://example.com/return?session_id={CHECKOUT_SESSION_ID}',
+})
 ```
 
 ```python
@@ -3147,24 +3148,24 @@ You can listen for changes to the [Checkout Session](https://docs.stripe.com/api
 ```javascript
 checkout = await stripe.initCheckout({
   fetchClientSecret: () => promise,
-  elementsOptions: { appearance },
-});
+  elementsOptions: {appearance},
+})
 
-checkout.on("change", (session) => {
+checkout.on('change', session => {
   // Handle changes to the checkout session
-});
+})
 ```
 
 ```jsx
-import React from "react";
-import { useCheckout } from "@stripe/react-stripe-js";
+import React from 'react'
+import {useCheckout} from '@stripe/react-stripe-js'
 
 const CheckoutForm = () => {
-  const checkout = useCheckout();
-  checkout.on("change", (session) => {
+  const checkout = useCheckout()
+  checkout.on('change', session => {
     // Handle changes to the checkout session
-  });
-};
+  })
+}
 ```
 
 ## Collect billing and shipping addresses
@@ -3186,8 +3187,8 @@ Create a container DOM element to mount the Billing Address Element. Then create
 ```
 
 ```javascript
-const billingAddressElement = checkout.createBillingAddressElement();
-billingAddressElement.mount("#billing-address");
+const billingAddressElement = checkout.createBillingAddressElement()
+billingAddressElement.mount('#billing-address')
 ```
 
 The Billing Address Element supports the following options:
@@ -3198,16 +3199,16 @@ The Billing Address Element supports the following options:
 Mount the `AddressElement` component within the `CheckoutProvider`.
 
 ```jsx
-import React from "react";
-import { AddressElement } from "@stripe/react-stripe-js";
+import React from 'react'
+import {AddressElement} from '@stripe/react-stripe-js'
 
 const CheckoutForm = () => {
   return (
     <form>
-      <AddressElement options={{ mode: "billing" }} />
+      <AddressElement options={{mode: 'billing'}} />
     </form>
-  );
-};
+  )
+}
 ```
 
 The Billing Address Element supports the following props:
@@ -3245,8 +3246,8 @@ Create a container DOM element to mount the Shipping Address Element. Then creat
 ```
 
 ```javascript
-const shippingAddressElement = checkout.createShippingAddressElement();
-shippingAddressElement.mount("#shipping-address");
+const shippingAddressElement = checkout.createShippingAddressElement()
+shippingAddressElement.mount('#shipping-address')
 ```
 
 The Shipping Address Element supports the following options:
@@ -3257,16 +3258,16 @@ The Shipping Address Element supports the following options:
 Mount the `AddressElement` component within the `CheckoutProvider`.
 
 ```jsx
-import React from "react";
-import { AddressElement } from "@stripe/react-stripe-js";
+import React from 'react'
+import {AddressElement} from '@stripe/react-stripe-js'
 
 const CheckoutForm = () => {
   return (
     <form>
-      <AddressElement options={{ mode: "shipping" }} />
+      <AddressElement options={{mode: 'shipping'}} />
     </form>
-  );
-};
+  )
+}
 ```
 
 The Shipping Address Element supports the following props:
@@ -3290,46 +3291,44 @@ Use the [Session object](https://docs.stripe.com/js/custom_checkout/session_obje
 ```
 
 ```javascript
-stripe.initCheckout({ clientSecret }).then((checkout) => {
-  const subtotal = document.getElementById("subtotal");
-  const shipping = document.getElementById("shipping");
-  const total = document.getElementById("total");
+stripe.initCheckout({clientSecret}).then(checkout => {
+  const subtotal = document.getElementById('subtotal')
+  const shipping = document.getElementById('shipping')
+  const total = document.getElementById('total')
 
-  checkout.on("change", (session) => {
-    subtotal.textContent = `Subtotal: ${session.total.subtotal.amount}`;
-    shipping.textContent = `Shipping: ${session.total.shippingRate.amount}`;
-    total.textContent = `Total: ${session.total.total.amount}`;
-  });
-});
+  checkout.on('change', session => {
+    subtotal.textContent = `Subtotal: ${session.total.subtotal.amount}`
+    shipping.textContent = `Shipping: ${session.total.shippingRate.amount}`
+    total.textContent = `Total: ${session.total.total.amount}`
+  })
+})
 ```
 
 Use [useCheckout](https://docs.stripe.com/js/custom_checkout/react/use_checkout) to render the shipping cost in your checkout form.
 
 ```jsx
-import React from "react";
-import { useCheckout } from "@stripe/react-stripe-js";
+import React from 'react'
+import {useCheckout} from '@stripe/react-stripe-js'
 
 const CheckoutForm = () => {
-  const checkout = useCheckout();
-  const [subtotal, setSubtotal] = React.useState(
-    checkout.total.subtotal.amount
-  );
+  const checkout = useCheckout()
+  const [subtotal, setSubtotal] = React.useState(checkout.total.subtotal.amount)
   const [shipping, setShipping] = React.useState(
-    checkout.total.shippingRate.amount
-  );
-  const [total, setTotal] = React.useState(checkout.total.total.amount);
+    checkout.total.shippingRate.amount,
+  )
+  const [total, setTotal] = React.useState(checkout.total.total.amount)
 
-  checkout.on("change", (session) => {
-    setSubtotal(session.total.subtotal.amount);
-    setShipping(session.total.shippingRate.amount);
-    setTotal(session.total.total.amount);
-  });
+  checkout.on('change', session => {
+    setSubtotal(session.total.subtotal.amount)
+    setShipping(session.total.shippingRate.amount)
+    setTotal(session.total.total.amount)
+  })
 
   return (
     <div>
       <div>
         <form>
-          <AddressElement options={{ mode: "shipping" }} />
+          <AddressElement options={{mode: 'shipping'}} />
         </form>
       </div>
       <div>
@@ -3343,8 +3342,8 @@ const CheckoutForm = () => {
         </pre>
       </div>
     </div>
-  );
-};
+  )
+}
 ```
 
 ### Use a custom form
@@ -3467,17 +3466,17 @@ public class StripeJavaQuickStart {
 ```
 
 ```javascript
-const express = require("express");
-const app = express();
+const express = require('express')
+const app = express()
 
-app.get("/secret", async (req, res) => {
+app.get('/secret', async (req, res) => {
   const intent = // ... Fetch or create the {{intentKind}}
-    res.json({ client_secret: intent.client_secret });
-});
+    res.json({client_secret: intent.client_secret})
+})
 
 app.listen(3000, () => {
-  console.log("Running on port 3000");
-});
+  console.log('Running on port 3000')
+})
 ```
 
 ```go
@@ -3533,11 +3532,11 @@ namespace StripeExampleApi.Controllers
 And then fetch the client secret with JavaScript on the client side:
 
 ```javascript
-(async () => {
-  const response = await fetch("/secret");
-  const { client_secret: clientSecret } = await response.json();
+;(async () => {
+  const response = await fetch('/secret')
+  const {client_secret: clientSecret} = await response.json()
   // Render the form using the clientSecret
-})();
+})()
 ```
 
 Pass the client secret to the client from your server. This approach works best if your application generates static content on the server before sending it to the browser.
@@ -3620,22 +3619,22 @@ public class StripeJavaQuickStart {
 ```
 
 ```javascript
-const express = require("express");
-const expressHandlebars = require("express-handlebars");
-const app = express();
+const express = require('express')
+const expressHandlebars = require('express-handlebars')
+const app = express()
 
-app.engine(".hbs", expressHandlebars({ extname: ".hbs" }));
-app.set("view engine", ".hbs");
-app.set("views", "./views");
+app.engine('.hbs', expressHandlebars({extname: '.hbs'}))
+app.set('view engine', '.hbs')
+app.set('views', './views')
 
-app.get("/checkout", async (req, res) => {
+app.get('/checkout', async (req, res) => {
   const intent = // ... Fetch or create the {{intentKind}}
-    res.render("checkout", { client_secret: intent.client_secret });
-});
+    res.render('checkout', {client_secret: intent.client_secret})
+})
 
 app.listen(3000, () => {
-  console.log("Running on port 3000");
-});
+  console.log('Running on port 3000')
+})
 ```
 
 ```html
@@ -3745,20 +3744,20 @@ When the previous form loads, create an instance of the Payment Element and moun
 
 ```javascript
 const options = {
-  clientSecret: "{{CLIENT_SECRET}}",
+  clientSecret: '{{CLIENT_SECRET}}',
   // Fully customizable with appearance API.
   appearance: {
     /*...*/
   },
-};
+}
 
 // Set up Stripe.js and Elements to use in checkout form, passing the client secret obtained in a previous step
-const elements = stripe.elements(options);
+const elements = stripe.elements(options)
 
 // Create and mount the Payment Element
-const paymentElementOptions = { layout: "accordion" };
-const paymentElement = elements.create("payment", paymentElementOptions);
-paymentElement.mount("#payment-element");
+const paymentElementOptions = {layout: 'accordion'}
+const paymentElement = elements.create('payment', paymentElementOptions)
+paymentElement.mount('#payment-element')
 ```
 
 ### Set up Stripe.js
@@ -3774,10 +3773,10 @@ npm install --save @stripe/react-stripe-js @stripe/stripe-js
 To use the Payment Element component, wrap your checkout page component in an [Elements provider](https://docs.stripe.com/sdks/stripejs-react.md#elements-provider). Call `loadStripe` with your publishable key, and pass the returned `Promise` to the `Elements` provider. Also pass the [client secret](https://docs.stripe.com/api/payment_intents/object.md#payment_intent_object-client_secret) from the previous step as `options` to the `Elements` provider.
 
 ```jsx
-import React from "react";
-import ReactDOM from "react-dom";
-import { Elements } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
+import React from 'react'
+import {Elements} from '@stripe/react-stripe-js'
+import {loadStripe} from '@stripe/stripe-js'
+import ReactDOM from 'react-dom'
 
 // Make sure to call `loadStripe` outside of a component’s render to avoid
 // recreating the `Stripe` object on every render.
@@ -3785,17 +3784,17 @@ import { loadStripe } from "@stripe/stripe-js";
 function App() {
   const options = {
     // passing the client secret obtained in step 3
-    clientSecret: "{{CLIENT_SECRET}}",
+    clientSecret: '{{CLIENT_SECRET}}',
     // Fully customizable with appearance API.
     appearance: {
       /*...*/
     },
-  };
+  }
 
-  return <Elements stripe={stripePromise} options={options}></Elements>;
+  return <Elements stripe={stripePromise} options={options}></Elements>
 }
 
-ReactDOM.render(<App />, document.getElementById("root"));
+ReactDOM.render(<App />, document.getElementById('root'))
 ```
 
 ### Add the Payment Element component
@@ -3853,11 +3852,11 @@ paymentElement.mount('#payment-element');
 To control dynamic content when a saved payment method is selected, listen to the Payment Element `change` event, which is populated with the selected payment method.
 
 ```javascript
-paymentElement.on("change", function (event) {
+paymentElement.on('change', function (event) {
   if (event.value.payment_method) {
     // Control dynamic content if a saved payment method is selected
   }
-});
+})
 ```
 
 ## Link in your checkout page
@@ -3944,12 +3943,12 @@ public class StripeJavaQuickStart {
 ```
 
 ```javascript
-app.get("/update", async (req, res) => {
-  const intent = await stripe.paymentIntents.update("{{PAYMENT_INTENT_ID}}", {
+app.get('/update', async (req, res) => {
+  const intent = await stripe.paymentIntents.update('{{PAYMENT_INTENT_ID}}', {
     amount: 1499,
-  });
-  res.json({ status: intent.status });
-});
+  })
+  res.json({status: intent.status})
+})
 ```
 
 ```go
@@ -4019,12 +4018,12 @@ namespace StripeExampleApi.Controllers
 This example demonstrates how to update the UI to reflect these changes on the client side:
 
 ```javascript
-(async () => {
-  const response = await fetch("/update");
-  if (response.status === "requires_payment_method") {
-    const { error } = await elements.fetchUpdates();
+;(async () => {
+  const response = await fetch('/update')
+  if (response.status === 'requires_payment_method') {
+    const {error} = await elements.fetchUpdates()
   }
-})();
+})()
 ```
 
 ## Submit the payment to Stripe
@@ -4032,31 +4031,31 @@ This example demonstrates how to update the UI to reflect these changes on the c
 Use [stripe.confirmPayment](https://docs.stripe.com/js/payment_intents/confirm_payment) to complete the payment using details from the Payment Element. Provide a [return_url](https://docs.stripe.com/api/payment_intents/create.md#create_payment_intent-return_url) to this function to indicate where Stripe should redirect the user after they complete the payment. Your user may be first redirected to an intermediate site, like a bank authorization page, before being redirected to the `return_url`. Card payments immediately redirect to the `return_url` when a payment is successful.
 
 ```javascript
-const form = document.getElementById("payment-form");
+const form = document.getElementById('payment-form')
 
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
+form.addEventListener('submit', async event => {
+  event.preventDefault()
 
-  const { error } = await stripe.confirmPayment({
+  const {error} = await stripe.confirmPayment({
     //`Elements` instance that was used to create the Payment Element
     elements,
     confirmParams: {
-      return_url: "https://example.com/order/123/complete",
+      return_url: 'https://example.com/order/123/complete',
     },
-  });
+  })
 
   if (error) {
     // This point will only be reached if there is an immediate error when
     // confirming the payment. Show error to your customer (for example, payment
     // details incomplete)
-    const messageContainer = document.querySelector("#error-message");
-    messageContainer.textContent = error.message;
+    const messageContainer = document.querySelector('#error-message')
+    messageContainer.textContent = error.message
   } else {
     // Your customer will be redirected to your `return_url`. For some payment
     // methods like iDEAL, your customer will be redirected to an intermediate
     // site first to authorize the payment, then redirected to the `return_url`.
   }
-});
+})
 ```
 
 To call [stripe.confirmPayment](https://docs.stripe.com/js/payment_intents/confirm_payment) from your payment form component, use the [useStripe](https://docs.stripe.com/sdks/stripejs-react.md#usestripe-hook) and [useElements](https://docs.stripe.com/sdks/stripejs-react.md#useelements-hook) hooks.
@@ -4064,49 +4063,45 @@ To call [stripe.confirmPayment](https://docs.stripe.com/js/payment_intents/confi
 If you prefer traditional class components over hooks, you can instead use an [ElementsConsumer](https://docs.stripe.com/sdks/stripejs-react.md#elements-consumer).
 
 ```jsx
-import React, { useState } from "react";
-import {
-  useStripe,
-  useElements,
-  PaymentElement,
-} from "@stripe/react-stripe-js";
+import React, {useState} from 'react'
+import {PaymentElement, useElements, useStripe} from '@stripe/react-stripe-js'
 
 const CheckoutForm = () => {
-  const stripe = useStripe();
-  const elements = useElements();
+  const stripe = useStripe()
+  const elements = useElements()
 
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null)
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async event => {
     // We don't want to let default form submission happen here,
     // which would refresh the page.
-    event.preventDefault();
+    event.preventDefault()
 
     if (!stripe || !elements) {
       // Stripe.js hasn't yet loaded.
       // Make sure to disable form submission until Stripe.js has loaded.
-      return;
+      return
     }
 
-    const { error } = await stripe.confirmPayment({
+    const {error} = await stripe.confirmPayment({
       //`Elements` instance that was used to create the Payment Element
       elements,
       confirmParams: {
-        return_url: "https://example.com/order/123/complete",
+        return_url: 'https://example.com/order/123/complete',
       },
-    });
+    })
 
     if (error) {
       // This point will only be reached if there is an immediate error when
       // confirming the payment. Show error to your customer (for example, payment
       // details incomplete)
-      setErrorMessage(error.message);
+      setErrorMessage(error.message)
     } else {
       // Your customer will be redirected to your `return_url`. For some payment
       // methods like iDEAL, your customer will be redirected to an intermediate
       // site first to authorize the payment, then redirected to the `return_url`.
     }
-  };
+  }
 
   return (
     <form onSubmit={handleSubmit}>
@@ -4115,10 +4110,10 @@ const CheckoutForm = () => {
       {/* Show error message to your customers */}
       {errorMessage && <div>{errorMessage}</div>}
     </form>
-  );
-};
+  )
+}
 
-export default CheckoutForm;
+export default CheckoutForm
 ```
 
 Make sure the `return_url` corresponds to a page on your website that provides the status of the payment. When Stripe redirects the customer to the `return_url`, we provide the following URL query parameters:
@@ -4134,17 +4129,17 @@ Use one of the query parameters to retrieve the PaymentIntent. Inspect the [stat
 
 ```javascript
 // Initialize Stripe.js using your publishable key
-const stripe = Stripe("<<publishable key>>");
+const stripe = Stripe('<<publishable key>>')
 
 // Retrieve the "payment_intent_client_secret" query parameter appended to
 // your return_url by Stripe.js
 const clientSecret = new URLSearchParams(window.location.search).get(
-  "payment_intent_client_secret"
-);
+  'payment_intent_client_secret',
+)
 
 // Retrieve the PaymentIntent
-stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
-  const message = document.querySelector("#message");
+stripe.retrievePaymentIntent(clientSecret).then(({paymentIntent}) => {
+  const message = document.querySelector('#message')
 
   // Inspect the PaymentIntent `status` to indicate the status of the payment
   // to your customer.
@@ -4154,49 +4149,49 @@ stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
   //
   // [0]: https://stripe.com/docs/payments/payment-methods#payment-notification
   switch (paymentIntent.status) {
-    case "succeeded":
-      message.innerText = "Success! Payment received.";
-      break;
+    case 'succeeded':
+      message.innerText = 'Success! Payment received.'
+      break
 
-    case "processing":
+    case 'processing':
       message.innerText =
-        "Payment processing. We'll update you when payment is received.";
-      break;
+        "Payment processing. We'll update you when payment is received."
+      break
 
-    case "requires_payment_method":
-      message.innerText = "Payment failed. Please try another payment method.";
+    case 'requires_payment_method':
+      message.innerText = 'Payment failed. Please try another payment method.'
       // Redirect your user back to your payment page to attempt collecting
       // payment again
-      break;
+      break
 
     default:
-      message.innerText = "Something went wrong.";
-      break;
+      message.innerText = 'Something went wrong.'
+      break
   }
-});
+})
 ```
 
 ```jsx
-import React, { useState, useEffect } from "react";
-import { useStripe } from "@stripe/react-stripe-js";
+import React, {useEffect, useState} from 'react'
+import {useStripe} from '@stripe/react-stripe-js'
 
 const PaymentStatus = () => {
-  const stripe = useStripe();
-  const [message, setMessage] = useState(null);
+  const stripe = useStripe()
+  const [message, setMessage] = useState(null)
 
   useEffect(() => {
     if (!stripe) {
-      return;
+      return
     }
 
     // Retrieve the "payment_intent_client_secret" query parameter appended to
     // your return_url by Stripe.js
     const clientSecret = new URLSearchParams(window.location.search).get(
-      "payment_intent_client_secret"
-    );
+      'payment_intent_client_secret',
+    )
 
     // Retrieve the PaymentIntent
-    stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
+    stripe.retrievePaymentIntent(clientSecret).then(({paymentIntent}) => {
       // Inspect the PaymentIntent `status` to indicate the status of the payment
       // to your customer.
       //
@@ -4205,33 +4200,33 @@ const PaymentStatus = () => {
       //
       // [0]: https://stripe.com/docs/payments/payment-methods#payment-notification
       switch (paymentIntent.status) {
-        case "succeeded":
-          setMessage("Success! Payment received.");
-          break;
+        case 'succeeded':
+          setMessage('Success! Payment received.')
+          break
 
-        case "processing":
+        case 'processing':
           setMessage(
-            "Payment processing. We'll update you when payment is received."
-          );
-          break;
+            "Payment processing. We'll update you when payment is received.",
+          )
+          break
 
-        case "requires_payment_method":
+        case 'requires_payment_method':
           // Redirect your user back to your payment page to attempt collecting
           // payment again
-          setMessage("Payment failed. Please try another payment method.");
-          break;
+          setMessage('Payment failed. Please try another payment method.')
+          break
 
         default:
-          setMessage("Something went wrong.");
-          break;
+          setMessage('Something went wrong.')
+          break
       }
-    });
-  }, [stripe]);
+    })
+  }, [stripe])
 
-  return message;
-};
+  return message
+}
 
-export default PaymentStatus;
+export default PaymentStatus
 ```
 
 ## Handle post-payment events
@@ -4292,97 +4287,93 @@ The Payment Element [supports many payment methods](https://docs.stripe.com/paym
 To begin using Affirm, you must enable it in the [Dashboard](https://dashboard.stripe.com/settings/payment_methods). When you create a PaymentIntent with the Affirm payment method, you need to include a [shipping address](https://docs.stripe.com/api/payment_intents/create.md#create_payment_intent-shipping). This example suggests passing the shipping information on the client after the customer [selects their payment method](https://docs.stripe.com/payments/accept-a-payment.md#web-create-intent). Learn more about using [Affirm](https://docs.stripe.com/payments/affirm.md) with Stripe.
 
 ```javascript
-const form = document.getElementById("payment-form");
+const form = document.getElementById('payment-form')
 
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
+form.addEventListener('submit', async event => {
+  event.preventDefault()
 
-  const { error } = await stripe.confirmPayment({
+  const {error} = await stripe.confirmPayment({
     //`Elements` instance that was used to create the Payment Element
     elements,
     confirmParams: {
-      return_url: "https://my-site.com/order/123/complete",
+      return_url: 'https://my-site.com/order/123/complete',
       shipping: {
-        name: "Jenny Rosen",
+        name: 'Jenny Rosen',
         address: {
-          line1: "1 Street",
-          city: "Seattle",
-          state: "WA",
-          postal_code: "95123",
-          country: "US",
+          line1: '1 Street',
+          city: 'Seattle',
+          state: 'WA',
+          postal_code: '95123',
+          country: 'US',
         },
       },
     },
-  });
+  })
 
   if (error) {
     // This point is reached if there's an immediate error when
     // confirming the payment. Show error to your customer (e.g., payment
     // details incomplete)
-    const messageContainer = document.querySelector("#error-message");
-    messageContainer.textContent = error.message;
+    const messageContainer = document.querySelector('#error-message')
+    messageContainer.textContent = error.message
   } else {
     // Your customer is redirected to your `return_url`. For some payment
     // methods like iDEAL, your customer is redirected to an intermediate
     // site first to authorize the payment, then redirected to the `return_url`.
   }
-});
+})
 ```
 
 ```jsx
-import React, { useState } from "react";
-import {
-  useStripe,
-  useElements,
-  PaymentElement,
-} from "@stripe/react-stripe-js";
+import React, {useState} from 'react'
+import {PaymentElement, useElements, useStripe} from '@stripe/react-stripe-js'
 
 const CheckoutForm = () => {
-  const stripe = useStripe();
-  const elements = useElements();
+  const stripe = useStripe()
+  const elements = useElements()
 
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null)
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async event => {
     // We don't want to let default form submission happen here,
     // which would refresh the page.
-    event.preventDefault();
+    event.preventDefault()
 
     if (!stripe || !elements) {
       // Stripe.js hasn't yet loaded.
       // Make sure to disable form submission until Stripe.js has loaded.
-      return;
+      return
     }
 
-    const { error } = await stripe.confirmPayment({
+    const {error} = await stripe.confirmPayment({
       //`Elements` instance that was used to create the Payment Element
       elements,
       confirmParams: {
-        return_url: "https://my-site.com/order/123/complete",
+        return_url: 'https://my-site.com/order/123/complete',
         shipping: {
-          name: "Jenny Rosen",
+          name: 'Jenny Rosen',
           address: {
-            line1: "1 Street",
-            city: "Seattle",
-            state: "WA",
-            postal_code: "95123",
-            country: "US",
+            line1: '1 Street',
+            city: 'Seattle',
+            state: 'WA',
+            postal_code: '95123',
+            country: 'US',
           },
         },
       },
-    });
+    })
 
     if (error) {
       // This point will only be reached if there is an immediate error when
       // confirming the payment. Show error to your customer (e.g., payment
       // details incomplete)
-      setErrorMessage(error.message);
+      setErrorMessage(error.message)
     } else {
       // Your customer will be redirected to your `return_url`. For some payment
       // methods like iDEAL, your customer will be redirected to an intermediate
       // site first to authorize the payment, then redirected to the `return_url`.
     }
-  };
+  }
 
   return (
     <form onSubmit={handleSubmit}>
@@ -4391,10 +4382,10 @@ const CheckoutForm = () => {
       {/* Show error message to your customers */}
       {errorMessage && <div>{errorMessage}</div>}
     </form>
-  );
-};
+  )
+}
 
-export default CheckoutForm;
+export default CheckoutForm
 ```
 
 #### Test Affirm
@@ -4490,25 +4481,25 @@ PaymentIntent paymentIntent = PaymentIntent.create(params);
 ```
 
 ```node
-const stripe = require("stripe")("<<secret key>>");
+const stripe = require('stripe')('<<secret key>>')
 
 const paymentIntent = await stripe.paymentIntents.create({
   amount: 1099,
-  currency: "USD",
+  currency: 'USD',
   automatic_payment_methods: {
     enabled: true,
   },
   shipping: {
-    name: "Jenny Rosen",
+    name: 'Jenny Rosen',
     address: {
-      line1: "1234 Main Street",
-      city: "San Francisco",
-      state: "CA",
-      country: "US",
-      postal_code: "94111",
+      line1: '1234 Main Street',
+      city: 'San Francisco',
+      state: 'CA',
+      country: 'US',
+      postal_code: '94111',
     },
   },
-});
+})
 ```
 
 ```python
@@ -4617,9 +4608,9 @@ When using the Payment Element with the ACH Direct Debit payment method, follow 
    ```
 
    ```node
-   const stripe = require("stripe")("<<secret key>>");
+   const stripe = require('stripe')('<<secret key>>')
 
-   const customer = await stripe.customers.create();
+   const customer = await stripe.customers.create()
    ```
 
    ```python
@@ -4687,15 +4678,15 @@ When using the Payment Element with the ACH Direct Debit payment method, follow 
    ```
 
    ```node
-   const stripe = require("stripe")("<<secret key>>");
+   const stripe = require('stripe')('<<secret key>>')
 
    const paymentIntent = await stripe.paymentIntents.create({
      amount: 1099,
-     currency: "usd",
-     setup_future_usage: "off_session",
-     customer: "{{CUSTOMER_ID}}",
-     payment_method_types: ["us_bank_account"],
-   });
+     currency: 'usd',
+     setup_future_usage: 'off_session',
+     customer: '{{CUSTOMER_ID}}',
+     payment_method_types: ['us_bank_account'],
+   })
    ```
 
    ```python
@@ -5925,20 +5916,20 @@ We recommend following the [official TypeScript guide](https://reactnative.dev/d
 To initialize Stripe in your React Native app, either wrap your payment screen with the `StripeProvider` component, or use the `initStripe` initialization method. Only the API [publishable key](https://docs.stripe.com/keys.md#obtain-api-keys) in `publishableKey` is required. The following example shows how to initialize Stripe using the `StripeProvider` component.
 
 ```jsx
-import { useState, useEffect } from "react";
-import { StripeProvider } from "@stripe/stripe-react-native";
+import {useEffect, useState} from 'react'
+import {StripeProvider} from '@stripe/stripe-react-native'
 
 function App() {
-  const [publishableKey, setPublishableKey] = useState("");
+  const [publishableKey, setPublishableKey] = useState('')
 
   const fetchPublishableKey = async () => {
-    const key = await fetchKey(); // fetch key from your server here
-    setPublishableKey(key);
-  };
+    const key = await fetchKey() // fetch key from your server here
+    setPublishableKey(key)
+  }
 
   useEffect(() => {
-    fetchPublishableKey();
-  }, []);
+    fetchPublishableKey()
+  }, [])
 
   return (
     <StripeProvider
@@ -5948,7 +5939,7 @@ function App() {
     >
       {/* Your app code here */}
     </StripeProvider>
-  );
+  )
 }
 ```
 
@@ -5970,31 +5961,31 @@ In the checkout of your app, make a network request to the backend endpoint you 
 
 ```javascript
 export default function CheckoutScreen() {
-  const { initPaymentSheet, presentPaymentSheet } = useStripe();
-  const [loading, setLoading] = useState(false);
+  const {initPaymentSheet, presentPaymentSheet} = useStripe()
+  const [loading, setLoading] = useState(false)
 
   const fetchPaymentSheetParams = async () => {
     const response = await fetch(`${API_URL}/payment-sheet`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
-    });
-    const { paymentIntent, ephemeralKey, customer } = await response.json();
+    })
+    const {paymentIntent, ephemeralKey, customer} = await response.json()
 
     return {
       paymentIntent,
       ephemeralKey,
       customer,
-    };
-  };
+    }
+  }
 
   const initializePaymentSheet = async () => {
-    const { paymentIntent, ephemeralKey, customer } =
-      await fetchPaymentSheetParams();
+    const {paymentIntent, ephemeralKey, customer} =
+      await fetchPaymentSheetParams()
 
-    const { error } = await initPaymentSheet({
-      merchantDisplayName: "Example, Inc.",
+    const {error} = await initPaymentSheet({
+      merchantDisplayName: 'Example, Inc.',
       customerId: customer,
       customerEphemeralKeySecret: ephemeralKey,
       paymentIntentClientSecret: paymentIntent,
@@ -6002,21 +5993,21 @@ export default function CheckoutScreen() {
       //methods that complete payment after a delay, like SEPA Debit and Sofort.
       allowsDelayedPaymentMethods: true,
       defaultBillingDetails: {
-        name: "Jane Doe",
+        name: 'Jane Doe',
       },
-    });
+    })
     if (!error) {
-      setLoading(true);
+      setLoading(true)
     }
-  };
+  }
 
   const openPaymentSheet = async () => {
     // see below
-  };
+  }
 
   useEffect(() => {
-    initializePaymentSheet();
-  }, []);
+    initializePaymentSheet()
+  }, [])
 
   return (
     <Screen>
@@ -6027,7 +6018,7 @@ export default function CheckoutScreen() {
         onPress={openPaymentSheet}
       />
     </Screen>
-  );
+  )
 }
 ```
 
@@ -6038,14 +6029,14 @@ export default function CheckoutScreen() {
   // continued from above
 
   const openPaymentSheet = async () => {
-    const { error } = await presentPaymentSheet();
+    const {error} = await presentPaymentSheet()
 
     if (error) {
-      Alert.alert(`Error code: ${error.code}`, error.message);
+      Alert.alert(`Error code: ${error.code}`, error.message)
     } else {
-      Alert.alert("Success", "Your order is confirmed!");
+      Alert.alert('Success', 'Your order is confirmed!')
     }
-  };
+  }
 
   return (
     <Screen>
@@ -6056,7 +6047,7 @@ export default function CheckoutScreen() {
         onPress={openPaymentSheet}
       />
     </Screen>
-  );
+  )
 }
 ```
 
@@ -6266,34 +6257,34 @@ A sample integration is [available on our GitHub](https://github.com/stripe/stri
 1. First, call `initPaymentSheet` and pass `customFlow: true`. `initPaymentSheet` resolves with an initial payment option containing an image and label representing the customer’s payment method. Update your UI with these details.
 
 ```javascript
-const { initPaymentSheet, presentPaymentSheet, confirmPaymentSheetPayment } =
-  useStripe();
+const {initPaymentSheet, presentPaymentSheet, confirmPaymentSheetPayment} =
+  useStripe()
 
-const { error, paymentOption } = await initPaymentSheet({
+const {error, paymentOption} = await initPaymentSheet({
   customerId: customer,
   customerEphemeralKeySecret: ephemeralKey,
   paymentIntentClientSecret: paymentIntent,
   customFlow: true,
-  merchantDisplayName: "Example Inc.",
-});
+  merchantDisplayName: 'Example Inc.',
+})
 // Update your UI with paymentOption
 ```
 
 2. Use `presentPaymentSheet` to collect payment details. When the customer finishes, the sheet dismisses itself and resolves the promise. Update your UI with the selected payment method details.
 
 ```javascript
-const { error, paymentOption } = await presentPaymentSheet();
+const {error, paymentOption} = await presentPaymentSheet()
 ```
 
 3. Use `confirmPaymentSheetPayment` to confirm the payment. This resolves with the result of the payment.
 
 ```javascript
-const { error } = await confirmPaymentSheetPayment();
+const {error} = await confirmPaymentSheetPayment()
 
 if (error) {
-  Alert.alert(`Error code: ${error.code}`, error.message);
+  Alert.alert(`Error code: ${error.code}`, error.message)
 } else {
-  Alert.alert("Success", "Your order is confirmed!");
+  Alert.alert('Success', 'Your order is confirmed!')
 }
 ```
 

@@ -1,126 +1,59 @@
-import { useRouter } from "expo-router";
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
-import { useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api";
+import React, {useState} from 'react'
+import {ActivityIndicator, Text, TouchableOpacity, View} from 'react-native'
+import {useRouter} from 'expo-router'
 
 export default function RoleSelectionScreen() {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleSelection = async (role: "social" | "host") => {
-    if (isLoading) return;
-    setIsLoading(true);
+  const handleSelection = async (role: 'social' | 'host') => {
+    if (isLoading) return
+    setIsLoading(true)
 
     try {
-      if (role === "social") {
-        router.push("/(onboarding)/(social)/profile-setup");
+      if (role === 'social') {
+        router.push('/(onboarding)/(social)/profile-setup')
       } else {
-        router.push("/(onboarding)/(host)/host-profile-setup");
+        router.push('/(onboarding)/(host)/host-profile-setup')
       }
     } catch (error) {
-      console.error("Failed to update onboarding state:", error);
+      console.error('Failed to update onboarding state:', error)
       // Optionally, show an alert to the user
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>How would you like to start?</Text>
-      <Text style={styles.subtitle}>
+    <View className="flex-1 items-center justify-center bg-white p-5">
+      <Text className="text-center text-[26px] font-bold mb-2.5">
+        How would you like to start?
+      </Text>
+      <Text className="mb-10 text-center text-base text-gray-600">
         Choose your primary reason for joining Momento. You can always add the
         other role later.
       </Text>
 
       <TouchableOpacity
-        style={styles.card}
-        onPress={() => handleSelection("social")}
-        disabled={isLoading}
-      >
-        <Text style={styles.cardTitle}>Attend Events</Text>
-        <Text style={styles.cardDescription}>
+        className="mb-5 w-full items-center rounded-2xl border border-gray-200 bg-gray-50 p-6"
+        onPress={() => handleSelection('social')}
+        disabled={isLoading}>
+        <Text className="mb-2 text-xl font-bold">Attend Events</Text>
+        <Text className="text-center text-sm text-gray-800">
           Join unique experiences and connect with new people.
         </Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={styles.card}
-        onPress={() => handleSelection("host")}
-        disabled={isLoading}
-      >
-        <Text style={styles.cardTitle}>Host Events</Text>
-        <Text style={styles.cardDescription}>
+        className="w-full items-center rounded-2xl border border-gray-200 bg-gray-50 p-6"
+        onPress={() => handleSelection('host')}
+        disabled={isLoading}>
+        <Text className="mb-2 text-xl font-bold">Host Events</Text>
+        <Text className="text-center text-sm text-gray-800">
           Create your own events and build a community.
         </Text>
-        {isLoading && <ActivityIndicator style={{ marginTop: 10 }} />}
+        {isLoading && <ActivityIndicator className="mt-2.5" />}
       </TouchableOpacity>
     </View>
-  );
+  )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    marginBottom: 10,
-    textAlign: "center",
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#666",
-    textAlign: "center",
-    marginBottom: 40,
-  },
-  card: {
-    width: "100%",
-    padding: 25,
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    marginBottom: 20,
-    alignItems: "center",
-    backgroundColor: "#f9f9f9",
-  },
-  disabledCard: {
-    opacity: 0.6,
-  },
-  cardTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 8,
-  },
-  cardDescription: {
-    fontSize: 14,
-    color: "#333",
-    textAlign: "center",
-  },
-  comingSoonBadge: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    backgroundColor: "#ffc107",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  comingSoonText: {
-    color: "#000",
-    fontWeight: "bold",
-    fontSize: 10,
-  },
-});

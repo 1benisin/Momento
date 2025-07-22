@@ -42,11 +42,11 @@ VerificationSession verificationSession = VerificationSession.create(params);
 ```
 
 ```node
-const stripe = require("stripe")("<<secret key>>");
+const stripe = require('stripe')('<<secret key>>')
 
 const verificationSession = await stripe.identity.verificationSessions.create({
-  type: "document",
-});
+  type: 'document',
+})
 ```
 
 ```python
@@ -235,11 +235,11 @@ var clientSecret = verificationSession.ClientSecret;
 This example demonstrates how to fetch the client secret with JavaScript on the client side:
 
 ```javascript
-(async () => {
-  const response = await fetch("/create-verification-session");
-  const { client_secret: clientSecret } = await response.json();
+;(async () => {
+  const response = await fetch('/create-verification-session')
+  const {client_secret: clientSecret} = await response.json()
   // Call stripe.verifyIdentity() with the client secret.
-})();
+})()
 ```
 
 The client secret is a sensitive token that you can use to complete the verification. Don’t log it, embed it in URLs, or expose it to anyone but the user that you’re verifying. Make sure that you have _TLS_ on any page that includes the client secret.
@@ -337,11 +337,11 @@ VerificationSession verificationSession = resource.cancel(params);
 ```
 
 ```node
-const stripe = require("stripe")("<<secret key>>");
+const stripe = require('stripe')('<<secret key>>')
 
 const verificationSession = await stripe.identity.verificationSessions.cancel(
-  "<<identityVerificationSession>>"
-);
+  '<<identityVerificationSession>>',
+)
 ```
 
 ```python
@@ -396,11 +396,11 @@ VerificationSession verificationSession = resource.redact(params);
 ```
 
 ```node
-const stripe = require("stripe")("<<secret key>>");
+const stripe = require('stripe')('<<secret key>>')
 
 const verificationSession = await stripe.identity.verificationSessions.redact(
-  "<<identityVerificationSession>>"
-);
+  '<<identityVerificationSession>>',
+)
 ```
 
 ```python
@@ -520,15 +520,15 @@ VerificationSession verificationSession = VerificationSession.create(params);
 ```
 
 ```node
-const stripe = require("stripe")("<<secret key>>");
+const stripe = require('stripe')('<<secret key>>')
 
 const verificationSession = await stripe.identity.verificationSessions.create({
-  type: "document",
+  type: 'document',
   metadata: {
-    user_id: "{{USER_ID}}",
-    reference: "{{IDENTIFIER}}",
+    user_id: '{{USER_ID}}',
+    reference: '{{IDENTIFIER}}',
   },
-});
+})
 ```
 
 ```python

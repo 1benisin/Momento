@@ -1,5 +1,5 @@
 ---
-title: "`<Protect>`"
+title: '`<Protect>`'
 description: The Protect component protects content or even entire routes based
   on authentication, and optionally, authorization. It only renders its children
   when the current user is signed-in, and if performing authorization checks, if
@@ -81,7 +81,8 @@ A boolean that indicates whether to treat pending sessions as signed out. Defaul
 
 <Tabs items={["Next.js", "React", "Astro", "Expo", "React Router", "Tanstack React Start", "Vue"]}>
 <Tab>
-```tsx {{ filename: 'app/dashboard/page.tsx' }}
+
+````tsx {{ filename: 'app/dashboard/page.tsx' }}
 import { Protect } from '@clerk/nextjs'
 
     export default function Page() {
@@ -852,3 +853,4 @@ import { Protect } from '@clerk/nextjs'
 
   </Tab>
 </Tabs>
+````

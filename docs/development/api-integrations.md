@@ -48,22 +48,22 @@ Momento integrates with several third-party services to provide a complete user 
 
 ```typescript
 // convex/lib/stripe.ts
-import Stripe from "stripe";
+import Stripe from 'stripe'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2023-10-16",
+  apiVersion: '2023-10-16',
   typescript: true,
-});
+})
 
-export { stripe };
+export {stripe}
 ```
 
 #### Payment Intent Creation
 
 ```typescript
 // convex/payments.ts
-import { mutation } from "./_generated/server";
-import { stripe } from "./lib/stripe";
+import {mutation} from './_generated/server'
+import {stripe} from './lib/stripe'
 
 export const createPaymentIntent = mutation({
   args: {
@@ -80,17 +80,17 @@ export const createPaymentIntent = mutation({
         metadata: {
           userId: ctx.auth.userId,
         },
-      });
+      })
 
       return {
         clientSecret: paymentIntent.client_secret,
         paymentIntentId: paymentIntent.id,
-      };
+      }
     } catch (error) {
-      throw new Error(`Payment creation failed: ${error.message}`);
+      throw new Error(`Payment creation failed: ${error.message}`)
     }
   },
-});
+})
 ```
 
 #### Client-Side Payment Processing
@@ -139,39 +139,39 @@ export const PaymentForm = ({ clientSecret }: { clientSecret: string }) => {
 
 ```typescript
 // convex/verification.ts
-import { mutation } from "./_generated/server";
-import { stripe } from "./lib/stripe";
+import {mutation} from './_generated/server'
+import {stripe} from './lib/stripe'
 
 export const createVerificationSession = mutation({
   args: {
-    userId: v.id("users"),
+    userId: v.id('users'),
   },
   handler: async (ctx, args) => {
     try {
       const verificationSession =
         await stripe.identity.verificationSessions.create({
-          type: "document",
+          type: 'document',
           return_url: `${process.env.FRONTEND_URL}/verification-complete`,
           metadata: {
             userId: args.userId,
           },
-        });
+        })
 
       // Update user with verification session ID
       await ctx.db.patch(args.userId, {
         verificationSessionId: verificationSession.id,
-        verificationStatus: "pending",
-      });
+        verificationStatus: 'pending',
+      })
 
       return {
         clientSecret: verificationSession.client_secret,
         verificationSessionId: verificationSession.id,
-      };
+      }
     } catch (error) {
-      throw new Error(`Verification session creation failed: ${error.message}`);
+      throw new Error(`Verification session creation failed: ${error.message}`)
     }
   },
-});
+})
 ```
 
 #### Verification Status Check
@@ -180,38 +180,38 @@ export const createVerificationSession = mutation({
 // convex/verification.ts
 export const checkVerificationStatus = query({
   args: {
-    userId: v.id("users"),
+    userId: v.id('users'),
   },
   handler: async (ctx, args) => {
-    const user = await ctx.db.get(args.userId);
+    const user = await ctx.db.get(args.userId)
 
     if (!user?.verificationSessionId) {
-      return { status: "not_started" };
+      return {status: 'not_started'}
     }
 
     try {
       const session = await stripe.identity.verificationSessions.retrieve(
-        user.verificationSessionId
-      );
+        user.verificationSessionId,
+      )
 
-      if (session.status === "verified") {
+      if (session.status === 'verified') {
         // Update user verification status
         await ctx.db.patch(args.userId, {
           isVerified: true,
-          verificationStatus: "verified",
-        });
+          verificationStatus: 'verified',
+        })
       }
 
       return {
         status: session.status,
         verifiedAt: session.verified_at,
-      };
+      }
     } catch (error) {
-      console.error("Verification status check failed:", error);
-      return { status: "error" };
+      console.error('Verification status check failed:', error)
+      return {status: 'error'}
     }
   },
-});
+})
 ```
 
 ### Webhook Handling
@@ -220,51 +220,51 @@ export const checkVerificationStatus = query({
 
 ```typescript
 // convex/http.ts
-import { httpAction } from "./_generated/server";
-import { stripe } from "./lib/stripe";
-import { internal } from "./_generated/api";
+import {internal} from './_generated/api'
+import {httpAction} from './_generated/server'
+import {stripe} from './lib/stripe'
 
 export const stripeWebhook = httpAction(async (ctx, request) => {
-  const body = await request.text();
-  const signature = request.headers.get("stripe-signature");
+  const body = await request.text()
+  const signature = request.headers.get('stripe-signature')
 
   if (!signature) {
-    return new Response("Missing signature", { status: 400 });
+    return new Response('Missing signature', {status: 400})
   }
 
   try {
     const event = stripe.webhooks.constructEvent(
       body,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    );
+      process.env.STRIPE_WEBHOOK_SECRET!,
+    )
 
     switch (event.type) {
-      case "payment_intent.succeeded":
+      case 'payment_intent.succeeded':
         await ctx.runMutation(internal.payments.handlePaymentSuccess, {
           paymentIntentId: event.data.object.id,
-        });
-        break;
+        })
+        break
 
-      case "payment_intent.payment_failed":
+      case 'payment_intent.payment_failed':
         await ctx.runMutation(internal.payments.handlePaymentFailure, {
           paymentIntentId: event.data.object.id,
-        });
-        break;
+        })
+        break
 
-      case "identity.verification_session.verified":
+      case 'identity.verification_session.verified':
         await ctx.runMutation(internal.verification.handleVerificationSuccess, {
           sessionId: event.data.object.id,
-        });
-        break;
+        })
+        break
     }
 
-    return new Response("Webhook processed", { status: 200 });
+    return new Response('Webhook processed', {status: 200})
   } catch (error) {
-    console.error("Webhook error:", error);
-    return new Response("Webhook error", { status: 400 });
+    console.error('Webhook error:', error)
+    return new Response('Webhook error', {status: 400})
   }
-});
+})
 ```
 
 ---
@@ -277,8 +277,8 @@ export const stripeWebhook = httpAction(async (ctx, request) => {
 
 ```typescript
 // convex/auth.ts
-import { mutation } from "./_generated/server";
-import { ConvexError } from "convex/values";
+import {ConvexError} from 'convex/values'
+import {mutation} from './_generated/server'
 
 export const createUserProfile = mutation({
   args: {
@@ -291,18 +291,16 @@ export const createUserProfile = mutation({
   handler: async (ctx, args) => {
     // Check if user already exists
     const existingUser = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_user_id", (q) =>
-        q.eq("clerkUserId", args.clerkUserId)
-      )
-      .first();
+      .query('users')
+      .withIndex('by_clerk_user_id', q => q.eq('clerkUserId', args.clerkUserId))
+      .first()
 
     if (existingUser) {
-      throw new ConvexError("User already exists");
+      throw new ConvexError('User already exists')
     }
 
     // Create user profile
-    const userId = await ctx.db.insert("users", {
+    const userId = await ctx.db.insert('users', {
       clerkUserId: args.clerkUserId,
       email: args.email,
       phoneNumber: args.phoneNumber,
@@ -310,14 +308,14 @@ export const createUserProfile = mutation({
       lastName: args.lastName,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      status: "active",
+      status: 'active',
       isVerified: false,
-      activeRole: "social",
-    });
+      activeRole: 'social',
+    })
 
-    return userId;
+    return userId
   },
-});
+})
 ```
 
 #### User Authentication State
@@ -326,23 +324,21 @@ export const createUserProfile = mutation({
 // convex/auth.ts
 export const getCurrentUser = query({
   args: {},
-  handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
+  handler: async ctx => {
+    const identity = await ctx.auth.getUserIdentity()
 
     if (!identity) {
-      return null;
+      return null
     }
 
     const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_user_id", (q) =>
-        q.eq("clerkUserId", identity.subject)
-      )
-      .first();
+      .query('users')
+      .withIndex('by_clerk_user_id', q => q.eq('clerkUserId', identity.subject))
+      .first()
 
-    return user;
+    return user
   },
-});
+})
 ```
 
 ### Client-Side Authentication
@@ -351,14 +347,14 @@ export const getCurrentUser = query({
 
 ```typescript
 // hooks/useAuth.ts
-import { useAuth as useClerkAuth } from "@clerk/clerk-expo";
-import { useQuery } from "convex/react";
-import { api } from "../convex/_generated/api";
+import {useAuth as useClerkAuth} from '@clerk/clerk-expo'
+import {useQuery} from 'convex/react'
+import {api} from '../convex/_generated/api'
 
 export const useAuth = () => {
-  const { isSignedIn, userId, signOut } = useClerkAuth();
+  const {isSignedIn, userId, signOut} = useClerkAuth()
 
-  const user = useQuery(api.auth.getCurrentUser);
+  const user = useQuery(api.auth.getCurrentUser)
 
   return {
     isSignedIn,
@@ -366,8 +362,8 @@ export const useAuth = () => {
     user,
     signOut,
     isLoading: user === undefined,
-  };
-};
+  }
+}
 ```
 
 #### Protected Routes
@@ -402,8 +398,8 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 ```typescript
 // convex/schema.ts
-import { defineSchema, defineTable } from "convex/server";
-import { v } from "convex/values";
+import {defineSchema, defineTable} from 'convex/server'
+import {v} from 'convex/values'
 
 export default defineSchema({
   users: defineTable({
@@ -421,29 +417,29 @@ export default defineSchema({
         longitude: v.number(),
         city: v.string(),
         state: v.string(),
-      })
+      }),
     ),
     isVerified: v.boolean(),
     verificationSessionId: v.optional(v.string()),
     verificationStatus: v.union(
-      v.literal("not_started"),
-      v.literal("pending"),
-      v.literal("verified"),
-      v.literal("failed")
+      v.literal('not_started'),
+      v.literal('pending'),
+      v.literal('verified'),
+      v.literal('failed'),
     ),
-    activeRole: v.union(v.literal("social"), v.literal("host")),
+    activeRole: v.union(v.literal('social'), v.literal('host')),
     status: v.union(
-      v.literal("active"),
-      v.literal("paused"),
-      v.literal("deleted")
+      v.literal('active'),
+      v.literal('paused'),
+      v.literal('deleted'),
     ),
     createdAt: v.string(),
     updatedAt: v.string(),
   })
-    .index("by_clerk_user_id", ["clerkUserId"])
-    .index("by_email", ["email"])
-    .index("by_phone", ["phoneNumber"]),
-});
+    .index('by_clerk_user_id', ['clerkUserId'])
+    .index('by_email', ['email'])
+    .index('by_phone', ['phoneNumber']),
+})
 ```
 
 #### Event Schema
@@ -453,7 +449,7 @@ export default defineSchema({
 export default defineSchema({
   // ... existing schema
   events: defineTable({
-    hostId: v.id("users"),
+    hostId: v.id('users'),
     title: v.string(),
     description: v.string(),
     date: v.string(),
@@ -470,20 +466,20 @@ export default defineSchema({
     category: v.string(),
     tags: v.array(v.string()),
     status: v.union(
-      v.literal("draft"),
-      v.literal("published"),
-      v.literal("cancelled"),
-      v.literal("completed")
+      v.literal('draft'),
+      v.literal('published'),
+      v.literal('cancelled'),
+      v.literal('completed'),
     ),
     publishedAt: v.optional(v.string()),
     createdAt: v.string(),
     updatedAt: v.string(),
   })
-    .index("by_host", ["hostId"])
-    .index("by_status", ["status"])
-    .index("by_date", ["date"])
-    .index("by_location", ["location.latitude", "location.longitude"]),
-});
+    .index('by_host', ['hostId'])
+    .index('by_status', ['status'])
+    .index('by_date', ['date'])
+    .index('by_location', ['location.latitude', 'location.longitude']),
+})
 ```
 
 ### Query Functions
@@ -492,75 +488,75 @@ export default defineSchema({
 
 ```typescript
 // convex/events.ts
-import { query } from "./_generated/server";
-import { v } from "convex/values";
+import {v} from 'convex/values'
+import {query} from './_generated/server'
 
 export const getEventsForUser = query({
   args: {
-    userId: v.id("users"),
+    userId: v.id('users'),
     location: v.optional(
       v.object({
         latitude: v.number(),
         longitude: v.number(),
         radius: v.number(), // in miles
-      })
+      }),
     ),
     categories: v.optional(v.array(v.string())),
     dateRange: v.optional(
       v.object({
         start: v.string(),
         end: v.string(),
-      })
+      }),
     ),
   },
   handler: async (ctx, args) => {
-    const user = await ctx.db.get(args.userId);
+    const user = await ctx.db.get(args.userId)
     if (!user) {
-      throw new Error("User not found");
+      throw new Error('User not found')
     }
 
     let eventsQuery = ctx.db
-      .query("events")
-      .withIndex("by_status", (q) => q.eq("status", "published"));
+      .query('events')
+      .withIndex('by_status', q => q.eq('status', 'published'))
 
     // Apply location filter
     if (args.location) {
       // Note: This is a simplified location filter
       // In production, use a proper geospatial index
-      eventsQuery = eventsQuery.filter((q) =>
+      eventsQuery = eventsQuery.filter(q =>
         q.and(
-          q.gte(q.field("location.latitude"), args.location!.latitude - 0.1),
-          q.lte(q.field("location.latitude"), args.location!.latitude + 0.1),
-          q.gte(q.field("location.longitude"), args.location!.longitude - 0.1),
-          q.lte(q.field("location.longitude"), args.location!.longitude + 0.1)
-        )
-      );
+          q.gte(q.field('location.latitude'), args.location!.latitude - 0.1),
+          q.lte(q.field('location.latitude'), args.location!.latitude + 0.1),
+          q.gte(q.field('location.longitude'), args.location!.longitude - 0.1),
+          q.lte(q.field('location.longitude'), args.location!.longitude + 0.1),
+        ),
+      )
     }
 
     // Apply category filter
     if (args.categories && args.categories.length > 0) {
-      eventsQuery = eventsQuery.filter((q) =>
+      eventsQuery = eventsQuery.filter(q =>
         q.or(
-          ...args.categories!.map((category) =>
-            q.eq(q.field("category"), category)
-          )
-        )
-      );
+          ...args.categories!.map(category =>
+            q.eq(q.field('category'), category),
+          ),
+        ),
+      )
     }
 
     // Apply date range filter
     if (args.dateRange) {
-      eventsQuery = eventsQuery.filter((q) =>
+      eventsQuery = eventsQuery.filter(q =>
         q.and(
-          q.gte(q.field("date"), args.dateRange!.start),
-          q.lte(q.field("date"), args.dateRange!.end)
-        )
-      );
+          q.gte(q.field('date'), args.dateRange!.start),
+          q.lte(q.field('date'), args.dateRange!.end),
+        ),
+      )
     }
 
-    return await eventsQuery.collect();
+    return await eventsQuery.collect()
   },
-});
+})
 ```
 
 ### Mutation Functions
@@ -569,8 +565,8 @@ export const getEventsForUser = query({
 
 ```typescript
 // convex/events.ts
-import { mutation } from "./_generated/server";
-import { v } from "convex/values";
+import {v} from 'convex/values'
+import {mutation} from './_generated/server'
 
 export const createEvent = mutation({
   args: {
@@ -591,37 +587,35 @@ export const createEvent = mutation({
     tags: v.array(v.string()),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
+    const identity = await ctx.auth.getUserIdentity()
     if (!identity) {
-      throw new Error("Not authenticated");
+      throw new Error('Not authenticated')
     }
 
     const user = await ctx.db
-      .query("users")
-      .withIndex("by_clerk_user_id", (q) =>
-        q.eq("clerkUserId", identity.subject)
-      )
-      .first();
+      .query('users')
+      .withIndex('by_clerk_user_id', q => q.eq('clerkUserId', identity.subject))
+      .first()
 
     if (!user) {
-      throw new Error("User not found");
+      throw new Error('User not found')
     }
 
     if (!user.isVerified) {
-      throw new Error("User must be verified to create events");
+      throw new Error('User must be verified to create events')
     }
 
-    const eventId = await ctx.db.insert("events", {
+    const eventId = await ctx.db.insert('events', {
       hostId: user._id,
       ...args,
-      status: "draft",
+      status: 'draft',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-    });
+    })
 
-    return eventId;
+    return eventId
   },
-});
+})
 ```
 
 ---
@@ -632,11 +626,11 @@ export const createEvent = mutation({
 
 ```typescript
 // convex/lib/postmark.ts
-import { ServerClient } from "postmark";
+import {ServerClient} from 'postmark'
 
-const postmarkClient = new ServerClient(process.env.POSTMARK_API_KEY!);
+const postmarkClient = new ServerClient(process.env.POSTMARK_API_KEY!)
 
-export { postmarkClient };
+export {postmarkClient}
 ```
 
 ### Transactional Emails
@@ -645,29 +639,29 @@ export { postmarkClient };
 
 ```typescript
 // convex/emails.ts
-import { mutation } from "./_generated/server";
-import { postmarkClient } from "./lib/postmark";
+import {mutation} from './_generated/server'
+import {postmarkClient} from './lib/postmark'
 
 export const sendEventInvitation = mutation({
   args: {
-    userId: v.id("users"),
-    eventId: v.id("events"),
-    invitationId: v.id("invitations"),
+    userId: v.id('users'),
+    eventId: v.id('events'),
+    invitationId: v.id('invitations'),
   },
   handler: async (ctx, args) => {
     const [user, event, invitation] = await Promise.all([
       ctx.db.get(args.userId),
       ctx.db.get(args.eventId),
       ctx.db.get(args.invitationId),
-    ]);
+    ])
 
     if (!user || !event || !invitation) {
-      throw new Error("Required data not found");
+      throw new Error('Required data not found')
     }
 
     try {
       await postmarkClient.sendEmail({
-        From: "noreply@momento.com",
+        From: 'noreply@momento.com',
         To: user.email!,
         Subject: `You're invited to ${event.title}!`,
         HtmlBody: `
@@ -691,20 +685,20 @@ export const sendEventInvitation = mutation({
           
           Accept your invitation: ${process.env.FRONTEND_URL}/invitation/${invitation._id}
         `,
-        MessageStream: "outbound",
-      });
+        MessageStream: 'outbound',
+      })
 
       // Update invitation status
       await ctx.db.patch(args.invitationId, {
         emailSent: true,
         emailSentAt: new Date().toISOString(),
-      });
+      })
     } catch (error) {
-      console.error("Email sending failed:", error);
-      throw new Error("Failed to send invitation email");
+      console.error('Email sending failed:', error)
+      throw new Error('Failed to send invitation email')
     }
   },
-});
+})
 ```
 
 #### Payment Confirmation Email
@@ -713,23 +707,23 @@ export const sendEventInvitation = mutation({
 // convex/emails.ts
 export const sendPaymentConfirmation = mutation({
   args: {
-    userId: v.id("users"),
-    eventId: v.id("events"),
+    userId: v.id('users'),
+    eventId: v.id('events'),
     paymentIntentId: v.string(),
   },
   handler: async (ctx, args) => {
     const [user, event] = await Promise.all([
       ctx.db.get(args.userId),
       ctx.db.get(args.eventId),
-    ]);
+    ])
 
     if (!user || !event) {
-      throw new Error("Required data not found");
+      throw new Error('Required data not found')
     }
 
     try {
       await postmarkClient.sendEmail({
-        From: "payments@momento.com",
+        From: 'payments@momento.com',
         To: user.email!,
         Subject: `Payment Confirmed - ${event.title}`,
         HtmlBody: `
@@ -745,14 +739,14 @@ export const sendPaymentConfirmation = mutation({
           <p>Transaction ID: ${args.paymentIntentId}</p>
           <p>We'll send you a reminder 24 hours before the event.</p>
         `,
-        MessageStream: "outbound",
-      });
+        MessageStream: 'outbound',
+      })
     } catch (error) {
-      console.error("Payment confirmation email failed:", error);
+      console.error('Payment confirmation email failed:', error)
       // Don't throw error for email failures
     }
   },
-});
+})
 ```
 
 ---
@@ -767,37 +761,37 @@ export class ConvexError extends Error {
   constructor(
     message: string,
     public code: string,
-    public statusCode: number = 400
+    public statusCode: number = 400,
   ) {
-    super(message);
-    this.name = "ConvexError";
+    super(message)
+    this.name = 'ConvexError'
   }
 }
 
 export const createError = (
   code: string,
   message: string,
-  statusCode?: number
+  statusCode?: number,
 ) => {
-  return new ConvexError(message, code, statusCode);
-};
+  return new ConvexError(message, code, statusCode)
+}
 
 export const ErrorCodes = {
-  UNAUTHORIZED: "UNAUTHORIZED",
-  NOT_FOUND: "NOT_FOUND",
-  VALIDATION_ERROR: "VALIDATION_ERROR",
-  PAYMENT_FAILED: "PAYMENT_FAILED",
-  VERIFICATION_FAILED: "VERIFICATION_FAILED",
-  RATE_LIMITED: "RATE_LIMITED",
-  SERVICE_UNAVAILABLE: "SERVICE_UNAVAILABLE",
-} as const;
+  UNAUTHORIZED: 'UNAUTHORIZED',
+  NOT_FOUND: 'NOT_FOUND',
+  VALIDATION_ERROR: 'VALIDATION_ERROR',
+  PAYMENT_FAILED: 'PAYMENT_FAILED',
+  VERIFICATION_FAILED: 'VERIFICATION_FAILED',
+  RATE_LIMITED: 'RATE_LIMITED',
+  SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE',
+} as const
 ```
 
 ### Error Handling in Functions
 
 ```typescript
 // convex/events.ts
-import { createError, ErrorCodes } from "./lib/errors";
+import {ErrorCodes, createError} from './lib/errors'
 
 export const createEvent = mutation({
   args: {
@@ -805,67 +799,67 @@ export const createEvent = mutation({
   },
   handler: async (ctx, args) => {
     try {
-      const identity = await ctx.auth.getUserIdentity();
+      const identity = await ctx.auth.getUserIdentity()
       if (!identity) {
         throw createError(
           ErrorCodes.UNAUTHORIZED,
-          "Authentication required",
-          401
-        );
+          'Authentication required',
+          401,
+        )
       }
 
       // ... function logic
     } catch (error) {
       if (error instanceof ConvexError) {
-        throw error;
+        throw error
       }
 
       // Log unexpected errors
-      console.error("Unexpected error in createEvent:", error);
+      console.error('Unexpected error in createEvent:', error)
       throw createError(
         ErrorCodes.SERVICE_UNAVAILABLE,
-        "An unexpected error occurred",
-        500
-      );
+        'An unexpected error occurred',
+        500,
+      )
     }
   },
-});
+})
 ```
 
 ### Client-Side Error Handling
 
 ```typescript
 // hooks/useMutation.ts
-import { useMutation } from "convex/react";
-import { api } from "../convex/_generated/api";
+import {useMutation} from 'convex/react'
+import {api} from '../convex/_generated/api'
 
 export const useCreateEvent = () => {
-  const createEvent = useMutation(api.events.createEvent);
+  const createEvent = useMutation(api.events.createEvent)
 
   const handleCreateEvent = async (eventData: EventData) => {
     try {
-      const result = await createEvent(eventData);
-      return { success: true, data: result };
+      const result = await createEvent(eventData)
+      return {success: true, data: result}
     } catch (error: any) {
-      console.error("Event creation failed:", error);
+      console.error('Event creation failed:', error)
 
       // Handle specific error types
       switch (error.code) {
-        case "UNAUTHORIZED":
+        case 'UNAUTHORIZED':
           // Redirect to login
-          return { success: false, error: "Please log in to create events" };
-        case "VALIDATION_ERROR":
-          return { success: false, error: error.message };
-        case "PAYMENT_FAILED":
-          return { success: false, error: "Payment processing failed" };
+          return {success: false, error: 'Please log in to create events'}
+        case 'VALIDATION_ERROR':
+          return {success: false, error: error.message}
+        case 'PAYMENT_FAILED':
+          return {success: false, error: 'Payment processing failed'}
         default:
-          return { success: false, error: "An unexpected error occurred" };
+          return {success: false, error: 'An unexpected error occurred'}
       }
     }
-  };
+  }
 
-  return { createEvent: handleCreateEvent };
-};
+  return {createEvent: handleCreateEvent}
+}
 ```
 
 ---
@@ -876,24 +870,24 @@ export const useCreateEvent = () => {
 
 ```typescript
 // convex/http.ts
-import { httpAction } from "./_generated/server";
-import crypto from "crypto";
+import crypto from 'crypto'
+import {httpAction} from './_generated/server'
 
 const verifyWebhookSignature = (
   body: string,
   signature: string,
-  secret: string
+  secret: string,
 ): boolean => {
   const expectedSignature = crypto
-    .createHmac("sha256", secret)
-    .update(body, "utf8")
-    .digest("hex");
+    .createHmac('sha256', secret)
+    .update(body, 'utf8')
+    .digest('hex')
 
   return crypto.timingSafeEqual(
     Buffer.from(signature),
-    Buffer.from(expectedSignature)
-  );
-};
+    Buffer.from(expectedSignature),
+  )
+}
 ```
 
 ### Webhook Error Handling
@@ -901,41 +895,41 @@ const verifyWebhookSignature = (
 ```typescript
 // convex/http.ts
 export const stripeWebhook = httpAction(async (ctx, request) => {
-  const body = await request.text();
-  const signature = request.headers.get("stripe-signature");
+  const body = await request.text()
+  const signature = request.headers.get('stripe-signature')
 
   if (!signature) {
-    return new Response("Missing signature", { status: 400 });
+    return new Response('Missing signature', {status: 400})
   }
 
   try {
     const event = stripe.webhooks.constructEvent(
       body,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    );
+      process.env.STRIPE_WEBHOOK_SECRET!,
+    )
 
     // Process webhook
-    await processWebhookEvent(ctx, event);
+    await processWebhookEvent(ctx, event)
 
-    return new Response("Webhook processed", { status: 200 });
+    return new Response('Webhook processed', {status: 200})
   } catch (error) {
-    console.error("Webhook processing failed:", error);
+    console.error('Webhook processing failed:', error)
 
     // Return 200 to prevent retries for permanent failures
-    if (error.message.includes("No such event")) {
-      return new Response("Event not found", { status: 200 });
+    if (error.message.includes('No such event')) {
+      return new Response('Event not found', {status: 200})
     }
 
     // Return 400 for signature verification failures
-    if (error.message.includes("Invalid signature")) {
-      return new Response("Invalid signature", { status: 400 });
+    if (error.message.includes('Invalid signature')) {
+      return new Response('Invalid signature', {status: 400})
     }
 
     // Return 500 for processing errors (will be retried)
-    return new Response("Processing error", { status: 500 });
+    return new Response('Processing error', {status: 500})
   }
-});
+})
 ```
 
 ---
@@ -960,70 +954,70 @@ export const mockStripe = {
   webhooks: {
     constructEvent: jest.fn(),
   },
-};
+}
 
 export const mockPostmark = {
   sendEmail: jest.fn(),
-};
+}
 
 export const setupTestMocks = () => {
-  jest.mock("./stripe", () => ({
+  jest.mock('./stripe', () => ({
     stripe: mockStripe,
-  }));
+  }))
 
-  jest.mock("./postmark", () => ({
+  jest.mock('./postmark', () => ({
     postmarkClient: mockPostmark,
-  }));
-};
+  }))
+}
 ```
 
 ### Integration Test Examples
 
 ```typescript
 // convex/__tests__/payments.test.ts
-import { runMutation } from "convex-test";
-import { api } from "../_generated/api";
-import { mockStripe } from "../lib/test-utils";
+import {runMutation} from 'convex-test'
+import {api} from '../_generated/api'
+import {mockStripe} from '../lib/test-utils'
 
-describe("Payment Integration", () => {
+describe('Payment Integration', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-  });
+    jest.clearAllMocks()
+  })
 
-  it("should create payment intent successfully", async () => {
+  it('should create payment intent successfully', async () => {
     const mockPaymentIntent = {
-      id: "pi_test123",
-      client_secret: "pi_test123_secret",
-    };
+      id: 'pi_test123',
+      client_secret: 'pi_test123_secret',
+    }
 
-    mockStripe.paymentIntents.create.mockResolvedValue(mockPaymentIntent);
+    mockStripe.paymentIntents.create.mockResolvedValue(mockPaymentIntent)
 
     const result = await runMutation(api.payments.createPaymentIntent, {
       amount: 500,
-      currency: "usd",
-    });
+      currency: 'usd',
+    })
 
-    expect(result.clientSecret).toBe("pi_test123_secret");
+    expect(result.clientSecret).toBe('pi_test123_secret')
     expect(mockStripe.paymentIntents.create).toHaveBeenCalledWith({
       amount: 500,
-      currency: "usd",
+      currency: 'usd',
       metadata: expect.any(Object),
-    });
-  });
+    })
+  })
 
-  it("should handle payment creation failure", async () => {
+  it('should handle payment creation failure', async () => {
     mockStripe.paymentIntents.create.mockRejectedValue(
-      new Error("Payment failed")
-    );
+      new Error('Payment failed'),
+    )
 
     await expect(
       runMutation(api.payments.createPaymentIntent, {
         amount: 500,
-        currency: "usd",
-      })
-    ).rejects.toThrow("Payment creation failed: Payment failed");
-  });
-});
+        currency: 'usd',
+      }),
+    ).rejects.toThrow('Payment creation failed: Payment failed')
+  })
+})
 ```
 
 ---
@@ -1051,18 +1045,18 @@ export const config = {
     frontendUrl: process.env.FRONTEND_URL!,
     environment: process.env.NODE_ENV!,
   },
-};
+}
 
 // Validate required environment variables
 Object.entries(config).forEach(([service, config]) => {
   Object.entries(config).forEach(([key, value]) => {
     if (!value) {
       throw new Error(
-        `Missing required environment variable: ${service}.${key}`
-      );
+        `Missing required environment variable: ${service}.${key}`,
+      )
     }
-  });
-});
+  })
+})
 ```
 
 ### API Key Rotation
@@ -1075,48 +1069,48 @@ export const rotateApiKeys = async () => {
 
   const newStripeKey = await stripe.accounts.createLoginLink({
     account: process.env.STRIPE_ACCOUNT_ID!,
-  });
+  })
 
   // Update environment variables
   // Notify team of key changes
   // Update all services using the old key
-};
+}
 ```
 
 ### Rate Limiting
 
 ```typescript
 // convex/lib/rate-limiting.ts
-import { ConvexError } from "convex/values";
+import {ConvexError} from 'convex/values'
 
-const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+const rateLimitStore = new Map<string, {count: number; resetTime: number}>()
 
 export const checkRateLimit = (
   key: string,
   limit: number,
-  windowMs: number
+  windowMs: number,
 ): boolean => {
-  const now = Date.now();
-  const record = rateLimitStore.get(key);
+  const now = Date.now()
+  const record = rateLimitStore.get(key)
 
   if (!record || now > record.resetTime) {
-    rateLimitStore.set(key, { count: 1, resetTime: now + windowMs });
-    return true;
+    rateLimitStore.set(key, {count: 1, resetTime: now + windowMs})
+    return true
   }
 
   if (record.count >= limit) {
-    return false;
+    return false
   }
 
-  record.count++;
-  return true;
-};
+  record.count++
+  return true
+}
 
 export const withRateLimit = (key: string, limit: number, windowMs: number) => {
   if (!checkRateLimit(key, limit, windowMs)) {
-    throw new ConvexError("Rate limit exceeded", "RATE_LIMITED", 429);
+    throw new ConvexError('Rate limit exceeded', 'RATE_LIMITED', 429)
   }
-};
+}
 ```
 
 ---

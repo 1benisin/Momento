@@ -20,7 +20,8 @@ The following example uses the `useClerk()` hook to access the `clerk` object. T
 
 <Tabs items={['React', 'Next.js']}>
 <Tab>
-```tsx {{ filename: 'src/Home.tsx' }}
+
+````tsx {{ filename: 'src/Home.tsx' }}
 import { useClerk } from "@clerk/clerk-react";
 
     export default function Home() {
@@ -47,3 +48,4 @@ import { useClerk } from "@clerk/clerk-react";
 
   </Tab>
 </Tabs>
+````

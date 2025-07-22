@@ -20,10 +20,10 @@ Momento implements a **soft delete strategy** for user accounts to balance user 
 
 ```typescript
 export const AccountStatuses = {
-  ACTIVE: "active", // Normal account state
-  PAUSED: "paused", // Temporary suspension
-  DELETED: "deleted", // Soft deleted - data anonymized
-} as const;
+  ACTIVE: 'active', // Normal account state
+  PAUSED: 'paused', // Temporary suspension
+  DELETED: 'deleted', // Soft deleted - data anonymized
+} as const
 ```
 
 ### User Record Transformation After Deletion
@@ -65,16 +65,16 @@ When a user deletes their account, the user record undergoes the following trans
 ```typescript
 // convex/schema.ts
 export const AccountStatuses = {
-  ACTIVE: "active",
-  PAUSED: "paused",
-  DELETED: "deleted", // New status
-} as const;
+  ACTIVE: 'active',
+  PAUSED: 'paused',
+  DELETED: 'deleted', // New status
+} as const
 
 export const accountStatusValidator = v.union(
   v.literal(AccountStatuses.ACTIVE),
   v.literal(AccountStatuses.PAUSED),
-  v.literal(AccountStatuses.DELETED) // Add to validator
-);
+  v.literal(AccountStatuses.DELETED), // Add to validator
+)
 
 // Add deletion tracking fields to users table
 users: defineTable({
@@ -82,7 +82,7 @@ users: defineTable({
   accountStatus: accountStatusValidator,
   deletedAt: v.optional(v.number()), // Timestamp when account was deleted
   // ... rest of fields ...
-});
+})
 ```
 
 #### Deletion Process Flow
@@ -90,10 +90,10 @@ users: defineTable({
 ```typescript
 // convex/user.ts
 export const softDeleteUser = internalMutation({
-  args: { clerkId: v.string() },
+  args: {clerkId: v.string()},
   handler: async (ctx, args) => {
-    const user = await getUserByClerkId(ctx, { clerkId: args.clerkId });
-    if (!user) return;
+    const user = await getUserByClerkId(ctx, {clerkId: args.clerkId})
+    if (!user) return
 
     // 1. Anonymize user record
     await ctx.db.patch(user._id, {
@@ -108,8 +108,8 @@ export const softDeleteUser = internalMutation({
       // Preserve display name and photo for UI continuity
       displayName: user.first_name
         ? `${user.first_name} (Deleted)`
-        : "Deleted User",
-    });
+        : 'Deleted User',
+    })
 
     // 2. Anonymize social profile
     if (user.socialProfile) {
@@ -119,7 +119,7 @@ export const softDeleteUser = internalMutation({
           photos: [], // Remove all photos
           current_photo_url: null,
         },
-      });
+      })
     }
 
     // 3. Anonymize host profile
@@ -127,19 +127,19 @@ export const softDeleteUser = internalMutation({
       await ctx.db.patch(user._id, {
         hostProfile: {
           ...user.hostProfile,
-          host_name: "Deleted Host",
+          host_name: 'Deleted Host',
           host_bio: null,
           photos: [], // Remove all photos
         },
-      });
+      })
     }
 
     // 4. Clean up related data
     await ctx.runMutation(internal.cleanup.deleteUserData, {
       userId: user._id,
-    });
+    })
   },
-});
+})
 ```
 
 #### Related Data Cleanup
@@ -147,29 +147,29 @@ export const softDeleteUser = internalMutation({
 ```typescript
 // convex/cleanup.ts
 export const deleteUserData = internalMutation({
-  args: { userId: v.id("users") },
+  args: {userId: v.id('users')},
   handler: async (ctx, args) => {
     // Remove payment methods from Stripe
     await ctx.runAction(internal.stripe.deleteCustomer, {
       userId: args.userId,
-    });
+    })
 
     // Clear notifications
     await ctx.runMutation(internal.notifications.clearUserNotifications, {
       userId: args.userId,
-    });
+    })
 
     // Anonymize event participation (keep event IDs but remove personal context)
     await ctx.runMutation(internal.events.anonymizeUserParticipation, {
       userId: args.userId,
-    });
+    })
 
     // Anonymize connections (maintain connection records)
     await ctx.runMutation(internal.connections.anonymizeUserConnections, {
       userId: args.userId,
-    });
+    })
   },
-});
+})
 ```
 
 ### UI/UX Implications
@@ -180,10 +180,10 @@ export const deleteUserData = internalMutation({
 // When displaying connections with deleted users
 const getDisplayName = (user: User) => {
   if (user.accountStatus === AccountStatuses.DELETED) {
-    return user.displayName || "User has deactivated their account";
+    return user.displayName || 'User has deactivated their account'
   }
-  return user.first_name || "Unknown User";
-};
+  return user.first_name || 'Unknown User'
+}
 ```
 
 #### Event History
@@ -278,37 +278,37 @@ const getDisplayName = (user: User) => {
 
 ```typescript
 interface User {
-  _id: Id<"users">;
-  clerkId: string;
-  phone_number?: string;
-  email?: string;
-  first_name?: string;
-  last_name?: string;
-  birth_date: number;
-  is_verified: boolean;
-  accountStatus: "active" | "paused" | "deleted";
-  deletedAt?: number; // Only present for deleted accounts
+  _id: Id<'users'>
+  clerkId: string
+  phone_number?: string
+  email?: string
+  first_name?: string
+  last_name?: string
+  birth_date: number
+  is_verified: boolean
+  accountStatus: 'active' | 'paused' | 'deleted'
+  deletedAt?: number // Only present for deleted accounts
   onboardingState:
-    | "needs_role_selection"
-    | "needs_social_profile"
-    | "needs_host_profile"
-    | "completed";
-  active_role: "social" | "host";
-  last_active_at: number;
-  user_number: number;
-  payment_customer_id?: string;
-  min_lead_time_days?: number;
-  availability_preferences?: object; // Simplified for brevity
-  distance_preference?: number;
-  price_sensitivity?: number;
-  person_attraction_vector?: number[];
-  socialProfile?: object; // See socialProfile interface
-  hostProfile?: object; // See hostProfile interface
-  internalMetrics?: object;
-  interestVectors?: object[];
-  socialLinks?: object[];
-  notificationSettings: object;
-  contextualNudges?: object;
+    | 'needs_role_selection'
+    | 'needs_social_profile'
+    | 'needs_host_profile'
+    | 'completed'
+  active_role: 'social' | 'host'
+  last_active_at: number
+  user_number: number
+  payment_customer_id?: string
+  min_lead_time_days?: number
+  availability_preferences?: object // Simplified for brevity
+  distance_preference?: number
+  price_sensitivity?: number
+  person_attraction_vector?: number[]
+  socialProfile?: object // See socialProfile interface
+  hostProfile?: object // See hostProfile interface
+  internalMetrics?: object
+  interestVectors?: object[]
+  socialLinks?: object[]
+  notificationSettings: object
+  contextualNudges?: object
 }
 ```
 
@@ -336,36 +336,36 @@ interface User {
 
 ```typescript
 interface Event {
-  _id: Id<"events">;
-  hostId: Id<"users">;
-  title: string;
-  description: string;
-  event_vector: number[];
+  _id: Id<'events'>
+  hostId: Id<'users'>
+  title: string
+  description: string
+  event_vector: number[]
   status:
-    | "draft"
-    | "published"
-    | "completed"
-    | "cancelled"
-    | "cancelled_by_host";
-  min_attendees: number;
-  max_attendees: number;
-  age_min?: number;
-  age_max?: number;
-  arrival_signpost?: string;
-  confirmation_fee: number;
-  estimated_event_cost?: any; // JSON object for cost details
-  itinerary: ItineraryStop[];
-  collaborators?: Collaborator[];
-  event_summary?: EventSummary;
+    | 'draft'
+    | 'published'
+    | 'completed'
+    | 'cancelled'
+    | 'cancelled_by_host'
+  min_attendees: number
+  max_attendees: number
+  age_min?: number
+  age_max?: number
+  arrival_signpost?: string
+  confirmation_fee: number
+  estimated_event_cost?: any // JSON object for cost details
+  itinerary: ItineraryStop[]
+  collaborators?: Collaborator[]
+  event_summary?: EventSummary
 }
 
 interface ItineraryStop {
-  location_id: Id<"locations">;
-  order: number;
-  title: string;
-  description: string;
-  start_time: number;
-  end_time: number;
+  location_id: Id<'locations'>
+  order: number
+  title: string
+  description: string
+  start_time: number
+  end_time: number
 }
 ```
 

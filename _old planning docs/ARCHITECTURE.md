@@ -121,8 +121,8 @@ To solve this, we will leverage a purpose-built geospatial library within the Co
 
     ```typescript
     // convex/events.ts (Illustrative Example)
-    import { query } from "./_generated/server";
-    import { बनाएंGeospatialQuery } from "@convex-dev/geospatial";
+    import {बनाएंGeospatialQuery} from '@convex-dev/geospatial'
+    import {query} from './_generated/server'
 
     export const getNearbyEvents = query({
       args: {
@@ -132,32 +132,32 @@ To solve this, we will leverage a purpose-built geospatial library within the Co
       },
       handler: async (ctx, args) => {
         // 1. Initialize the geospatial query helper with our locations
-        const locations = await ctx.db.query("locations").collect();
+        const locations = await ctx.db.query('locations').collect()
         const geoQuery = बनाएंGeospatialQuery(
           locations,
-          "latitude",
-          "longitude"
-        );
+          'latitude',
+          'longitude',
+        )
 
         // 2. Find locations within the user's radius
         const nearbyLocationIds = geoQuery
           .query({
-            center: { latitude: args.latitude, longitude: args.longitude },
+            center: {latitude: args.latitude, longitude: args.longitude},
             radiusInMiles: args.searchRadiusMiles,
           })
-          .map((loc) => loc._id);
+          .map(loc => loc._id)
 
         // 3. Find all events that have an itinerary stop at one of those locations
-        const allEvents = await ctx.db.query("events").collect();
-        const nearbyEvents = allEvents.filter((event) =>
-          event.itinerary.some((stop) =>
-            nearbyLocationIds.includes(stop.location_id)
-          )
-        );
+        const allEvents = await ctx.db.query('events').collect()
+        const nearbyEvents = allEvents.filter(event =>
+          event.itinerary.some(stop =>
+            nearbyLocationIds.includes(stop.location_id),
+          ),
+        )
 
-        return nearbyEvents;
+        return nearbyEvents
       },
-    });
+    })
     ```
 
 This architectural decision is critical for ensuring the matching process remains fast and scalable as the platform grows. It allows the backend to quickly eliminate the vast majority of events that are outside a user's radius, rather than calculating the distance for each one.

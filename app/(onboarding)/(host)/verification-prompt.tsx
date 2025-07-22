@@ -1,89 +1,48 @@
-import { useRouter } from "expo-router";
-import React from "react";
-import { View, StyleSheet, TouchableOpacity } from "react-native";
-import { Text } from "@/components/Themed";
+import React from 'react'
+import {Text, TouchableOpacity, View} from 'react-native'
+import {useRouter} from 'expo-router'
 
 export default function VerificationPromptScreen() {
-  const router = useRouter();
+  const router = useRouter()
 
   const handleVerifyNow = () => {
     // For now, just complete onboarding and let the root layout redirect.
-    handleCompleteOnboarding();
-  };
+    handleCompleteOnboarding()
+  }
 
   const handleDoThisLater = () => {
-    handleCompleteOnboarding();
-  };
+    handleCompleteOnboarding()
+  }
 
   const handleCompleteOnboarding = () => {
     // The user has a host profile now, so we can send them to the host-side
     // of the app. We use `replace` to prevent them from navigating back
     // to the onboarding flow.
-    router.replace("/(tabs)/(host)/dashboard");
-  };
+    router.replace('/(tabs)/(host)/dashboard')
+  }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Verification Required</Text>
-      <Text style={styles.subtitle}>
-        To ensure the safety of our community, you'll need to verify your
-        identity before you can publish an event.
+    <View className="flex-1 items-center justify-center bg-white p-5">
+      <Text className="mb-4 text-center text-[26px] font-bold">
+        Verification Required
+      </Text>
+      <Text className="mb-10 px-2.5 text-center text-base text-gray-500">
+        {
+          "To ensure the safety of our community, you'll need to verify your identity before you can publish an event."
+        }
       </Text>
 
-      <TouchableOpacity style={styles.button} onPress={handleVerifyNow}>
-        <Text style={styles.buttonText}>Verify Now</Text>
+      <TouchableOpacity
+        className="mb-4 w-full items-center rounded-xl bg-blue-500 p-4"
+        onPress={handleVerifyNow}>
+        <Text className="font-bold text-white text-base">Verify Now</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        style={[styles.button, styles.secondaryButton]}
-        onPress={handleDoThisLater}
-      >
-        <Text style={[styles.buttonText, styles.secondaryButtonText]}>
-          Do This Later
-        </Text>
+        className="w-full items-center rounded-xl bg-gray-100 p-4"
+        onPress={handleDoThisLater}>
+        <Text className="font-bold text-blue-500 text-base">Do This Later</Text>
       </TouchableOpacity>
     </View>
-  );
+  )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    marginBottom: 15,
-    textAlign: "center",
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#666",
-    textAlign: "center",
-    marginBottom: 40,
-    paddingHorizontal: 10,
-  },
-  button: {
-    width: "100%",
-    padding: 15,
-    backgroundColor: "#007bff",
-    borderRadius: 10,
-    alignItems: "center",
-    marginBottom: 15,
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  secondaryButton: {
-    backgroundColor: "#e9ecef",
-  },
-  secondaryButtonText: {
-    color: "#007bff",
-  },
-});

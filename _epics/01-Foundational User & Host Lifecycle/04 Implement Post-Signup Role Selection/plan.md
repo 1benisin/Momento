@@ -61,7 +61,6 @@ There are **no changes** to the Convex backend implementation for this story. Al
 ### 5. Frontend Implementation (`app/`, `components/`)
 
 - **Files to Create**:
-
   - `app/(onboarding)/role-selection.tsx`: This new screen will present the two role choices to the user. It will be a simple component with two buttons or tappable cards.
 
 - **Files to Modify**:
@@ -71,18 +70,15 @@ There are **no changes** to the Convex backend implementation for this story. Al
 ### 6. Step-by-Step Task Breakdown
 
 1.  **Create `role-selection.tsx` Screen**:
-
     - Create the file `app/(onboarding)/role-selection.tsx`.
     - Build the UI with two distinct, tappable options: "Attend Events" and "Host Events".
     - Implement the `onPress` handler for the "Attend Events" option to navigate the user to `/(onboarding)/profile-setup`.
     - The "Host Events" option can be a placeholder for now (e.g., disabled or shows an alert).
 
 2.  **Update Onboarding Navigator**:
-
     - In `app/(onboarding)/_layout.tsx`, add `<Stack.Screen name="role-selection" />` to register the new route within the onboarding `Stack`.
 
 3.  **Update Root Navigation Logic**:
-
     - In `app/_layout.tsx`, locate the `InitialLayout` component's `useEffect` hook.
     - Modify the conditional logic: if `userData.status === UserStatuses.PENDING_ONBOARDING`, the router should replace the current route with `/(onboarding)/role-selection`.
     - Ensure this logic correctly executes for all new users, overriding the previous direct navigation to `profile-setup` or `initial-photo`.

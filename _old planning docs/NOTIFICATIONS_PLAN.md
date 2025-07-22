@@ -15,12 +15,10 @@ This document outlines the complete plan for user notifications, covering four k
 We will use a combination of services to handle different types of notifications, all orchestrated by our Supabase backend.
 
 - **Push Notifications (In-App & System):** **Expo Push Notifications**
-
   - **Why:** As we are using Expo, this is the most tightly integrated and straightforward solution. It provides a single API for both iOS and Android and can be triggered directly from our backend.
   - **Implementation:** We will use `expo-notifications` on the client-side to request permissions and receive notifications. Push tokens for each device will be stored in our database.
 
 - **SMS Notifications:** **Twilio**
-
   - **Why:** Twilio is a reliable, industry-standard service for programmable SMS. Your `ROADMAP.md` already identified this as a potential service.
   - **Implementation:** We will use the Twilio SDK within a Supabase Edge Function to send SMS messages. This keeps our API keys and logic secure on the server side.
 
@@ -122,7 +120,6 @@ Here is a brainstormed list of potential notifications, their triggers, and sugg
 ## 4. Advanced Scenarios & Best Practices
 
 - **Chat Message Bundling:** To avoid overwhelming users, we should not send a push notification for every single chat message. A better approach is to "bundle" them.
-
   - **Strategy:** When a message is received, the backend function should wait for a short period (e.g., 1-2 minutes). If no other messages arrive for that user in that window, it sends a single notification ("You have new messages from [Sender Name]"). If more messages arrive, the timer resets.
 
 - **Deep Linking:** All notifications should use deep links. Tapping a notification for an event invitation should take the user directly to that invitation screen in the app, not just the home screen. Expo's Linking library combined with Expo Router handles this well.

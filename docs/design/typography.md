@@ -143,8 +143,8 @@ Momento's typography system combines **classic elegance with modern readability*
 ```css
 :root {
   /* Font Families */
-  --font-family-serif: "Playfair Display", Georgia, serif;
-  --font-family-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-family-serif: 'Playfair Display', Georgia, serif;
+  --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
   /* Font Sizes */
   --font-size-display: 3rem; /* 48px */

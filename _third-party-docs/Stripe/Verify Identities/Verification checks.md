@@ -105,16 +105,16 @@ VerificationSession verificationSession = VerificationSession.create(params);
 ```
 
 ```node
-const stripe = require("stripe")("<<secret key>>");
+const stripe = require('stripe')('<<secret key>>')
 
 const verificationSession = await stripe.identity.verificationSessions.create({
-  type: "document",
+  type: 'document',
   options: {
     document: {
       require_matching_selfie: true,
     },
   },
-});
+})
 ```
 
 ```python

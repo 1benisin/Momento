@@ -1,30 +1,30 @@
-import { defineSchema, defineTable } from "convex/server";
-import { v } from "convex/values";
+import {defineSchema, defineTable} from 'convex/server'
+import {v} from 'convex/values'
 
 export const AccountStatuses = {
-  ACTIVE: "active",
-  PAUSED: "paused",
-} as const;
+  ACTIVE: 'active',
+  PAUSED: 'paused',
+} as const
 
 export type AccountStatus =
-  (typeof AccountStatuses)[keyof typeof AccountStatuses];
+  (typeof AccountStatuses)[keyof typeof AccountStatuses]
 
 export const accountStatusValidator = v.union(
   v.literal(AccountStatuses.ACTIVE),
-  v.literal(AccountStatuses.PAUSED)
-);
+  v.literal(AccountStatuses.PAUSED),
+)
 
 export const UserRoles = {
-  SOCIAL: "social",
-  HOST: "host",
-} as const;
+  SOCIAL: 'social',
+  HOST: 'host',
+} as const
 
-export type UserRole = (typeof UserRoles)[keyof typeof UserRoles];
+export type UserRole = (typeof UserRoles)[keyof typeof UserRoles]
 
 export const userRoleValidator = v.union(
   v.literal(UserRoles.SOCIAL),
-  v.literal(UserRoles.HOST)
-);
+  v.literal(UserRoles.HOST),
+)
 
 export default defineSchema({
   users: defineTable({
@@ -42,7 +42,7 @@ export default defineSchema({
         host_type: v.string(), // 'user' or 'community'
         host_name: v.string(),
         host_bio: v.string(),
-        location_id: v.optional(v.id("locations")),
+        location_id: v.optional(v.id('locations')),
         address: v.optional(v.string()),
         website_url: v.optional(v.string()),
         average_rating: v.optional(v.number()),
@@ -56,7 +56,7 @@ export default defineSchema({
         verification_data: v.optional(v.any()), // Verification response data
         verification_completed_at: v.optional(v.number()), // Timestamp when verification completed
         verification_status: v.optional(v.string()), // e.g., 'processing', 'requires_input', 'canceled'
-      })
+      }),
     ),
 
     socialProfile: v.optional(
@@ -69,14 +69,14 @@ export default defineSchema({
             is_authentic: v.boolean(),
             created_at: v.number(),
             authentic_expires_at: v.optional(v.number()),
-          })
+          }),
         ),
         current_photo_url: v.optional(v.string()),
-      })
+      }),
     ),
   })
-    .index("by_token", ["tokenIdentifier"])
-    .index("by_clerk_id", ["clerkId"]),
+    .index('by_token', ['tokenIdentifier'])
+    .index('by_clerk_id', ['clerkId']),
 
   locations: defineTable({
     name: v.string(),
@@ -85,11 +85,11 @@ export default defineSchema({
     longitude: v.number(),
     google_place_id: v.optional(v.string()),
   })
-    .index("by_position", ["latitude", "longitude"])
-    .index("by_google_place_id", ["google_place_id"]),
+    .index('by_position', ['latitude', 'longitude'])
+    .index('by_google_place_id', ['google_place_id']),
 
   events: defineTable({
-    hostId: v.id("users"),
+    hostId: v.id('users'),
     title: v.string(),
     description: v.string(),
     event_vector: v.optional(v.array(v.float64())),
@@ -103,7 +103,7 @@ export default defineSchema({
       v.object({
         amount: v.number(), // dollar amount
         description: v.string(),
-      })
+      }),
     ),
     itinerary: v.array(
       v.object({
@@ -116,22 +116,22 @@ export default defineSchema({
           google_place_id: v.optional(v.string()),
         }),
         description: v.string(),
-      })
+      }),
     ),
     collaborators: v.optional(
       v.array(
         v.object({
-          userId: v.optional(v.id("users")),
+          userId: v.optional(v.id('users')),
           role: v.string(),
           first_name: v.string(),
-        })
-      )
+        }),
+      ),
     ),
     // event_summary object omitted for brevity
-  }).index("by_hostId_and_status", ["hostId", "status"]),
+  }).index('by_hostId_and_status', ['hostId', 'status']),
 
   // Other tables from your original schema can go here
   // e.g. messages: defineTable({ ... })
 
   // The waitlist_users table is now removed.
-});
+})

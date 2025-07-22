@@ -412,7 +412,8 @@ The following examples demonstrate how to update `unsafeMetadata` using [the Bac
 
 <Tabs items={["React-based SDKs", "JavaScript"]}>
 <Tab>
-```tsx {{ filename: 'page.tsx' }}
+
+````tsx {{ filename: 'page.tsx' }}
 export default function Page() {
 const { user } = useUser()
 const [birthday, setBirthday] = useState('')
@@ -477,3 +478,4 @@ There are multiple ways to retrieve unsafe metadata.
 On the frontend, it is available on the <SDKLink href="/docs/references/javascript/user" sdks={["js-frontend"]} code={true}>User</SDKLink> object, which you can access by using the [`useUser()`](/docs/hooks/use-user) hook.
 
 On the backend, it's available on the <SDKLink href="/docs/references/backend/types/backend-user" sdks={["js-backend"]}>Backend `User`</SDKLink> object which can be accessed using the JavaScript Backend SDK's <SDKLink href="/docs/references/backend/user/get-user" sdks={["js-backend"]} code={true}>getUser()</SDKLink> method. It can also be attached to a session token, and the `sessionClaims` of the session token can be retrieved on the <SDKLink href="/docs/references/backend/types/auth-object" sdks={["js-backend"]} code={true}>Auth</SDKLink> object. If you need to retrieve unsafe metadata frequently in the backend, the best option is to attach it to the session token and retrieve it from the session token. See the [guide on customizing your session token](/docs/backend-requests/custom-session-token).
+````

@@ -79,18 +79,18 @@ export default defineSchema({
             is_authentic: v.boolean(),
             created_at: v.number(),
             authentic_expires_at: v.optional(v.number()),
-          })
+          }),
         ),
         current_photo_url: v.optional(v.string()),
-      })
+      }),
     ),
 
     // --- Fields to Remove ---
     // name: v.optional(v.string()), // This will be stored in socialProfile.first_name
   })
-    .index("by_token", ["tokenIdentifier"])
-    .index("by_clerk_id", ["clerkId"]),
-});
+    .index('by_token', ['tokenIdentifier'])
+    .index('by_clerk_id', ['clerkId']),
+})
 ```
 
 _Note: The `name` field will be removed from the top level and stored inside `socialProfile` as `first_name`._

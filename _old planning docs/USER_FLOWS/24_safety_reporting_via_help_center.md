@@ -52,12 +52,10 @@ sequenceDiagram
 ## 5. Step-by-Step Breakdown
 
 1.  **Accessing the Form**:
-
     - The user navigates to `SettingsScreen` -> `HelpCenterScreen`.
     - Alongside the general "Contact Support" option, there is a distinct and clearly labeled button: **"Report a Safety Concern"**.
 
 2.  **Submitting a Safety Report**:
-
     - Tapping this button opens the familiar support ticket form, but with a key difference: the `category` field is pre-selected and locked to **"Safety & Trust Report"**.
     - The form prompts the user to be as detailed as possible in the `body` text area, encouraging them to include:
       - The name(s) of the user(s) involved.
@@ -66,7 +64,6 @@ sequenceDiagram
     - The user fills out the form and taps "Submit".
 
 3.  **Backend Processing & High-Priority Routing**:
-
     - The client calls the same `createSupportTicket` Convex mutation as the general support flow.
     - The backend creates a new `support_tickets` document.
     - **Crucially**, the backend's notification logic inspects the ticket's `category`.

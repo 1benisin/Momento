@@ -111,38 +111,38 @@ Draft
 // Enhanced app.config.ts for deep linking
 const config: ExpoConfig = {
   // ... existing config
-  scheme: "momento",
+  scheme: 'momento',
   ios: {
     // ... existing iOS config
-    associatedDomains: ["applinks:yourdomain.com"],
+    associatedDomains: ['applinks:yourdomain.com'],
   },
   android: {
     // ... existing Android config
     intentFilters: [
       {
-        action: "VIEW",
+        action: 'VIEW',
         autoVerify: true,
         data: [
           {
-            scheme: "https",
-            host: "yourdomain.com",
-            pathPrefix: "/",
+            scheme: 'https',
+            host: 'yourdomain.com',
+            pathPrefix: '/',
           },
         ],
-        category: ["BROWSABLE", "DEFAULT"],
+        category: ['BROWSABLE', 'DEFAULT'],
       },
     ],
   },
   plugins: [
     // ... existing plugins
     [
-      "expo-router",
+      'expo-router',
       {
-        origin: "https://yourdomain.com",
+        origin: 'https://yourdomain.com',
       },
     ],
   ],
-};
+}
 ```
 
 **Schema Enhancements for Navigation State:**
@@ -160,12 +160,12 @@ users: defineTable({
         v.object({
           lastDeepLink: v.optional(v.string()),
           deepLinkTimestamp: v.optional(v.number()),
-        })
+        }),
       ),
-    })
+    }),
   ),
   // ... rest of existing schema
-});
+})
 ```
 
 ## Testing

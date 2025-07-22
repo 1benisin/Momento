@@ -63,17 +63,14 @@ sequenceDiagram
 ### 5.1. Blocking a User
 
 1.  **Initiating the Block**:
-
     - User A finds User B's profile via the `MemoryBook` (`ConnectionDetailScreen`) or their public `UserProfileScreen`.
     - User A taps a "..." menu icon, which reveals several options, including **"Block [User B's Name]"**. This may be part of a `ReportAndBlockModal` that presents "Block" and "Report" as separate actions.
 
 2.  **Confirmation**:
-
     - Selecting "Block" presents a confirmation modal.
     - The modal clearly explains the consequences: _"Are you sure you want to block [User B's Name]? You will no longer see each other or be placed in events together. They will not be notified."_
 
 3.  **Backend Action**:
-
     - User A confirms. The client calls a `blockUser` Convex mutation.
     - The backend executes a series of actions:
       1.  Creates a new document in the `blocked_users` collection: `{ blockerId: 'ID_of_A', blockedId: 'ID_of_B' }`.

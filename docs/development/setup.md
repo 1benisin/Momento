@@ -63,21 +63,18 @@ EXPO_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 #### Environment Setup Steps
 
 1. **Clerk Setup**:
-
    - Create a Clerk account at [clerk.com](https://clerk.com)
    - Create a new application
    - Copy the publishable key and secret key
    - Configure authentication methods (phone, email)
 
 2. **Convex Setup**:
-
    - Create a Convex account at [convex.dev](https://convex.dev)
    - Create a new project
    - Copy the deployment URL
    - Set up your database schema
 
 3. **Stripe Setup**:
-
    - Create a Stripe account at [stripe.com](https://stripe.com)
    - Get your publishable and secret keys
    - Configure webhook endpoints
@@ -217,9 +214,9 @@ npx expo run:android
 Use the `devLog` utility for consistent logging:
 
 ```typescript
-import { devLog } from "../utils/devLog";
+import {devLog} from '../utils/devLog'
 
-devLog("User profile updated", { userId, changes });
+devLog('User profile updated', {userId, changes})
 ```
 
 ## Platform-Specific Setup

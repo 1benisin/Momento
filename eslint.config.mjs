@@ -1,56 +1,87 @@
 // eslint.config.mjs
-import globals from "globals";
-import tseslint from "typescript-eslint";
-import pluginReact from "eslint-plugin-react";
-import pluginReactHooks from "eslint-plugin-react-hooks";
-import pluginReactNative from "eslint-plugin-react-native";
-import prettier from "eslint-plugin-prettier";
-import prettierConfig from "eslint-config-prettier";
+import tseslintPlugin from '@typescript-eslint/eslint-plugin'
+import tseslintParser from '@typescript-eslint/parser'
+import prettierConfig from 'eslint-config-prettier'
+import prettier from 'eslint-plugin-prettier'
+import pluginReact from 'eslint-plugin-react'
+import pluginReactHooks from 'eslint-plugin-react-hooks'
+import pluginReactNative from 'eslint-plugin-react-native'
+import globals from 'globals'
 
-export default tseslint.config(
+export default [
   {
-    ignores: ["node_modules/", ".expo/", "dist/", "build/"],
+    ignores: [
+      'node_modules/',
+      '.expo/',
+      'dist/',
+      'build/',
+      '*.config.js',
+      '*.config.cjs',
+      '*.config.mjs',
+      '*.config.ts',
+      '*.rc.js',
+      '*.rc.cjs',
+      '*.rc.mjs',
+      '*.rc.ts',
+      'convex/_generated/*.js',
+      '.*.*',
+    ],
   },
   {
     languageOptions: {
       ecmaVersion: 2021,
-      sourceType: "module",
+      sourceType: 'module',
       globals: {
         ...globals.browser,
         ...globals.node,
         ...globals.es2021,
       },
-      parser: tseslint.parser,
+      parser: tseslintParser,
       parserOptions: {
         ecmaFeatures: {
           jsx: true,
         },
-        project: "./tsconfig.json",
+        project: './tsconfig.json',
       },
     },
     plugins: {
-      "@typescript-eslint": tseslint.plugin,
+      '@typescript-eslint': tseslintPlugin,
       react: pluginReact,
-      "react-hooks": pluginReactHooks,
-      "react-native": pluginReactNative,
+      'react-hooks': pluginReactHooks,
+      'react-native': pluginReactNative,
       prettier,
     },
     rules: {
-      ...tseslint.configs.recommended.rules,
+      ...tseslintPlugin.configs.recommended.rules,
       ...pluginReact.configs.recommended.rules,
       ...pluginReactHooks.configs.recommended.rules,
       ...pluginReactNative.configs.all.rules,
       ...prettierConfig.rules,
-      "prettier/prettier": "error",
-      "react/react-in-jsx-scope": "off",
-      "react/prop-types": "off",
-      "@typescript-eslint/explicit-module-boundary-types": "off",
-      "react-native/no-raw-text": "off",
+      'prettier/prettier': 'error',
+      'react/react-in-jsx-scope': 'off',
+      'react/prop-types': 'off',
+      '@typescript-eslint/explicit-module-boundary-types': 'off',
+      'react-native/no-raw-text': 'off',
+      'react-native/no-inline-styles': 'off',
+      'react-native/no-color-literals': 'off',
+      '@typescript-eslint/no-require-imports': [
+        'error',
+        {
+          allow: [
+            '\\.ttf$',
+            '\\.png$',
+            '\\.jpg$',
+            '\\.jpeg$',
+            '\\.gif$',
+            '\\.svg$',
+          ],
+        },
+      ],
     },
     settings: {
       react: {
-        version: "detect",
+        version: 'detect',
       },
     },
   },
-);
+]

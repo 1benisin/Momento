@@ -40,13 +40,11 @@ The previous custom authentication flows are replaced by a single, streamlined p
 ### The Unified Clerk Flow
 
 1.  **App Start**:
-
     - The root layout (`app/_layout.tsx`) is wrapped with `<ClerkProvider>` and `<ConvexProviderWithClerk>`.
     - Clerk attempts to load a session token from its secure cache (`tokenCache.ts`).
     - The `useConvexAuth()` hook determines the user's authentication state.
 
 2.  **Unauthenticated User Journey**:
-
     - The user is shown the `app/(auth)/sign-in.tsx` or `app/(auth)/sign-up.tsx` screen.
     - **Sign-Up (`sign-up.tsx`)**:
       - The UI uses Clerk's `useSignUp()` hook.
@@ -61,7 +59,6 @@ The previous custom authentication flows are replaced by a single, streamlined p
       - The flow is nearly identical to sign-up, using `signIn.create()`, `signIn.prepareFirstFactor()`, and `signIn.attemptFirstFactor()` to handle the OTP process.
 
 3.  **Authenticated State & Data Sync**:
-
     - Once `setActive()` is called, the `<ConvexProviderWithClerk>` automatically fetches the JWT from Clerk and authenticates with the Convex backend.
     - Convex validates the token using the configuration in `convex/auth.config.ts`.
     - Components wrapped in `<Authenticated>` are now rendered.

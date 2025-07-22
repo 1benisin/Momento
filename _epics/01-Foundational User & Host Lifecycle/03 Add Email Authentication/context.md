@@ -57,12 +57,10 @@ To manage the initial authentication state gracefully, the root layout will be w
 To provide a clear and organized experience, all user management functions are centralized in a custom-built account screen.
 
 - **Custom User Icon**:
-
   - **Location**: Placed in the header of the main `(tabs)` layout.
   - **Functionality**: On press, it navigates the user directly to the main `AccountScreen`.
 
 - **`AccountScreen` (`/account`)**:
-
   - **Purpose**: This screen is our custom, native replacement for Clerk's web-based `<UserProfile />`. It serves as the secure hub for core identity and security management, built using Clerk's hooks like `useUser()`.
   - **File Path**: `app/(tabs)/account.tsx`.
 
@@ -100,7 +98,7 @@ export default defineSchema({
     // ...
   }),
   //...
-});
+})
 ```
 
 ### Note on Data Synchronization

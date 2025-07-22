@@ -52,7 +52,8 @@ The following example uses the `useSession()` hook to access the `Session` objec
 
 <Tabs items={['React', 'Next.js']}>
 <Tab>
-```tsx {{ filename: 'src/Home.tsx' }}
+
+````tsx {{ filename: 'src/Home.tsx' }}
 import { useSession } from "@clerk/clerk-react";
 
     export default function Home() {
@@ -111,3 +112,4 @@ import { useSession } from "@clerk/clerk-react";
 
   </Tab>
 </Tabs>
+````

@@ -9,7 +9,6 @@ Momento's color system emphasizes **minimalism, sophistication, and accessibilit
 ### Background Colors
 
 - **Deep Inky Black** (`#000000` or `#0A0A0A`)
-
   - Primary background for dark mode
   - Creates dramatic contrast and premium feel
   - Alternative: Very dark navy (`#0F1419`) for slightly warmer tone
@@ -22,7 +21,6 @@ Momento's color system emphasizes **minimalism, sophistication, and accessibilit
 ### Accent Colors
 
 - **Warm Metallic Gold** (`#D4AF37` or `#B8860B`)
-
   - Primary accent color for premium elements
   - Used for borders, highlights, and important UI elements
   - Flat, uniform line weight for consistent application
@@ -83,7 +81,6 @@ Momento's color system emphasizes **minimalism, sophistication, and accessibilit
 ### Celestial Elements
 
 - **Starlight White** (`#F7FAFC`)
-
   - Stars, moon highlights, celestial accents
   - Pure white for maximum contrast and sparkle
 
@@ -94,7 +91,6 @@ Momento's color system emphasizes **minimalism, sophistication, and accessibilit
 ### Botanical Elements
 
 - **Forest Green** (`#2D5A3D`)
-
   - Leaves, vines, natural elements
   - Muted green that feels organic and sophisticated
 
@@ -178,12 +174,12 @@ All color combinations must meet WCAG AA standards:
 ### Dark Mode Support
 
 ```css
-[data-theme="dark"] {
+[data-theme='dark'] {
   --color-background: var(--color-background-dark);
   --color-text: var(--color-text-primary);
 }
 
-[data-theme="light"] {
+[data-theme='light'] {
   --color-background: var(--color-background-light);
   --color-text: var(--color-text-muted);
 }

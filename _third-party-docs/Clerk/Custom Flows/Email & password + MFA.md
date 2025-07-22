@@ -51,7 +51,8 @@ To authenticate a user using their email and password, you need to:
 
 <Tabs items={["Next.js", "JavaScript", "Expo", "iOS"]}>
 <Tab>
-```tsx {{ filename: 'app/sign-in/[[...sign-in]]/page.tsx', collapsible: true }}
+
+````tsx {{ filename: 'app/sign-in/[[...sign-in]]/page.tsx', collapsible: true }}
 'use client'
 
       import * as React from 'react'
@@ -550,3 +551,4 @@ To authenticate a user using their email and password, you need to:
 ## Next steps
 
 Now that users can sign in with MFA, you need to add the ability for your users to manage their MFA settings. Learn how to build a custom flow for [managing TOTP MFA](/docs/custom-flows/manage-totp-based-mfa) or for [managing SMS MFA](/docs/custom-flows/manage-sms-based-mfa).
+````

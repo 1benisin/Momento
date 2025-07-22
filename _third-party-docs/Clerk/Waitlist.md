@@ -1,5 +1,5 @@
 ---
-title: "`<Waitlist />` component"
+title: '`<Waitlist />` component'
 description: The <Waitlist /> component renders a waitlist form that allows
   users to join for early access to your application.
 lastUpdated: 2025-07-08T15:25:49.000Z
@@ -62,7 +62,8 @@ The following example includes a basic implementation of the `<Waitlist />` comp
 
 <Tabs items={["Next.js", "React", "Astro", "Tanstack React Start", "Vue"]}>
 <Tab>
-```tsx {{ filename: 'app/waitlist/[[...waitlist]]/page.tsx' }}
+
+````tsx {{ filename: 'app/waitlist/[[...waitlist]]/page.tsx' }}
 import { Waitlist } from '@clerk/nextjs'
 
     export default function WaitlistPage() {
@@ -141,7 +142,7 @@ Render the `<Waitlist />` component to an HTML `<div>` element.
 
 ```typescript
 function mountWaitlist(node: HTMLDivElement, props?: WaitlistProps): void;
-```
+````
 
 ### <code>mount<wbr />Waitlist()</code> params
 
@@ -162,19 +163,19 @@ The properties to pass to the `<Waitlist />` component
 #### `mountWaitlist()` usage
 
 ```js {{ filename: 'main.js', mark: [13] }}
-import { Clerk } from "@clerk/clerk-js";
+import {Clerk} from '@clerk/clerk-js'
 
 // Initialize Clerk with your Clerk Publishable Key
-const clerk = new Clerk("{{pub_key}}");
-await clerk.load();
+const clerk = new Clerk('{{pub_key}}')
+await clerk.load()
 
-document.getElementById("app").innerHTML = `
+document.getElementById('app').innerHTML = `
   <div id="waitlist"></div>
-`;
+`
 
-const waitlistDiv = document.getElementById("waitlist");
+const waitlistDiv = document.getElementById('waitlist')
 
-clerk.mountWaitlist(waitlistDiv);
+clerk.mountWaitlist(waitlistDiv)
 ```
 
 ### <code>unmount<wbr />Waitlist()</code>
@@ -182,7 +183,7 @@ clerk.mountWaitlist(waitlistDiv);
 Unmount and run cleanup on an existing `<Waitlist />` component instance.
 
 ```typescript
-function unmountWaitlist(node: HTMLDivElement): void;
+function unmountWaitlist(node: HTMLDivElement): void
 ```
 
 #### `unmountWaitlist()` params
@@ -197,23 +198,23 @@ The container `<div>` element with a rendered `<Waitlist />` component instance
 #### `unmountWaitlist()` usage
 
 ```js {{ filename: 'main.js', mark: [17] }}
-import { Clerk } from "@clerk/clerk-js";
+import {Clerk} from '@clerk/clerk-js'
 
 // Initialize Clerk with your Clerk Publishable Key
-const clerk = new Clerk("{{pub_key}}");
-await clerk.load();
+const clerk = new Clerk('{{pub_key}}')
+await clerk.load()
 
-document.getElementById("app").innerHTML = `
+document.getElementById('app').innerHTML = `
   <div id="waitlist"></div>
-`;
+`
 
-const waitlistDiv = document.getElementById("waitlist");
+const waitlistDiv = document.getElementById('waitlist')
 
-clerk.mountWaitlist(waitlistDiv);
+clerk.mountWaitlist(waitlistDiv)
 
 // ...
 
-clerk.unmountWaitlist(waitlistDiv);
+clerk.unmountWaitlist(waitlistDiv)
 ```
 
 ### `openWaitlist()`
@@ -221,7 +222,7 @@ clerk.unmountWaitlist(waitlistDiv);
 Opens the `<Waitlist />` component as an overlay at the root of your HTML `body` element.
 
 ```typescript
-function openWaitlist(props?: WaitlistProps): void;
+function openWaitlist(props?: WaitlistProps): void
 ```
 
 #### `openWaitlist()` params
@@ -236,19 +237,19 @@ The properties to pass to the `<Waitlist />` component
 #### `openWaitlist()` usage
 
 ```js {{ filename: 'main.js', mark: [13] }}
-import { Clerk } from "@clerk/clerk-js";
+import {Clerk} from '@clerk/clerk-js'
 
 // Initialize Clerk with your Clerk Publishable Key
-const clerk = new Clerk("{{pub_key}}");
-await clerk.load();
+const clerk = new Clerk('{{pub_key}}')
+await clerk.load()
 
-document.getElementById("app").innerHTML = `
+document.getElementById('app').innerHTML = `
   <div id="waitlist"></div>
-`;
+`
 
-const waitlistDiv = document.getElementById("waitlist");
+const waitlistDiv = document.getElementById('waitlist')
 
-clerk.openWaitlist(waitlistDiv);
+clerk.openWaitlist(waitlistDiv)
 ```
 
 ### `closeWaitlist()`
@@ -256,29 +257,29 @@ clerk.openWaitlist(waitlistDiv);
 Closes the waitlist overlay.
 
 ```typescript
-function closeWaitlist(): void;
+function closeWaitlist(): void
 ```
 
 #### `closeWaitlist()` usage
 
 ```js {{ filename: 'main.js', mark: [17] }}
-import { Clerk } from "@clerk/clerk-js";
+import {Clerk} from '@clerk/clerk-js'
 
 // Initialize Clerk with your Clerk Publishable Key
-const clerk = new Clerk("{{pub_key}}");
-await clerk.load();
+const clerk = new Clerk('{{pub_key}}')
+await clerk.load()
 
-document.getElementById("app").innerHTML = `
+document.getElementById('app').innerHTML = `
   <div id="waitlist"></div>
-`;
+`
 
-const waitlistDiv = document.getElementById("waitlist");
+const waitlistDiv = document.getElementById('waitlist')
 
-clerk.openWaitlist(waitlistDiv);
+clerk.openWaitlist(waitlistDiv)
 
 // ...
 
-clerk.closeWaitlist(waitlistDiv);
+clerk.closeWaitlist(waitlistDiv)
 ```
 
 ## Customization

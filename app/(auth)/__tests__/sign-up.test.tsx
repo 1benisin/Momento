@@ -1,12 +1,59 @@
+import {fireEvent, render, waitFor} from '@testing-library/react-native'
 import React from 'react'
-import {render, fireEvent, waitFor} from '@testing-library/react-native'
-import SignUpScreen from '../sign-up'
+import {TextInput, View} from 'react-native'
 import {useSignUp} from '@clerk/clerk-expo'
+import SignUpScreen from '../sign-up'
 
 // Mock the dependencies
 jest.mock('@clerk/clerk-expo', () => ({
   useSignUp: jest.fn(),
 }))
+
+jest.mock('react-native-phone-number-input', () => {
+  const PhoneNumberInput = React.forwardRef(
+    (
+      props: {
+        onChangeText?: (text: string) => void
+        onChangeFormattedText?: (text: string) => void
+        defaultValue?: string
+      },
+      ref: React.Ref<{isValidNumber: (value: string) => boolean}>,
+    ) => {
+      const {onChangeText, onChangeFormattedText, defaultValue} = props
+      if (ref) {
+        const refObj = ref as React.RefObject<{
+          isValidNumber: (value: string) => boolean
+        }>
+        if (refObj && 'current' in refObj) {
+          refObj.current = {
+            isValidNumber: (value: string) => {
+              // simple validation for testing
+              return !!value && value.length > 5
+            },
+          }
+        }
+      }
+      return (
+        <View>
+          <TextInput
+            testID="phone-input"
+            defaultValue={defaultValue}
+            onChangeText={(text: string) => {
+              if (onChangeText) onChangeText(text)
+              if (onChangeFormattedText) onChangeFormattedText(`+1${text}`)
+            }}
+          />
+        </View>
+      )
+    },
+  )
+  PhoneNumberInput.displayName = 'PhoneNumberInput'
+
+  return {
+    __esModule: true,
+    default: PhoneNumberInput,
+  }
+})
 
 jest.mock('expo-router', () => ({
   useRouter: () => ({
@@ -22,6 +69,8 @@ describe('SignUpScreen', () => {
       create: jest.fn(),
       prepareEmailAddressVerification: jest.fn(),
       attemptEmailAddressVerification: jest.fn(),
+      preparePhoneNumberVerification: jest.fn(),
+      attemptPhoneNumberVerification: jest.fn(),
     },
     setActive: jest.fn(),
   }
@@ -38,6 +87,65 @@ describe('SignUpScreen', () => {
     const {getByText, getByPlaceholderText} = render(<SignUpScreen />)
     fireEvent.press(getByText('Email'))
     expect(getByPlaceholderText('email@example.com')).toBeTruthy()
+  })
+
+  it('calls sign up with phone on valid submission', async () => {
+    const {getByText, getByTestId} = render(<SignUpScreen />)
+    fireEvent.changeText(getByTestId('phone-input'), '1234567890')
+    fireEvent.press(getByText('Sign Up'))
+
+    await waitFor(() => {
+      expect(mockSignUp.signUp.create).toHaveBeenCalledWith({
+        phoneNumber: '+11234567890',
+      })
+      expect(
+        mockSignUp.signUp.preparePhoneNumberVerification,
+      ).toHaveBeenCalled()
+    })
+  })
+
+  it('shows an error message if sign up fails', async () => {
+    const {getByText, getByTestId, findByText} = render(<SignUpScreen />)
+    const errorMessage = 'This phone number is already in use.'
+    mockSignUp.signUp.create.mockRejectedValueOnce({
+      errors: [{longMessage: errorMessage}],
+    })
+
+    fireEvent.changeText(getByTestId('phone-input'), '1234567890')
+    fireEvent.press(getByText('Sign Up'))
+
+    const error = await findByText(errorMessage)
+    expect(error).toBeTruthy()
+  })
+
+  it('calls phone verification and sets active session', async () => {
+    const {getByText, getByTestId, getByPlaceholderText} = render(
+      <SignUpScreen />,
+    )
+    fireEvent.changeText(getByTestId('phone-input'), '1234567890')
+    fireEvent.press(getByText('Sign Up'))
+
+    await waitFor(() => {
+      fireEvent.changeText(getByPlaceholderText('Code...'), '123456')
+    })
+
+    mockSignUp.signUp.attemptPhoneNumberVerification.mockResolvedValueOnce({
+      status: 'complete',
+      createdSessionId: 'sess_67890',
+    })
+
+    fireEvent.press(getByText('Verify'))
+
+    await waitFor(() => {
+      expect(
+        mockSignUp.signUp.attemptPhoneNumberVerification,
+      ).toHaveBeenCalledWith({
+        code: '123456',
+      })
+      expect(mockSignUp.setActive).toHaveBeenCalledWith({
+        session: 'sess_67890',
+      })
+    })
   })
 
   it('calls sign up with email on valid submission', async () => {

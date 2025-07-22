@@ -1,177 +1,143 @@
-import React, { useState } from "react";
+import React, {useState} from 'react'
 import {
-  Button,
-  Image,
-  View,
-  StyleSheet,
-  Text,
-  Alert,
-  Linking,
   ActivityIndicator,
-} from "react-native";
-import * as ImagePicker from "expo-image-picker";
-import { useMutation } from "convex/react";
-import { api } from "../convex/_generated/api";
+  Alert,
+  Image,
+  Linking,
+  Pressable,
+  Text,
+  View,
+} from 'react-native'
+import {useMutation} from 'convex/react'
+import * as ImagePicker from 'expo-image-picker'
+import {api} from '../convex/_generated/api'
 
 interface ImageUploaderProps {
-  onUploadSuccess: (storageId: string, isAuthentic: boolean) => void;
+  onUploadSuccess: (storageId: string, isAuthentic: boolean) => void
 }
 
-export default function ImageUploader({ onUploadSuccess }: ImageUploaderProps) {
-  const [image, setImage] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const generateUploadUrl = useMutation(api.files.generateUploadUrl);
+export default function ImageUploader({onUploadSuccess}: ImageUploaderProps) {
+  const [image, setImage] = useState<string | null>(null)
+  const [isUploading, setIsUploading] = useState(false)
+  const generateUploadUrl = useMutation(api.files.generateUploadUrl)
 
   const handleImageUpload = async (uri: string, isAuthentic: boolean) => {
-    setIsUploading(true);
+    setIsUploading(true)
     try {
-      // Step 1: Get a short-lived upload URL
-      const uploadUrl = await generateUploadUrl();
-
-      // Step 2: POST the file to the URL
-      const response = await fetch(uri);
-      const blob = await response.blob();
+      const uploadUrl = await generateUploadUrl()
+      const response = await fetch(uri)
+      const blob = await response.blob()
       const uploadResponse = await fetch(uploadUrl, {
-        method: "POST",
-        headers: { "Content-Type": blob.type },
+        method: 'POST',
+        headers: {'Content-Type': blob.type},
         body: blob,
-      });
+      })
 
       if (!uploadResponse.ok) {
-        throw new Error("Upload failed");
+        throw new Error('Upload failed')
       }
 
-      const { storageId } = await uploadResponse.json();
-
-      // Step 3: Pass the storageId to the parent component
-      onUploadSuccess(storageId, isAuthentic);
+      const {storageId} = await uploadResponse.json()
+      onUploadSuccess(storageId, isAuthentic)
     } catch (error) {
-      console.error(error);
+      console.error(error)
       Alert.alert(
-        "Upload Failed",
-        "Sorry, we couldn't upload your image. Please try again."
-      );
+        'Upload Failed',
+        "Sorry, we couldn't upload your image. Please try again.",
+      )
     } finally {
-      setIsUploading(false);
+      setIsUploading(false)
     }
-  };
+  }
 
   const pickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
+    const {status} = await ImagePicker.requestMediaLibraryPermissionsAsync()
+    if (status !== 'granted') {
       Alert.alert(
-        "Permission required",
-        "Please grant camera roll permissions to select an image.",
+        'Permission required',
+        'Please grant camera roll permissions to select an image.',
         [
-          { text: "Cancel", style: "cancel" },
-          { text: "Open Settings", onPress: () => Linking.openSettings() },
-        ]
-      );
-      return;
+          {text: 'Cancel', style: 'cancel'},
+          {text: 'Open Settings', onPress: () => Linking.openSettings()},
+        ],
+      )
+      return
     }
 
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: "images",
+      mediaTypes: 'images',
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
-    });
+    })
 
     if (!result.canceled) {
-      const uri = result.assets[0].uri;
-      setImage(uri);
-      await handleImageUpload(uri, false);
+      const uri = result.assets[0].uri
+      setImage(uri)
+      await handleImageUpload(uri, false)
     }
-  };
+  }
 
   const takePhoto = async () => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== "granted") {
+    const {status} = await ImagePicker.requestCameraPermissionsAsync()
+    if (status !== 'granted') {
       Alert.alert(
-        "Permission required",
-        "Please grant camera permissions to take a photo.",
+        'Permission required',
+        'Please grant camera permissions to take a photo.',
         [
-          { text: "Cancel", style: "cancel" },
-          { text: "Open Settings", onPress: () => Linking.openSettings() },
-        ]
-      );
-      return;
+          {text: 'Cancel', style: 'cancel'},
+          {text: 'Open Settings', onPress: () => Linking.openSettings()},
+        ],
+      )
+      return
     }
 
     let result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
-    });
+    })
 
     if (!result.canceled) {
-      const uri = result.assets[0].uri;
-      setImage(uri);
-      await handleImageUpload(uri, true);
+      const uri = result.assets[0].uri
+      setImage(uri)
+      await handleImageUpload(uri, true)
     }
-  };
+  }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>Add a Profile Photo</Text>
-      <View style={styles.buttonContainer}>
-        <Button
-          title="Pick an image from camera roll"
+    <View className="flex-1 items-center justify-center p-5">
+      <Text className="text-lg font-bold mb-5">Add a Profile Photo</Text>
+      <View className="w-full mb-5">
+        <Pressable
+          className="bg-blue-500 py-3 rounded-md items-center mb-2.5"
           onPress={pickImage}
-          disabled={isUploading}
-        />
-        <View style={styles.spacer} />
-        <Button
-          title="Take a photo"
+          disabled={isUploading}>
+          <Text className="text-white font-bold">
+            Pick an image from camera roll
+          </Text>
+        </Pressable>
+        <Pressable
+          className="bg-blue-500 py-3 rounded-md items-center"
           onPress={takePhoto}
-          disabled={isUploading}
-        />
+          disabled={isUploading}>
+          <Text className="text-white font-bold">Take a photo</Text>
+        </Pressable>
       </View>
 
       {isUploading && (
-        <View style={styles.loadingOverlay}>
+        <View className="absolute inset-0 bg-white/70 justify-center items-center">
           <ActivityIndicator size="large" color="#0000ff" />
           <Text>Uploading...</Text>
         </View>
       )}
 
       {image && !isUploading && (
-        <Image source={{ uri: image }} style={styles.image} />
+        <Image
+          source={{uri: image}}
+          className="w-52 h-52 rounded-full border-2 border-gray-300"
+        />
       )}
     </View>
-  );
+  )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
-  },
-  label: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  buttonContainer: {
-    width: "100%",
-    marginBottom: 20,
-  },
-  spacer: {
-    height: 10,
-  },
-  image: {
-    width: 200,
-    height: 200,
-    borderRadius: 100, // Make it a circle
-    borderWidth: 2,
-    borderColor: "#ccc",
-  },
-  loadingOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(255, 255, 255, 0.7)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});

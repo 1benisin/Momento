@@ -176,26 +176,26 @@ Here’s an example of accessing the extracted date of birth, ID number, and doc
 ```javascript
 // Set your restricted key. Remember to switch to a live restricted key in production.
 // See your keys here: https://dashboard.stripe.com/apikeys
-const stripe = require("stripe")("rk_test_...");
+const stripe = require('stripe')('rk_test_...')
 
 const verificationSession = await stripe.identity.verificationSessions.retrieve(
-  "{{SESSION_ID}}",
+  '{{SESSION_ID}}',
   {
     expand: [
-      "verified_outputs.dob",
-      "verified_outputs.id_number",
-      "last_verification_report.document.number",
-      "last_verification_report.document.expiration_date",
+      'verified_outputs.dob',
+      'verified_outputs.id_number',
+      'last_verification_report.document.number',
+      'last_verification_report.document.expiration_date',
     ],
-  }
-);
+  },
+)
 
-const dateOfBirth = verificationSession.verified_outputs.dob;
-const idNumber = verificationSession.verified_outputs.id_number;
+const dateOfBirth = verificationSession.verified_outputs.dob
+const idNumber = verificationSession.verified_outputs.id_number
 const documentNumber =
-  verificationSession.last_verification_report.document.number;
+  verificationSession.last_verification_report.document.number
 const documentExpirationDate =
-  verificationSession.last_verification_report.document.expiration_date;
+  verificationSession.last_verification_report.document.expiration_date
 ```
 
 ```ruby
@@ -337,28 +337,28 @@ To access the contents of the file, you need to authenticate using the previousl
 ```javascript
 // Set your restricted key. Remember to switch to a live restricted key in production.
 // See your keys here: https://dashboard.stripe.com/apikeys
-const stripe = require("stripe")("rk_test_...");
+const stripe = require('stripe')('rk_test_...')
 
 // Get the VerificationReport
 const session = await stripe.identity.verificationSessions.retrieve(
-  "{{SESSION_ID}}",
+  '{{SESSION_ID}}',
   {
-    expand: ["last_verification_report"],
-  }
-);
+    expand: ['last_verification_report'],
+  },
+)
 
 // Retrieve the File id
-const report = session.last_verification_report;
-const documentFrontFile = report.document.files[0];
+const report = session.last_verification_report
+const documentFrontFile = report.document.files[0]
 
 // Create a short-lived FileLink
 const fileLink = await stripe.fileLinks.create({
   file: documentFrontFile,
   expires_at: Math.floor(Date.now() / 1000) + 30, // link expires in 30 seconds
-});
+})
 
 // Access the FileLink URL to download file contents
-const fileUrl = fileLink.url;
+const fileUrl = fileLink.url
 ```
 
 ```ruby

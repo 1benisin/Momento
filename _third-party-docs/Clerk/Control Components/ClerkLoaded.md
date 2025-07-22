@@ -1,5 +1,5 @@
 ---
-title: "`<ClerkLoaded>`"
+title: '`<ClerkLoaded>`'
 description: The `<ClerkLoaded>` component guarantees that the Clerk object has
   loaded and will be available under `window.Clerk`. This allows you to wrap
   child components to access the Clerk object without the need to check it
@@ -17,7 +17,8 @@ It's not recommended to wrap the entire app in the `<ClerkLoaded>` component; in
 <Tab>
 <Tabs items={["App Router", "Pages Router"]}>
 <Tab>
-```tsx {{ filename: 'app/page.tsx' }}
+
+````tsx {{ filename: 'app/page.tsx' }}
 import { ClerkLoaded } from '@clerk/nextjs'
 
         export default function Page() {
@@ -111,3 +112,4 @@ import { ClerkLoaded } from '@clerk/nextjs'
 
   </Tab>
 </Tabs>
+````

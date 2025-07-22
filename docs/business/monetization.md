@@ -80,11 +80,11 @@ Momento's primary revenue stream is a flat **$5 Confirmation Fee** charged to pa
 ```typescript
 // User can add multiple payment methods
 interface PaymentMethod {
-  id: string;
-  type: "card" | "bank_account";
-  last4: string;
-  brand?: string;
-  isDefault: boolean;
+  id: string
+  type: 'card' | 'bank_account'
+  last4: string
+  brand?: string
+  isDefault: boolean
 }
 ```
 
@@ -109,11 +109,11 @@ interface PaymentMethod {
 ```typescript
 // Refund flow
 interface RefundRequest {
-  userId: string;
-  eventId: string;
-  reason: "user_cancellation" | "host_cancellation" | "event_changes";
-  amount: number;
-  timestamp: Date;
+  userId: string
+  eventId: string
+  reason: 'user_cancellation' | 'host_cancellation' | 'event_changes'
+  amount: number
+  timestamp: Date
 }
 ```
 
@@ -201,22 +201,22 @@ Monthly Revenue = Number of Event Acceptances × $5 Confirmation Fee
 interface PaymentFlow {
   // 1. Create payment intent
   paymentIntent: {
-    amount: number; // $5.00 in cents
-    currency: "usd";
-    customer: string; // Stripe customer ID
+    amount: number // $5.00 in cents
+    currency: 'usd'
+    customer: string // Stripe customer ID
     metadata: {
-      eventId: string;
-      userId: string;
-      type: "confirmation_fee";
-    };
-  };
+      eventId: string
+      userId: string
+      type: 'confirmation_fee'
+    }
+  }
 
   // 2. Confirm payment
   confirmation: {
-    paymentIntentId: string;
-    status: "succeeded" | "failed";
-    receiptUrl: string;
-  };
+    paymentIntentId: string
+    status: 'succeeded' | 'failed'
+    receiptUrl: string
+  }
 }
 ```
 
@@ -225,13 +225,13 @@ interface PaymentFlow {
 ```typescript
 // Stripe customer creation
 interface StripeCustomer {
-  id: string;
-  email?: string;
-  phone?: string;
+  id: string
+  email?: string
+  phone?: string
   metadata: {
-    userId: string;
-    userType: "participant" | "host" | "hybrid";
-  };
+    userId: string
+    userType: 'participant' | 'host' | 'hybrid'
+  }
 }
 ```
 
@@ -256,19 +256,19 @@ interface StripeCustomer {
 ```typescript
 // Webhook event handling
 interface PaymentWebhook {
-  "payment_intent.succeeded": {
-    eventId: string;
-    userId: string;
-    amount: number;
-    timestamp: Date;
-  };
+  'payment_intent.succeeded': {
+    eventId: string
+    userId: string
+    amount: number
+    timestamp: Date
+  }
 
-  "payment_intent.payment_failed": {
-    eventId: string;
-    userId: string;
-    error: string;
-    timestamp: Date;
-  };
+  'payment_intent.payment_failed': {
+    eventId: string
+    userId: string
+    error: string
+    timestamp: Date
+  }
 }
 ```
 

@@ -1,5 +1,5 @@
 ---
-title: "`<ClerkLoading>`"
+title: '`<ClerkLoading>`'
 description: The `<ClerkLoading>` renders its children while Clerk is loading,
   and is helpful for showing a custom loading state.
 lastUpdated: 2025-07-08T15:25:49.000Z

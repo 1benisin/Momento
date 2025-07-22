@@ -1,5 +1,5 @@
 ---
-title: "`<ClerkProvider>`"
+title: '`<ClerkProvider>`'
 description: The <ClerkProvider> component provides session and user context to
   Clerk's hooks and components.
 lastUpdated: 2025-07-08T15:25:49.000Z
@@ -14,7 +14,8 @@ The recommended approach is to wrap your entire app with `<ClerkProvider>` at th
 <Tabs items={["Next.js", "React", "Expo", "React Router", "Tanstack React Start"]}>
 <Tab>
 <CodeBlockTabs options={["App Router", "Pages Router"]}>
-```tsx {{ filename: 'app/layout.tsx' }}
+
+````tsx {{ filename: 'app/layout.tsx' }}
 import React from 'react'
 import { ClerkProvider } from '@clerk/nextjs'
 
@@ -220,3 +221,4 @@ Indicates whether or not Clerk should make dynamic auth data available based on 
 
 To enable, pass the URL of the web application that the extension will sync the authentication state from. See the <SDKLink href="/docs/references/chrome-extension/sync-host" sdks={["chrome-extension"]}>dedicated guide</SDKLink> for more information.
 </Properties>
+````

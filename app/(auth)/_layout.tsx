@@ -1,4 +1,4 @@
-import { Stack } from "expo-router";
+import {Stack} from 'expo-router'
 
 /**
  * This layout is for the authentication flow. It's a "dumb" layout that
@@ -9,8 +9,8 @@ import { Stack } from "expo-router";
 export default function AuthLayout() {
   return (
     <Stack>
-      <Stack.Screen name="sign-in" options={{ headerShown: false }} />
-      <Stack.Screen name="sign-up" options={{ headerShown: false }} />
+      <Stack.Screen name="sign-in" options={{headerShown: false}} />
+      <Stack.Screen name="sign-up" options={{headerShown: false}} />
     </Stack>
-  );
+  )
 }
