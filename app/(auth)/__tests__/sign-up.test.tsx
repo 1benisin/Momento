@@ -1,6 +1,5 @@
 import {fireEvent, render, waitFor} from '@testing-library/react-native'
 import React from 'react'
-import {TextInput, View} from 'react-native'
 import {useSignUp} from '@clerk/clerk-expo'
 import SignUpScreen from '../sign-up'
 
@@ -10,6 +9,10 @@ jest.mock('@clerk/clerk-expo', () => ({
 }))
 
 jest.mock('react-native-phone-number-input', () => {
+  // Use jest.requireActual to load the real dependencies
+  const React = jest.requireActual('react')
+  const {View, TextInput} = jest.requireActual('react-native')
+
   const PhoneNumberInput = React.forwardRef(
     (
       props: {

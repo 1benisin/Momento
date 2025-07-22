@@ -28,7 +28,7 @@ export default function UserInfo() {
       <Text className="text-lg font-bold">
         Hi, {user.firstName || user.primaryEmailAddress?.emailAddress}!
       </Text>
-      <Text>Your status is: {convexUser.status}</Text>
+      <Text>Your status is: {convexUser.accountStatus}</Text>
     </View>
   )
 }

@@ -1,7 +1,7 @@
 import React from 'react'
 import {TouchableOpacity, View} from 'react-native'
 import {FontAwesome} from '@expo/vector-icons'
-import {Text} from './Themed'
+import {Text} from 'react-native'
 
 type VerificationPromptBannerProps = {
   onPress?: () => void

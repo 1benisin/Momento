@@ -158,7 +158,14 @@ function InitialLayout() {
       devLog('[InitialLayout] Signed in, calling getOrCreateUser')
       getOrCreateUser({})
     }
-  }, [isSignedIn, getOrCreateUser])
+  }, [
+    isSignedIn,
+    getOrCreateUser,
+    segments,
+    inAuthGroup,
+    inOnboardingGroup,
+    inTabsGroup,
+  ])
 
   useEffect(() => {
     if (isLoading) {
@@ -227,7 +234,16 @@ function InitialLayout() {
     } else {
       devLog('[InitialLayout] Signed in, but userData is null')
     }
-  }, [isLoading, isSignedIn, userData, segments, router])
+  }, [
+    isLoading,
+    isSignedIn,
+    userData,
+    segments,
+    router,
+    inAuthGroup,
+    inOnboardingGroup,
+    inTabsGroup,
+  ])
 
   const loadingView = (msg: string) => (
     <View className="flex-1 items-center justify-center">

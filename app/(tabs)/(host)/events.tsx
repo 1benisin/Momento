@@ -8,10 +8,11 @@ import {Doc} from '@/convex/_generated/dataModel'
 
 const HostEventsScreen = () => {
   const router = useRouter()
-  const events = useQuery(api.events.getMyEvents) || []
+  const eventsQuery = useQuery(api.events.getMyEvents)
+
+  const events = useMemo(() => eventsQuery || [], [eventsQuery])
 
   const {drafts, published} = useMemo(() => {
-    if (!events) return {drafts: [], published: []}
     return {
       drafts: events.filter(e => e.status === 'draft'),
       published: events.filter(e => e.status === 'published'),

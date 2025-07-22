@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {ActivityIndicator, Alert, Pressable, Text, View} from 'react-native'
 import {usePaymentSheet} from '@stripe/stripe-react-native'
 import {useMutation} from 'convex/react'
@@ -34,11 +34,7 @@ export const PaymentSheetComponent: React.FC<PaymentSheetProps> = ({
     loading: paymentSheetLoading,
   } = usePaymentSheet()
 
-  useEffect(() => {
-    initializePaymentSheet()
-  }, [])
-
-  const initializePaymentSheet = async () => {
+  const initializePaymentSheet = useCallback(async () => {
     try {
       setLoading(true)
       devLog('[PaymentSheet] Initializing payment', {
@@ -84,7 +80,11 @@ export const PaymentSheetComponent: React.FC<PaymentSheetProps> = ({
     } finally {
       setLoading(false)
     }
-  }
+  }, [eventId, amount, currency, onError, initPaymentSheet, createPayment])
+
+  useEffect(() => {
+    initializePaymentSheet()
+  }, [initializePaymentSheet])
 
   const openPaymentSheet = async () => {
     const {error} = await presentPaymentSheet()

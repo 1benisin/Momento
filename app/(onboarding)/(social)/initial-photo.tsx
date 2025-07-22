@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {Alert, SafeAreaView, Text, TouchableOpacity, View} from 'react-native'
+import {Alert, Text, TouchableOpacity, View} from 'react-native'
 import {useMutation} from 'convex/react'
 import {useRouter} from 'expo-router'
 import {Id} from '@/convex/_generated/dataModel'
@@ -18,8 +18,12 @@ export default function InitialPhotoScreen() {
   }
 
   const handleContinue = () => {
-    devLog('[InitialPhotoScreen] Navigating to social discover')
-    router.replace('/(tabs)/(social)/discover')
+    devLog('[InitialPhotoScreen] Navigating to location setup')
+    router.push('/(onboarding)/(social)/location-setup')
+  }
+
+  const handleBack = () => {
+    router.back()
   }
 
   const onSave = async () => {
@@ -66,36 +70,83 @@ export default function InitialPhotoScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 items-center justify-center bg-white p-5">
-      <Text className="mb-2.5 text-center text-2xl font-bold">
-        Add your first photo
-      </Text>
-      <Text className="mb-8 text-center text-base text-gray-500">
-        This helps people recognize you. You can change it later.
-      </Text>
-
-      <ImageUploader onUploadSuccess={handleUploadSuccess} />
-
-      <View className="mt-5 w-full">
+    <View style={{flex: 1, backgroundColor: 'white'}}>
+      {/* Back Button */}
+      <View style={{padding: 20, paddingTop: 60}}>
         <TouchableOpacity
-          className="items-center rounded-md bg-blue-500 py-3 disabled:opacity-50"
-          onPress={onSave}
-          disabled={!storageId || isSubmitting}>
-          <Text className="text-lg font-semibold text-white">
-            {isSubmitting ? 'Saving...' : 'Save and Finish'}
+          onPress={handleBack}
+          style={{flexDirection: 'row', alignItems: 'center'}}
+          accessibilityRole="button"
+          accessibilityLabel="Go back to interest selection">
+          <Text style={{color: '#6B7280', fontSize: 20, marginRight: 4}}>
+            ←
+          </Text>
+          <Text style={{marginLeft: 4, color: '#6B7280', fontWeight: '500'}}>
+            Back
           </Text>
         </TouchableOpacity>
-        <View className="my-2">
+      </View>
+
+      <View
+        style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 20,
+        }}>
+        <Text
+          style={{
+            marginBottom: 10,
+            textAlign: 'center',
+            fontSize: 24,
+            fontWeight: 'bold',
+          }}>
+          Add your first photo
+        </Text>
+        <Text
+          style={{
+            marginBottom: 32,
+            textAlign: 'center',
+            fontSize: 16,
+            color: '#6B7280',
+          }}>
+          This helps people recognize you. You can change it later.
+        </Text>
+
+        <ImageUploader onUploadSuccess={handleUploadSuccess} />
+
+        <View style={{marginTop: 20, width: '100%'}}>
           <TouchableOpacity
-            className="items-center rounded-md py-3 disabled:opacity-50"
-            onPress={onSkip}
-            disabled={isSubmitting}>
-            <Text className="text-lg font-semibold text-gray-500">
-              Skip for now
+            style={{
+              alignItems: 'center',
+              borderRadius: 5,
+              backgroundColor: '#3B82F6',
+              padding: 12,
+              opacity: !storageId || isSubmitting ? 0.5 : 1,
+            }}
+            onPress={onSave}
+            disabled={!storageId || isSubmitting}>
+            <Text style={{fontSize: 18, fontWeight: '600', color: 'white'}}>
+              {isSubmitting ? 'Saving...' : 'Save and Finish'}
             </Text>
           </TouchableOpacity>
+          <View style={{marginVertical: 8}}>
+            <TouchableOpacity
+              style={{
+                alignItems: 'center',
+                borderRadius: 5,
+                padding: 12,
+                opacity: isSubmitting ? 0.5 : 1,
+              }}
+              onPress={onSkip}
+              disabled={isSubmitting}>
+              <Text style={{fontSize: 18, fontWeight: '600', color: '#6B7280'}}>
+                Skip for now
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   )
 }

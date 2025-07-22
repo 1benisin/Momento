@@ -4,14 +4,13 @@ import {
   Platform,
   ScrollView,
   Text,
+  TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native'
 import {useSignIn} from '@clerk/clerk-expo'
 import type {SignInFirstFactor} from '@clerk/types'
 import {Link} from 'expo-router'
-import {AuthButton} from '@/components/auth/AuthButton'
-import {AuthInput} from '@/components/auth/AuthInput'
-import {TabSelector} from '@/components/auth/TabSelector'
 import {devLog} from '@/utils/devLog'
 
 function isClerkError(
@@ -133,95 +132,186 @@ export default function SignInScreen() {
 
   const renderSignInForm = () => (
     <>
-      <TabSelector
-        tabs={['Phone', 'Email']}
-        activeTab={signInMethod}
-        onTabChange={tab =>
-          setSignInMethod(tab.toLowerCase() as 'email' | 'phone')
-        }
-      />
+      <View style={{flexDirection: 'row', marginBottom: 20}}>
+        <TouchableOpacity
+          style={{
+            flex: 1,
+            padding: 10,
+            backgroundColor: signInMethod === 'phone' ? '#007AFF' : '#E5E5EA',
+            marginRight: 5,
+            borderRadius: 5,
+          }}
+          onPress={() => setSignInMethod('phone')}>
+          <Text
+            style={{
+              textAlign: 'center',
+              color: signInMethod === 'phone' ? 'white' : 'black',
+            }}>
+            Phone
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            flex: 1,
+            padding: 10,
+            backgroundColor: signInMethod === 'email' ? '#007AFF' : '#E5E5EA',
+            marginLeft: 5,
+            borderRadius: 5,
+          }}
+          onPress={() => setSignInMethod('email')}>
+          <Text
+            style={{
+              textAlign: 'center',
+              color: signInMethod === 'email' ? 'white' : 'black',
+            }}>
+            Email
+          </Text>
+        </TouchableOpacity>
+      </View>
 
       {signInMethod === 'phone' ? (
-        <AuthInput
-          label="Phone Number"
-          value={phoneNumber}
-          onChangeText={setPhoneNumber}
-          placeholder="+1..."
-          keyboardType="phone-pad"
-          autoComplete="tel"
-          error={error ?? undefined}
-        />
+        <View style={{marginBottom: 20}}>
+          <Text style={{marginBottom: 5}}>Phone Number</Text>
+          <TextInput
+            value={phoneNumber}
+            onChangeText={setPhoneNumber}
+            placeholder="+1..."
+            keyboardType="phone-pad"
+            style={{
+              borderWidth: 1,
+              borderColor: '#E5E5EA',
+              borderRadius: 5,
+              padding: 10,
+              backgroundColor: 'white',
+            }}
+          />
+        </View>
       ) : (
-        <AuthInput
-          label="Email Address"
-          value={emailAddress}
-          onChangeText={setEmailAddress}
-          placeholder="email@example.com"
-          keyboardType="email-address"
-          autoComplete="email"
-          error={error ?? undefined}
-        />
+        <View style={{marginBottom: 20}}>
+          <Text style={{marginBottom: 5}}>Email Address</Text>
+          <TextInput
+            value={emailAddress}
+            onChangeText={setEmailAddress}
+            placeholder="email@example.com"
+            keyboardType="email-address"
+            style={{
+              borderWidth: 1,
+              borderColor: '#E5E5EA',
+              borderRadius: 5,
+              padding: 10,
+              backgroundColor: 'white',
+            }}
+          />
+        </View>
       )}
 
-      <AuthButton
-        title="Sign In"
+      <TouchableOpacity
         onPress={onSignInPress}
-        isLoading={loading}
-        disabled={signInMethod === 'email' ? !emailAddress : !phoneNumber}
-      />
+        disabled={
+          loading || (signInMethod === 'email' ? !emailAddress : !phoneNumber)
+        }
+        style={{
+          backgroundColor:
+            loading || (signInMethod === 'email' ? !emailAddress : !phoneNumber)
+              ? '#E5E5EA'
+              : '#007AFF',
+          padding: 15,
+          borderRadius: 5,
+          alignItems: 'center',
+        }}>
+        <Text style={{color: 'white', fontWeight: 'bold'}}>
+          {loading ? 'Loading...' : 'Sign In'}
+        </Text>
+      </TouchableOpacity>
     </>
   )
 
   const renderVerificationForm = () => (
     <>
-      <AuthInput
-        label="Verification Code"
-        value={code}
-        onChangeText={setCode}
-        placeholder="Code..."
-        keyboardType="numeric"
-        error={error ?? undefined}
-      />
-      <AuthButton title="Verify" onPress={onVerifyPress} isLoading={loading} />
-      <View className="mt-4">
-        <AuthButton title="Back" onPress={onBackPress} variant="secondary" />
+      <View style={{marginBottom: 20}}>
+        <Text style={{marginBottom: 5}}>Verification Code</Text>
+        <TextInput
+          value={code}
+          onChangeText={setCode}
+          placeholder="Code..."
+          keyboardType="numeric"
+          style={{
+            borderWidth: 1,
+            borderColor: '#E5E5EA',
+            borderRadius: 5,
+            padding: 10,
+            backgroundColor: 'white',
+          }}
+        />
       </View>
+      <TouchableOpacity
+        onPress={onVerifyPress}
+        disabled={loading}
+        style={{
+          backgroundColor: loading ? '#E5E5EA' : '#007AFF',
+          padding: 15,
+          borderRadius: 5,
+          alignItems: 'center',
+          marginBottom: 10,
+        }}>
+        <Text style={{color: 'white', fontWeight: 'bold'}}>
+          {loading ? 'Loading...' : 'Verify'}
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={onBackPress}
+        style={{
+          backgroundColor: '#E5E5EA',
+          padding: 15,
+          borderRadius: 5,
+          alignItems: 'center',
+        }}>
+        <Text style={{color: 'black'}}>Back</Text>
+      </TouchableOpacity>
     </>
   )
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1 bg-black">
+      style={{flex: 1, backgroundColor: 'white'}}>
       <ScrollView
-        contentContainerClassName="flex-grow justify-center px-6 py-12"
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: 'center',
+          padding: 20,
+        }}
         keyboardShouldPersistTaps="handled">
-        <View className="items-center mb-8">
-          <Text className="font-['Playfair_Display'] text-3xl text-[#F8F6F1] text-center">
+        <View style={{alignItems: 'center', marginBottom: 40}}>
+          <Text style={{fontSize: 24, fontWeight: 'bold', textAlign: 'center'}}>
             Welcome Back
           </Text>
-          <Text className="font-['Inter'] text-[#F8F6F1] text-center mt-2 opacity-80">
+          <Text style={{textAlign: 'center', marginTop: 10, opacity: 0.8}}>
             Continue your journey with Momento
           </Text>
         </View>
 
         {error && (
-          <View className="mb-4 p-3 bg-[#8B2635]/20 rounded-md">
-            <Text className="text-[#8B2635] font-['Inter'] text-center">
-              {error}
-            </Text>
+          <View
+            style={{
+              marginBottom: 20,
+              padding: 15,
+              backgroundColor: '#FFE5E5',
+              borderRadius: 5,
+            }}>
+            <Text style={{color: '#D70015', textAlign: 'center'}}>{error}</Text>
           </View>
         )}
 
-        <View className="w-full">
+        <View style={{width: '100%'}}>
           {pendingVerification ? renderVerificationForm() : renderSignInForm()}
         </View>
 
-        <View className="mt-8 items-center">
-          <Text className="text-[#F8F6F1] font-['Inter'] text-center">
+        <View style={{marginTop: 40, alignItems: 'center'}}>
+          <Text style={{textAlign: 'center'}}>
             {"Don't have an account?"}
             <Link href="/sign-up" asChild>
-              <Text className="text-[#D4AF37]">Sign Up</Text>
+              <Text style={{color: '#007AFF'}}>Sign Up</Text>
             </Link>
           </Text>
         </View>
