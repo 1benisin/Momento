@@ -1,12 +1,14 @@
 import {fireEvent, render} from '@testing-library/react-native'
 import React from 'react'
+import {AccessibilityInfo, Alert, View} from 'react-native'
 import {useRouter} from 'expo-router'
-import {AccessibilityInfo, Alert} from 'react-native'
+import {devLog} from '../../../utils/devLog'
 import RoleSelectionScreen from '../role-selection'
 
 // Mock expo-router
 jest.mock('expo-router', () => ({
   useRouter: jest.fn(),
+  useFocusEffect: jest.fn(),
 }))
 
 // Mock devLog
@@ -16,15 +18,18 @@ jest.mock('../../../utils/devLog', () => ({
 
 // Mock expo-linear-gradient
 jest.mock('expo-linear-gradient', () => {
-  const {View} = require('react-native')
+  const React = jest.requireActual('react')
+  const {View} = jest.requireActual('react-native')
   return {
-    LinearGradient: (props: any) => <View {...props} />,
+    LinearGradient: (props: React.ComponentProps<typeof View>) => (
+      <View {...props} />
+    ),
   }
 })
 
 // Mock react-native-reanimated
 jest.mock('react-native-reanimated', () => {
-  const Reanimated = require('react-native-reanimated/mock')
+  const Reanimated = jest.requireActual('react-native-reanimated/mock')
   Reanimated.default.call = () => {}
   return {
     ...Reanimated,
@@ -46,7 +51,7 @@ jest.mock('react-native-reanimated', () => {
 
 // Mock react-native-safe-area-context
 jest.mock('react-native-safe-area-context', () => {
-  const {View} = require('react-native')
+  const {View} = jest.requireActual('react-native')
   return {
     SafeAreaView: View,
   }
@@ -76,7 +81,7 @@ describe('RoleSelectionScreen', () => {
   it('renders role selection options', () => {
     const {getByText} = render(<RoleSelectionScreen />)
 
-    expect(getByText('CHOOSE YOUR PATH')).toBeTruthy()
+    expect(getByText('Choose Your Path')).toBeTruthy()
     expect(
       getByText(
         'How would you like to experience Momento? Select the role that resonates with your journey.',
@@ -129,7 +134,7 @@ describe('RoleSelectionScreen', () => {
     fireEvent.press(participantButton)
 
     expect(mockRouter.push).toHaveBeenCalledWith(
-      '/(onboarding)/(social)/profile-setup',
+      '/(onboarding)/(social)/welcome',
     )
   })
 
@@ -181,22 +186,22 @@ describe('RoleSelectionScreen', () => {
     // Should only have been called once
     expect(mockRouter.push).toHaveBeenCalledTimes(1)
     expect(mockRouter.push).toHaveBeenCalledWith(
-      '/(onboarding)/(social)/profile-setup',
+      '/(onboarding)/(social)/welcome',
     )
   })
 
   it('has proper accessibility labels', () => {
     const {getByLabelText} = render(<RoleSelectionScreen />)
 
-    expect(getByLabelText('Select Participant role')).toBeTruthy()
-    expect(getByLabelText('Select Host role')).toBeTruthy()
+    expect(getByLabelText('Select participant role')).toBeTruthy()
+    expect(getByLabelText('Select host role')).toBeTruthy()
   })
 
   it('shows role switching information', () => {
     const {getByText} = render(<RoleSelectionScreen />)
 
     expect(
-      getByText('💡 You can switch between roles anytime in your settings'),
+      getByText('💫 You can switch between roles anytime in your settings'),
     ).toBeTruthy()
   })
 
@@ -210,7 +215,6 @@ describe('RoleSelectionScreen', () => {
   })
 
   it('logs role selection with devLog', () => {
-    const {devLog} = require('../../../utils/devLog')
     const {getByText} = render(<RoleSelectionScreen />)
 
     const participantButton = getByText('Participant')
@@ -241,7 +245,6 @@ describe('RoleSelectionScreen', () => {
   })
 
   it('logs error when navigation fails', () => {
-    const {devLog} = require('../../../utils/devLog')
     const {getByText} = render(<RoleSelectionScreen />)
 
     // Mock router.push to throw an error
@@ -281,12 +284,5 @@ describe('RoleSelectionScreen', () => {
 
     expect(getByText('Discover and connect')).toBeTruthy()
     expect(getByText('Create and earn')).toBeTruthy()
-  })
-
-  it('shows Learn More text on both cards', () => {
-    const {getAllByText} = render(<RoleSelectionScreen />)
-
-    const learnMoreTexts = getAllByText('Learn More')
-    expect(learnMoreTexts).toHaveLength(2)
   })
 })

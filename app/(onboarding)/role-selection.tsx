@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState} from 'react'
 import {
   AccessibilityInfo,
   ActivityIndicator,
@@ -8,9 +8,9 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
-import {useRouter, useFocusEffect} from 'expo-router'
-import {SafeAreaView} from 'react-native-safe-area-context'
+import {useFocusEffect, useRouter} from 'expo-router'
 import {StatusBar} from 'expo-status-bar'
+import {SafeAreaView} from 'react-native-safe-area-context'
 import {devLog} from '../../utils/devLog'
 
 export default function RoleSelectionScreen() {

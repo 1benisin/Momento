@@ -8,56 +8,6 @@ jest.mock('@clerk/clerk-expo', () => ({
   useSignUp: jest.fn(),
 }))
 
-jest.mock('react-native-phone-number-input', () => {
-  // Use jest.requireActual to load the real dependencies
-  const React = jest.requireActual('react')
-  const {View, TextInput} = jest.requireActual('react-native')
-
-  const PhoneNumberInput = React.forwardRef(
-    (
-      props: {
-        onChangeText?: (text: string) => void
-        onChangeFormattedText?: (text: string) => void
-        defaultValue?: string
-      },
-      ref: React.Ref<{isValidNumber: (value: string) => boolean}>,
-    ) => {
-      const {onChangeText, onChangeFormattedText, defaultValue} = props
-      if (ref) {
-        const refObj = ref as React.RefObject<{
-          isValidNumber: (value: string) => boolean
-        }>
-        if (refObj && 'current' in refObj) {
-          refObj.current = {
-            isValidNumber: (value: string) => {
-              // simple validation for testing
-              return !!value && value.length > 5
-            },
-          }
-        }
-      }
-      return (
-        <View>
-          <TextInput
-            testID="phone-input"
-            defaultValue={defaultValue}
-            onChangeText={(text: string) => {
-              if (onChangeText) onChangeText(text)
-              if (onChangeFormattedText) onChangeFormattedText(`+1${text}`)
-            }}
-          />
-        </View>
-      )
-    },
-  )
-  PhoneNumberInput.displayName = 'PhoneNumberInput'
-
-  return {
-    __esModule: true,
-    default: PhoneNumberInput,
-  }
-})
-
 jest.mock('expo-router', () => ({
   useRouter: () => ({
     push: jest.fn(),
@@ -93,13 +43,13 @@ describe('SignUpScreen', () => {
   })
 
   it('calls sign up with phone on valid submission', async () => {
-    const {getByText, getByTestId} = render(<SignUpScreen />)
-    fireEvent.changeText(getByTestId('phone-input'), '1234567890')
+    const {getByText, getByPlaceholderText} = render(<SignUpScreen />)
+    fireEvent.changeText(getByPlaceholderText('+1...'), '1234567890')
     fireEvent.press(getByText('Sign Up'))
 
     await waitFor(() => {
       expect(mockSignUp.signUp.create).toHaveBeenCalledWith({
-        phoneNumber: '+11234567890',
+        phoneNumber: '1234567890',
       })
       expect(
         mockSignUp.signUp.preparePhoneNumberVerification,
@@ -108,13 +58,15 @@ describe('SignUpScreen', () => {
   })
 
   it('shows an error message if sign up fails', async () => {
-    const {getByText, getByTestId, findByText} = render(<SignUpScreen />)
+    const {getByText, getByPlaceholderText, findByText} = render(
+      <SignUpScreen />,
+    )
     const errorMessage = 'This phone number is already in use.'
     mockSignUp.signUp.create.mockRejectedValueOnce({
       errors: [{longMessage: errorMessage}],
     })
 
-    fireEvent.changeText(getByTestId('phone-input'), '1234567890')
+    fireEvent.changeText(getByPlaceholderText('+1...'), '1234567890')
     fireEvent.press(getByText('Sign Up'))
 
     const error = await findByText(errorMessage)
@@ -122,10 +74,8 @@ describe('SignUpScreen', () => {
   })
 
   it('calls phone verification and sets active session', async () => {
-    const {getByText, getByTestId, getByPlaceholderText} = render(
-      <SignUpScreen />,
-    )
-    fireEvent.changeText(getByTestId('phone-input'), '1234567890')
+    const {getByText, getByPlaceholderText} = render(<SignUpScreen />)
+    fireEvent.changeText(getByPlaceholderText('+1...'), '1234567890')
     fireEvent.press(getByText('Sign Up'))
 
     await waitFor(() => {
@@ -181,6 +131,10 @@ describe('SignUpScreen', () => {
       getByPlaceholderText('email@example.com'),
       'test@user.com',
     )
+
+    mockSignUp.signUp.create.mockResolvedValueOnce({})
+    mockSignUp.signUp.prepareEmailAddressVerification.mockResolvedValueOnce({})
+
     fireEvent.press(getByText('Sign Up'))
 
     await waitFor(() => {
@@ -195,6 +149,10 @@ describe('SignUpScreen', () => {
       getByPlaceholderText('email@example.com'),
       'test@user.com',
     )
+
+    mockSignUp.signUp.create.mockResolvedValueOnce({})
+    mockSignUp.signUp.prepareEmailAddressVerification.mockResolvedValueOnce({})
+
     fireEvent.press(getByText('Sign Up'))
 
     await waitFor(() => {
